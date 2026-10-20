@@ -10,3 +10,5 @@ jobs:
     with:
       standard-repository: ALacambraPoCs/harness-standard-lab
       cli-ref: cli-v0.1.1
+    secrets:
+      standard-token: ${{ secrets.HARNESS_STANDARD_TOKEN }}

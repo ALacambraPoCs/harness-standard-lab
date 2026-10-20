@@ -1,0 +1,93 @@
+# Workflow reutilizable de conformidad (producto B). Lo llaman las instancias:
+#
+#   jobs:
+#     conformance:
+#       uses: <owner>/<repo-estandar>/.github/workflows/harness-conformance.yml@cli-v0.1.0
+#       with:
+#         standard-repository: <owner>/<repo-estandar>   # p. ej. ALacambraPoCs/harness-standard-lab
+#         cli-ref: cli-v0.1.0                            # mantener igual que el ref de `uses`
+#
+# Seguridad (ADR-013): sin secretos del modelo, `contents: read`, credenciales de checkout no persistidas.
+# Nota: con run-commands=true se ejecutan `setup` y `check` del PR, como en cualquier CI de PR;
+# por eso este job no recibe secretos ni permisos de escritura.
+name: harness-conformance
+
+on:
+  workflow_call:
+    inputs:
+      standard-repository:
+        description: Repositorio del estándar (owner/name). Si se omite, <owner de la instancia>/harness-standard.
+        type: string
+        default: ""
+      cli-ref:
+        description: Tag o SHA del estándar/CLI a usar. Debe coincidir con el ref de `uses`.
+        type: string
+        default: cli-v0.1.0
+      run-commands:
+        description: Ejecutar setup/check del contrato de comandos (HS-VER-002/003).
+        type: boolean
+        default: true
+      strict:
+        description: Tratar avisos (DEBERÍA) como errores.
+        type: boolean
+        default: false
+      python-version:
+        type: string
+        default: "3.12"
+    secrets:
+      standard-token:
+        description: Token de solo lectura si el repositorio del estándar es privado.
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  harness-check:
+    name: harness check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout instancia
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Checkout estándar
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.standard-repository != '' && inputs.standard-repository || format('{0}/harness-standard', github.repository_owner) }}
+          ref: ${{ inputs.cli-ref }}
+          path: .harness-standard
+          token: ${{ secrets.standard-token || github.token }}
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Instalar CLI
+        run: python -m pip install --disable-pip-version-check ./.harness-standard
+
+      - name: harness check
+        shell: bash
+        run: |
+          args=(check --path .)
+          [ "${{ inputs.run-commands }}" = "true" ] && args+=(--run-commands)
+          [ "${{ inputs.strict }}" = "true" ] && args+=(--strict)
+          set +e
+          harness "${args[@]}" --json-out harness-report.json | tee harness-report.txt
+          code=${PIPESTATUS[0]}
+          set -e
+          { echo '## harness check'; echo '```'; cat harness-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $code
+
+      - name: Publicar informe
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: harness-report
+          path: |
+            harness-report.json
+            harness-report.txt
+          if-no-files-found: ignore

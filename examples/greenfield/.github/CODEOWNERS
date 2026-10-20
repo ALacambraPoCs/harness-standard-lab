@@ -1,0 +1,14 @@
+# Propietario por defecto
+*                         @AlbertoLacambra
+
+# Configuración de agentes y CI (ADR-013) — al final: gana el último patrón que coincide
+/AGENTS.md                @AlbertoLacambra
+**/AGENTS.md              @AlbertoLacambra
+/CLAUDE.md                @AlbertoLacambra
+**/CLAUDE.md              @AlbertoLacambra
+/.claude/                 @AlbertoLacambra
+/.agents/                 @AlbertoLacambra
+/.mcp.json                @AlbertoLacambra
+/.harness/                @AlbertoLacambra
+/.github/workflows/       @AlbertoLacambra
+/.github/CODEOWNERS       @AlbertoLacambra

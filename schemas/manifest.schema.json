@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harness-standard.local/schemas/manifest/0.1.0",
+  "title": "Manifiesto de instancia del Estándar de Harness",
+  "description": "Archivo .harness/manifest.yaml (ADR-004). Versión de esquema 0.1.0.",
+  "type": "object",
+  "required": ["standard", "project", "adapters", "commands"],
+  "additionalProperties": false,
+  "patternProperties": { "^x-": {} },
+  "properties": {
+    "standard": {
+      "type": "object",
+      "required": ["version", "level"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string", "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$" },
+        "level": { "enum": ["N0", "N1", "N2", "N3"] }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": ["name", "owner", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$", "maxLength": 100 },
+        "owner": { "type": "string", "pattern": "^(@[A-Za-z0-9][A-Za-z0-9-]*(/[A-Za-z0-9._-]+)?|[^@\\s]+@[^@\\s]+)$", "description": "Usuario o equipo de GitHub (@org/equipo) o email." },
+        "kind": { "enum": ["service", "library", "application", "infrastructure", "monorepo", "other"] },
+        "docs_language": { "type": "string", "pattern": "^[a-z]{2}(-[A-Z]{2})?$", "description": "Idioma de los documentos de la instancia (Q-02)." }
+      }
+    },
+    "adapters": {
+      "type": "object",
+      "required": ["agents", "platform"],
+      "additionalProperties": false,
+      "properties": {
+        "agents": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": ["id", "min_version"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "enum": ["claude-code"] },
+              "min_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+            }
+          }
+        },
+        "platform": {
+          "type": "object",
+          "required": ["id"],
+          "additionalProperties": false,
+          "properties": { "id": { "enum": ["github"] } }
+        }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "description": "Contrato de comandos (ADR-006).",
+      "required": ["setup", "check", "test"],
+      "additionalProperties": false,
+      "properties": {
+        "setup": { "$ref": "#/$defs/command" },
+        "check": { "$ref": "#/$defs/command" },
+        "test":  { "$ref": "#/$defs/command" },
+        "e2e":   { "$ref": "#/$defs/command" },
+        "build": { "$ref": "#/$defs/command" },
+        "dev":   { "$ref": "#/$defs/command" },
+        "clean": { "$ref": "#/$defs/command" }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "description": "Solo roles reubicables cuya ruta difiere de la por defecto.",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_.-]*$" },
+      "additionalProperties": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.)" }
+    },
+    "segments": { "type": "string", "description": "Ruta del mapa de segmentos (Fase 4)." },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "instructions_max_lines": { "type": "integer", "minimum": 20, "maximum": 2000 }
+      }
+    },
+    "waivers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requirement", "reason", "approved_by", "approved_on", "expires"],
+        "additionalProperties": false,
+        "properties": {
+          "requirement": { "type": "string", "pattern": "^HS-[A-Z]{2,3}-\\d{3}$" },
+          "reason": { "type": "string", "minLength": 10 },
+          "approved_by": { "type": "string", "minLength": 2 },
+          "approved_on": { "type": "string", "format": "date" },
+          "expires": { "type": "string", "format": "date" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "command": { "type": "string", "minLength": 1, "maxLength": 500 }
+  }
+}

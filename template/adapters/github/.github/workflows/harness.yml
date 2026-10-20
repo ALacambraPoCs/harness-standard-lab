@@ -1,0 +1,13 @@
+# Check de conformidad (HS-GOV-004). Márcalo como status check requerido en el ruleset de la rama principal.
+name: harness
+on:
+  pull_request:
+  merge_group:
+permissions:
+  contents: read
+jobs:
+  conformance:
+    uses: {{STANDARD_REPO}}/.github/workflows/harness-conformance.yml@{{CLI_REF}}
+    with:
+      standard-repository: {{STANDARD_REPO}}
+      cli-ref: {{CLI_REF}}

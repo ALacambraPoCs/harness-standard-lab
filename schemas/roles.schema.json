@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harness-standard.local/schemas/roles/0.1.0",
+  "title": "Registro de roles de archivo",
+  "type": "object",
+  "required": ["version_estandar", "roles", "rutas_sensibles"],
+  "additionalProperties": false,
+  "properties": {
+    "version_estandar": { "type": "string" },
+    "roles": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_.-]*$" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["ruta", "tipo", "reubicable", "capa", "nivel_minimo", "descripcion"],
+        "additionalProperties": false,
+        "properties": {
+          "ruta": { "type": "string" },
+          "alternativas": { "type": "array", "items": { "type": "string" } },
+          "tipo": { "enum": ["archivo", "directorio"] },
+          "reubicable": { "type": "boolean" },
+          "capa": { "type": "string", "pattern": "^(nucleo|adaptador:[a-z-]+)$" },
+          "nivel_minimo": { "enum": ["N0", "N1", "N2", "N3"] },
+          "descripcion": { "type": "string" }
+        }
+      }
+    },
+    "rutas_sensibles": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+  }
+}

@@ -1,0 +1,420 @@
+# Registro de requisitos del Estándar de Harness.
+# Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
+# Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
+version_estandar: 0.1.0
+# Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
+niveles_definidos: [N0]
+requisitos:
+
+  # ───────────────────────── GOBIERNO ─────────────────────────
+  - id: HS-GOV-001
+    titulo: Existe un manifiesto de instancia válido
+    texto: >-
+      La instancia DEBE contener `.harness/manifest.yaml` y este DEBE validar contra
+      `schemas/manifest.schema.json`.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [core.manifest.valid]
+    fuentes: [decision-propia, ADR-004]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si la conformidad pasa a declararse en un sistema externo versionado equivalente.
+
+  - id: HS-GOV-002
+    titulo: El manifiesto declara una versión soportada del estándar y un nivel definido
+    texto: >-
+      `standard.version` DEBE ser una versión SemVer del estándar publicada y soportada
+      por la versión de la CLI que la valida, y `standard.level` DEBE ser un nivel con
+      requisitos definidos en esa versión.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [core.manifest.standard-version]
+    fuentes: [decision-propia, ADR-001]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca mientras exista versionado del estándar.
+
+  - id: HS-GOV-003
+    titulo: Los waivers son válidos y están vigentes
+    texto: >-
+      Cada waiver DEBE referirse a un requisito existente y exentable, DEBE indicar motivo,
+      aprobador, fecha de aprobación y caducidad, NO DEBE superar 90 días entre aprobación
+      y caducidad y NO DEBE estar caducado.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [core.waivers.valid]
+    fuentes: [decision-propia, ADR-007]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si se sustituye por un registro de excepciones centralizado.
+
+  - id: HS-GOV-004
+    titulo: La CI ejecuta el check de conformidad en cada PR como check requerido
+    texto: >-
+      Un workflow de la instancia DEBE ejecutar `harness check` (directamente o mediante el
+      workflow reutilizable `harness-conformance.yml`) en `pull_request`, y el ruleset de la rama
+      principal DEBE exigirlo como status check requerido.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: semiautomatica
+    verificacion_manual: >-
+      Hasta la Fase 5, el propietario de la instancia confirma en el ruleset de GitHub que el
+      check es requerido. La regla automática solo comprueba que el workflow existe y se dispara en PR.
+    exentable: false
+    reglas: [core.ci.conformance-workflow]
+    fuentes: [S-GH, ADR-009]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca mientras la conformidad se compruebe en CI.
+
+  - id: HS-GOV-005
+    titulo: Todo requisito de enforcement está respaldado por un control L4 o L5
+    texto: >-
+      Cada requisito del estándar con `naturaleza: enforcement` DEBE estar respaldado por al menos
+      un control de CI (L4) o de plataforma (L5). Los hooks `prompt` o `agent` NO DEBEN contarse como control.
+    nivel: DEBE
+    ambito: estandar
+    conformidad: []
+    naturaleza: enforcement
+    verificacion: manual
+    verificacion_manual: Lo revisa el grupo de gobierno en cada cambio normativo (GOVERNANCE.md §2).
+    exentable: false
+    reglas: []
+    fuentes: [S-CC-MEM, S-VILA, ADR-009]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.
+
+  - id: HS-GOV-006
+    titulo: Solo se reubican roles reubicables y hacia rutas existentes
+    texto: >-
+      Cada entrada de `roles` del manifiesto DEBE referirse a un rol registrado en `roles.yaml`
+      con `reubicable: true` y DEBE apuntar a una ruta existente del tipo correcto (archivo o directorio).
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [core.roles.relocation]
+    fuentes: [decision-propia, ADR-004]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si se elimina la reubicación de roles.
+
+  # ───────────────────────── INSTRUCCIONES ─────────────────────────
+  - id: HS-INS-001
+    titulo: Existe AGENTS.md en la raíz
+    texto: La instancia DEBE tener un archivo `AGENTS.md` en la raíz del repositorio (rol `instructions.root`).
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: false
+    reglas: [core.instructions.root-exists]
+    fuentes: [S-AGENTSMD, S-OAI-HE#p5, ADR-003]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si AGENTS.md deja de ser un formato soportado por los adaptadores de la organización.
+
+  - id: HS-INS-002
+    titulo: AGENTS.md cita los comandos canónicos del manifiesto
+    texto: >-
+      `AGENTS.md` raíz DEBE contener, literalmente, las invocaciones de `setup`, `check` y `test`
+      declaradas en `commands` del manifiesto.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.commands-match]
+    fuentes: [S-LHE#L02, decision-propia, ADR-006]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si los adaptadores inyectan los comandos del manifiesto automáticamente en el contexto.
+
+  - id: HS-INS-004
+    titulo: Las instrucciones no contienen estado de tareas
+    texto: >-
+      Los archivos de instrucciones (AGENTS.md, CLAUDE.md, reglas, skills) NO DEBEN contener estado
+      de tareas (progreso, pendientes, bloqueos); este vive en los archivos de tarea (ADR-005).
+    nivel: NO DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: manual
+    verificacion_manual: Revisión en PR por CODEOWNERS de instrucciones (HS-SEC-002).
+    exentable: true
+    reglas: []
+    fuentes: [S-OAI-HE#p5, S-LHE#L04, ADR-005]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.
+
+  - id: HS-INS-005
+    titulo: Imports y enlaces de las instrucciones se resuelven
+    texto: >-
+      Todos los `@imports` (p. ej. `@AGENTS.md`) y enlaces Markdown relativos de los archivos
+      AGENTS.md y CLAUDE.md DEBEN resolverse a rutas existentes del repositorio.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.references-resolve]
+    fuentes: [S-CC-MEM, S-VILA#p20]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si las herramientas fallan de forma visible ante imports rotos.
+
+  - id: HS-INS-006
+    titulo: CLAUDE.md importa AGENTS.md (adaptador claude-code)
+    texto: >-
+      Si el manifiesto declara el adaptador `claude-code`, DEBE existir `CLAUDE.md` en la raíz y
+      DEBE contener una línea `@AGENTS.md` fuera de bloques de código.
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: false
+    reglas: [adapter.claude.imports-agents]
+    fuentes: [S-CC-MEM#agents-md, ADR-003]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si Claude Code carga AGENTS.md de forma incondicional en todas sus superficies.
+
+  - id: HS-INS-007
+    titulo: CLAUDE.md no duplica AGENTS.md (adaptador claude-code)
+    texto: >-
+      `CLAUDE.md` NO DEBE repetir encabezados ni líneas sustantivas de `AGENTS.md`; solo PUEDE
+      añadir contenido exclusivo de Claude Code.
+    nivel: NO DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.no-duplication]
+    fuentes: [S-LHE#L04, ADR-003]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.
+
+  - id: HS-INS-008
+    titulo: AGENTS.md enlaza a los documentos núcleo
+    texto: >-
+      `AGENTS.md` raíz DEBERÍA enlazar (enlace Markdown relativo) al mapa de arquitectura, al registro
+      de decisiones y a la política de seguridad. Es aceptable omitir un enlace si su contenido está
+      resumido en el propio AGENTS.md y el documento no existe por waiver.
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.links-core-docs]
+    fuentes: [S-OAI-HE#p5, S-LHE#L04]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si la CLI genera el índice de AGENTS.md automáticamente.
+
+  # ───────────────────────── CONTEXTO ─────────────────────────
+  - id: HS-CTX-001
+    titulo: Presupuesto de tamaño de las instrucciones
+    texto: >-
+      Cada archivo AGENTS.md o CLAUDE.md DEBERÍA tener como máximo `budgets.instructions_max_lines`
+      líneas (200 por defecto, ajustable en el manifiesto). Es aceptable superarlo transitoriamente
+      durante la adopción de un brownfield, con waiver.
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.size-budget]
+    fuentes: [S-CC-MEM, S-OAI-HE#p5, ADR-009]
+    nota: El umbral es un valor por defecto ajustable; la evidencia sobre el óptimo es débil (F0-01, C4).
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si las evaluaciones del harness (Fase 6) muestran que el tamaño no afecta a calidad ni coste.
+
+  # ───────────────────────── ARQUITECTURA ─────────────────────────
+  - id: HS-ARC-001
+    titulo: Existe el mapa de arquitectura
+    texto: La instancia DEBE tener un mapa de arquitectura (rol `architecture.map`).
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.architecture.map-exists]
+    fuentes: [S-OAI-HE#p6, S-LHE#L03]
+    nota: El contenido mínimo se especifica en la ficha de la Fase 2.
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.
+
+  - id: HS-ARC-002
+    titulo: Existe el registro de decisiones del proyecto
+    texto: >-
+      La instancia DEBE tener un directorio de decisiones (rol `decisions.dir`) con al menos un
+      archivo Markdown (índice o ADR).
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.decisions.exists]
+    fuentes: [S-LHE#L05, S-OAI-HE#p6]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.
+
+  # ───────────────────────── SEGURIDAD ─────────────────────────
+  - id: HS-SEC-001
+    titulo: Existe la política de seguridad del repositorio
+    texto: La instancia DEBE tener una política de seguridad (rol `security.policy`).
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.security.doc-exists]
+    fuentes: [S-OAI-HE, S-MCP]
+    nota: Contenido mínimo (amenazas, secretos, acciones que requieren aprobación) en Fase 2/5.
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.
+
+  - id: HS-SEC-002
+    titulo: CODEOWNERS protege la configuración de agentes
+    texto: >-
+      DEBE existir un archivo CODEOWNERS en una de las ubicaciones que reconoce GitHub y, aplicando
+      su semántica (gana el último patrón que coincide), cada ruta sensible de `roles.yaml#rutas_sensibles`
+      DEBE tener al menos un propietario.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [core.codeowners.sensitive-paths]
+    fuentes: [S-GH, S-VILA#p29, ADR-013]
+    nota: >-
+      La exigencia de revisión de code owner en el ruleset (L5) se verifica en la Fase 5; hasta entonces,
+      verificación manual del propietario de la instancia.
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca mientras exista configuración de agentes versionada.
+
+  - id: HS-SEC-003
+    titulo: Los archivos personales del agente no se versionan (adaptador claude-code)
+    texto: >-
+      Si el manifiesto declara `claude-code`, `.gitignore` raíz DEBE ignorar `CLAUDE.local.md` y
+      `.claude/settings.local.json`.
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.local-files-ignored]
+    fuentes: [S-CC-MEM, S-CC-SET]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Si Claude Code deja de usar archivos locales en el árbol del proyecto.
+
+  - id: HS-SEC-004
+    titulo: No hay secretos versionados
+    texto: >-
+      El repositorio NO DEBE contener secretos (claves, tokens, contraseñas). Se DEBERÍA activar el
+      secret scanning y la push protection de la plataforma.
+    nivel: NO DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: manual
+    verificacion_manual: >-
+      Hasta la Fase 5, el propietario confirma que secret scanning y push protection de GitHub están
+      activos. En la Fase 5 se añade una regla automática.
+    exentable: false
+    reglas: []
+    fuentes: [S-GH, S-LHE#L12]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.
+
+  # ───────────────────────── VERIFICACIÓN / COMANDOS ─────────────────────────
+  - id: HS-VER-001
+    titulo: El manifiesto declara los comandos obligatorios
+    texto: '`commands` DEBE declarar `setup`, `check` y `test` (ADR-006).'
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: false
+    reglas: [core.commands.declared]
+    fuentes: [S-LHE#L02, S-LHE#L06, ADR-006]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.
+
+  - id: HS-VER-002
+    titulo: setup y check terminan correctamente sin interacción
+    texto: >-
+      Ejecutados desde la raíz con la entrada estándar cerrada, `setup` y después `check` DEBEN
+      terminar con código 0 en un entorno limpio.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: true
+    reglas: [core.commands.execute]
+    fuentes: [S-LHE#L06, S-OAI-HE#p3, ADR-006]
+    nota: Solo se evalúa con `harness check --run-commands` (activado por defecto en el workflow reutilizable).
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.
+
+  - id: HS-VER-003
+    titulo: setup es idempotente
+    texto: >-
+      Ejecutar `setup` dos veces seguidas DEBERÍA terminar con código 0 ambas veces. Es aceptable
+      no cumplirlo si `setup` requiere un entorno efímero por diseño, documentado en AGENTS.md.
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.commands.idempotent]
+    fuentes: [ADR-006]
+    estado: aprobado
+    desde: 0.1.0
+    retirada: Nunca.

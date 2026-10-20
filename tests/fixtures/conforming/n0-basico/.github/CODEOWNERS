@@ -1,0 +1,14 @@
+# Propietario por defecto
+*                         @org/equipo-ejemplo
+
+# Configuración de agentes y CI (ADR-013) — al final: gana el último patrón que coincide
+/AGENTS.md                @org/harness-owners
+**/AGENTS.md              @org/harness-owners
+/CLAUDE.md                @org/harness-owners
+**/CLAUDE.md              @org/harness-owners
+/.claude/                 @org/harness-owners @org/security
+/.agents/                 @org/harness-owners
+/.mcp.json                @org/security
+/.harness/                @org/harness-owners
+/.github/workflows/       @org/platform @org/security
+/.github/CODEOWNERS       @org/platform @org/security

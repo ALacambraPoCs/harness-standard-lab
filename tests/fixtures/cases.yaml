@@ -1,0 +1,250 @@
+# Casos de autotest del producto B (ADR-001: requisito ↔ regla ↔ fixture).
+# Cada caso copia una instancia base, aplica mutaciones y comprueba qué reglas fallan.
+# - conforming: true  → no debe fallar ninguna regla (ni avisos).
+# - expect_fail       → conjunto EXACTO de reglas que deben fallar (más `allow_also`).
+# Operaciones: delete | write {path, content} | append {path, content} | replace {path, old, new}
+casos:
+  # ─────────────── Conformes ───────────────
+  - id: c-n0-basico
+    base: conforming/n0-basico
+    conforming: true
+    run_commands: true
+    expect_effective_level: N0
+
+  - id: c-n0-reubicado-con-waiver
+    base: conforming/n0-reubicado
+    conforming: true
+    run_commands: true
+    today: 2026-10-19
+    expect_effective_level: N0
+
+  # ─────────────── Gobierno ───────────────
+  - id: nc-manifiesto-ausente
+    base: conforming/n0-basico
+    mutations: [{delete: .harness/manifest.yaml}]
+    expect_fail: [core.manifest.valid]
+    expect_effective_level: null
+
+  - id: nc-manifiesto-esquema
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "level: N0", new: "level: N7"}
+    expect_fail: [core.manifest.valid]
+
+  - id: nc-version-no-soportada
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.1.0", new: "version: 0.9.0"}
+    expect_fail: [core.manifest.standard-version]
+
+  - id: nc-nivel-no-definido
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "level: N0", new: "level: N2"}
+    expect_fail: [core.manifest.standard-version]
+    expect_effective_level: null   # declarar un nivel no definido incumple HS-GOV-002 (DEBE, nivel N0)
+
+  - id: nc-waiver-no-exentable
+    base: conforming/n0-basico
+    mutations:
+      - append:
+          path: .harness/manifest.yaml
+          content: |
+            waivers:
+              - requirement: HS-SEC-002
+                reason: Intento de eximir CODEOWNERS sensible.
+                approved_by: "@alguien"
+                approved_on: 2026-10-01
+                expires: 2026-11-01
+    expect_fail: [core.waivers.valid]
+
+  - id: nc-waiver-caducado
+    base: conforming/n0-basico
+    mutations:
+      - delete: docs/architecture/ARCHITECTURE.md
+      - append:
+          path: .harness/manifest.yaml
+          content: |
+            waivers:
+              - requirement: HS-ARC-001
+                reason: Mapa pendiente de redactar tras el refactor.
+                approved_by: "@lider"
+                approved_on: 2026-08-01
+                expires: 2026-09-01
+    # El waiver caducado no se aplica: fallan también el rol y el enlace roto.
+    expect_fail: [core.waivers.valid, core.architecture.map-exists, core.instructions.references-resolve]
+
+  - id: nc-waiver-demasiado-largo
+    base: conforming/n0-basico
+    mutations:
+      - append:
+          path: .harness/manifest.yaml
+          content: |
+            waivers:
+              - requirement: HS-CTX-001
+                reason: Presupuesto relajado durante la migración.
+                approved_by: "@lider"
+                approved_on: 2026-10-01
+                expires: 2027-03-01
+    expect_fail: [core.waivers.valid]
+
+  - id: nc-rol-no-reubicable
+    base: conforming/n0-basico
+    mutations:
+      - append:
+          path: .harness/manifest.yaml
+          content: |
+            roles:
+              instructions.root: README.md
+    expect_fail: [core.roles.relocation]
+
+  - id: nc-rol-ruta-inexistente
+    base: conforming/n0-basico
+    mutations:
+      - append:
+          path: .harness/manifest.yaml
+          content: |
+            roles:
+              architecture.map: docs/no-existe.md
+    expect_fail: [core.roles.relocation, core.architecture.map-exists, core.instructions.links-core-docs]
+
+  - id: nc-ci-ausente
+    base: conforming/n0-basico
+    mutations: [{delete: .github/workflows/harness.yml}]
+    expect_fail: [core.ci.conformance-workflow]
+
+  - id: nc-ci-sin-pull-request
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: .github/workflows/harness.yml, old: "  pull_request:\n", new: "  push:\n"}
+    expect_fail: [core.ci.conformance-workflow]
+
+  # ─────────────── Instrucciones ───────────────
+  - id: nc-agents-ausente
+    base: conforming/n0-basico
+    mutations: [{delete: AGENTS.md}]
+    expect_fail: [core.instructions.root-exists, core.instructions.references-resolve]
+
+  - id: nc-comandos-no-citados
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: AGENTS.md, old: "`python3 -m unittest discover -s tests`", new: "`pytest`"}
+    expect_fail: [core.instructions.commands-match]
+
+  - id: nc-import-roto
+    base: conforming/n0-basico
+    mutations:
+      - append: {path: CLAUDE.md, content: "\n@docs/no-existe.md\n"}
+    expect_fail: [core.instructions.references-resolve]
+
+  - id: nc-enlace-roto-y-ruta-personal
+    base: conforming/n0-basico
+    mutations:
+      - append: {path: AGENTS.md, content: "\n- Guía: [guía](docs/guia.md)\n- Personal: @~/notas.md\n"}
+    expect_fail: [core.instructions.references-resolve]
+
+  - id: nc-sin-enlaces-nucleo
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: AGENTS.md, old: "[SECURITY.md](docs/security/SECURITY.md)", new: "SECURITY.md"}
+    expect_fail: [core.instructions.links-core-docs]
+
+  - id: nc-presupuesto-superado
+    base: conforming/n0-basico
+    mutations:
+      - append: {path: .harness/manifest.yaml, content: "budgets:\n  instructions_max_lines: 20\n"}
+    expect_fail: [core.instructions.size-budget]
+
+  - id: nc-claude-sin-import
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: CLAUDE.md, old: "@AGENTS.md", new: "Lee AGENTS.md antes de empezar."}
+    expect_fail: [adapter.claude.imports-agents]
+
+  - id: nc-claude-import-en-codigo
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: CLAUDE.md, old: "@AGENTS.md", new: "```\n@AGENTS.md\n```"}
+    expect_fail: [adapter.claude.imports-agents]
+
+  - id: nc-claude-duplica
+    base: conforming/n0-basico
+    mutations:
+      - append:
+          path: CLAUDE.md
+          content: |
+            ## Restricciones duras
+            - No añadas dependencias sin un ADR en [decisiones](docs/decisions/README.md).
+    expect_fail: [adapter.claude.no-duplication]
+
+  - id: nc-claude-ausente
+    base: conforming/n0-basico
+    mutations: [{delete: CLAUDE.md}]
+    expect_fail: [adapter.claude.imports-agents]
+
+  # ─────────────── Arquitectura y seguridad ───────────────
+  - id: nc-mapa-ausente
+    base: conforming/n0-basico
+    mutations: [{delete: docs/architecture/ARCHITECTURE.md}]
+    expect_fail: [core.architecture.map-exists, core.instructions.references-resolve]
+
+  - id: nc-decisiones-ausentes
+    base: conforming/n0-basico
+    mutations: [{delete: docs/decisions}]
+    expect_fail: [core.decisions.exists, core.instructions.references-resolve]
+
+  - id: nc-seguridad-ausente
+    base: conforming/n0-basico
+    mutations: [{delete: docs/security/SECURITY.md}]
+    expect_fail: [core.security.doc-exists, core.instructions.references-resolve]
+
+  - id: nc-codeowners-ausente
+    base: conforming/n0-basico
+    mutations: [{delete: .github/CODEOWNERS}]
+    expect_fail: [core.codeowners.sensitive-paths]
+
+  - id: nc-codeowners-anulado-por-ultimo-patron
+    base: conforming/n0-basico
+    mutations:
+      - append: {path: .github/CODEOWNERS, content: "/.claude/\n"}
+    expect_fail: [core.codeowners.sensitive-paths]
+
+  - id: nc-codeowners-sin-mcp
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: .github/CODEOWNERS, old: "*                         @org/equipo-ejemplo\n", new: ""}
+      - replace: {path: .github/CODEOWNERS, old: "/.mcp.json                @org/security\n", new: ""}
+    expect_fail: [core.codeowners.sensitive-paths]
+
+  - id: nc-gitignore-local
+    base: conforming/n0-basico
+    mutations: [{delete: .gitignore}]
+    expect_fail: [adapter.claude.local-files-ignored]
+
+  # ─────────────── Comandos ───────────────
+  - id: nc-comandos-no-declarados
+    base: conforming/n0-basico
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "  test: python3 -m unittest discover -s tests\n", new: ""}
+    expect_fail: [core.manifest.valid, core.commands.declared]
+
+  - id: nc-setup-falla
+    base: conforming/n0-basico
+    run_commands: true
+    mutations:
+      - write: {path: scripts/setup.py, content: "import sys\nsys.exit(3)\n"}
+    expect_fail: [core.commands.execute, core.commands.idempotent]
+
+  - id: nc-setup-no-idempotente
+    base: conforming/n0-basico
+    run_commands: true
+    mutations:
+      - write:
+          path: scripts/setup.py
+          content: |
+            import pathlib, sys
+            marker = pathlib.Path(".setup-done")
+            if marker.exists():
+                sys.exit("setup ya ejecutado")
+            marker.write_text("ok")
+    expect_fail: [core.commands.idempotent]

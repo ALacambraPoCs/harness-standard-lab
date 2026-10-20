@@ -1,0 +1,100 @@
+# Registro de roles de archivo (ADR-004). Validado por schemas/roles.schema.json.
+# Cada rol tiene una ruta por defecto. Solo los roles con `reubicable: true` pueden
+# declarar otra ruta en `roles` del manifiesto. `alternativas` son ubicaciones
+# que la herramienta destino reconoce por sí misma (se buscan en orden).
+version_estandar: 0.1.0
+roles:
+  manifest:
+    ruta: .harness/manifest.yaml
+    tipo: archivo
+    reubicable: false
+    capa: nucleo
+    nivel_minimo: N0
+    descripcion: Manifiesto de la instancia.
+  instructions.root:
+    ruta: AGENTS.md
+    tipo: archivo
+    reubicable: false
+    capa: nucleo
+    nivel_minimo: N0
+    descripcion: Índice de instrucciones para agentes (AGENTS.md raíz).
+  architecture.map:
+    ruta: docs/architecture/ARCHITECTURE.md
+    tipo: archivo
+    reubicable: true
+    capa: nucleo
+    nivel_minimo: N0
+    descripcion: Mapa de dominios, capas, límites y dependencias.
+  decisions.dir:
+    ruta: docs/decisions
+    tipo: directorio
+    reubicable: true
+    capa: nucleo
+    nivel_minimo: N0
+    descripcion: Registro de decisiones (ADR) del proyecto.
+  security.policy:
+    ruta: docs/security/SECURITY.md
+    tipo: archivo
+    reubicable: true
+    capa: nucleo
+    nivel_minimo: N0
+    descripcion: Política de seguridad del repositorio y del uso de agentes.
+  plans.dir:
+    ruta: docs/plans
+    tipo: directorio
+    reubicable: true
+    capa: nucleo
+    nivel_minimo: N1
+    descripcion: Tareas y planes de ejecución (ADR-005). Se especifica en la Fase 2.
+  segments.map:
+    ruta: .harness/segments.yaml
+    tipo: archivo
+    reubicable: false
+    capa: nucleo
+    nivel_minimo: N2
+    descripcion: Mapa de segmentos (ADR-014). Se especifica en la Fase 4.
+  codeowners:
+    ruta: .github/CODEOWNERS
+    alternativas: [.github/CODEOWNERS, CODEOWNERS, docs/CODEOWNERS]
+    tipo: archivo
+    reubicable: false
+    capa: adaptador:github
+    nivel_minimo: N0
+    descripcion: Propietarios de código; GitHub usa el primero que encuentra en el orden de `alternativas`.
+  ci.workflows:
+    ruta: .github/workflows
+    tipo: directorio
+    reubicable: false
+    capa: adaptador:github
+    nivel_minimo: N0
+    descripcion: Workflows de GitHub Actions.
+  adapter.claude.instructions:
+    ruta: CLAUDE.md
+    tipo: archivo
+    reubicable: false
+    capa: adaptador:claude-code
+    nivel_minimo: N0
+    descripcion: Adaptador fino de Claude Code; contiene `@AGENTS.md` (ADR-003).
+  adapter.claude.settings:
+    ruta: .claude/settings.json
+    tipo: archivo
+    reubicable: false
+    capa: adaptador:claude-code
+    nivel_minimo: N1
+    descripcion: Permisos, hooks y sandbox de Claude Code a nivel de proyecto. Se especifica en la Fase 3.
+
+# Rutas de ejemplo que CODEOWNERS DEBE cubrir (HS-SEC-002, ADR-013).
+# Se evalúan como si existieran; representan cada patrón sensible.
+rutas_sensibles:
+  - AGENTS.md
+  - src/ejemplo/AGENTS.md
+  - CLAUDE.md
+  - src/ejemplo/CLAUDE.md
+  - .claude/settings.json
+  - .claude/agents/ejemplo.md
+  - .claude/skills/ejemplo/SKILL.md
+  - .agents/skills/ejemplo/SKILL.md
+  - .mcp.json
+  - .harness/manifest.yaml
+  - .github/workflows/ejemplo.yml
+  - .github/CODEOWNERS

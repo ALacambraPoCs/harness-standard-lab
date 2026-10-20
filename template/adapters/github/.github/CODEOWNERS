@@ -1,0 +1,15 @@
+# Propietario por defecto
+*                         {{OWNER}}
+
+# Configuración de agentes y CI (ADR-013, HS-SEC-002).
+# Mantener AL FINAL: en CODEOWNERS gana el último patrón que coincide.
+/AGENTS.md                {{HARNESS_OWNERS}}
+**/AGENTS.md              {{HARNESS_OWNERS}}
+/CLAUDE.md                {{HARNESS_OWNERS}}
+**/CLAUDE.md              {{HARNESS_OWNERS}}
+/.claude/                 {{HARNESS_OWNERS}} {{SECURITY_OWNERS}}
+/.agents/                 {{HARNESS_OWNERS}}
+/.mcp.json                {{SECURITY_OWNERS}}
+/.harness/                {{HARNESS_OWNERS}}
+/.github/workflows/       {{PLATFORM_OWNERS}} {{SECURITY_OWNERS}}
+/.github/CODEOWNERS       {{PLATFORM_OWNERS}} {{SECURITY_OWNERS}}

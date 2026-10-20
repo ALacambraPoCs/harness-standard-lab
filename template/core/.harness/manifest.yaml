@@ -1,0 +1,20 @@
+# Manifiesto de instancia — Estándar de Harness (ADR-004). Esquema: schemas/manifest.schema.json
+standard:
+  version: 0.1.0
+  level: N0
+project:
+  name: {{PROJECT_NAME}}
+  owner: "{{OWNER}}"
+  kind: {{KIND}}
+adapters:
+  agents:
+    - id: claude-code
+      min_version: 2.1.277
+  platform:
+    id: github
+commands:
+  setup: {{SETUP}}
+  check: {{CHECK}}
+  test: {{TEST}}
+# roles:        # solo si un rol reubicable vive en otra ruta (brownfield)
+# waivers:      # excepciones temporales: requirement, reason, approved_by, approved_on, expires (≤ 90 días)

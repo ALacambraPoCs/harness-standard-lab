@@ -1,0 +1,10 @@
+__pycache__/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+MATRIZ.md
+!docs/MATRIZ.md
+CLAUDE.local.md
+.claude/settings.local.json

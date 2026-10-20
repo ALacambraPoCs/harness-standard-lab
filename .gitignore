@@ -8,3 +8,7 @@ MATRIZ.md
 !docs/MATRIZ.md
 CLAUDE.local.md
 .claude/settings.local.json
+
+# Metadatos de Windows (ADS) al copiar a WSL
+*:Zone.Identifier
+*:sec.endpointdlp

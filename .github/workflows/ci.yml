@@ -26,7 +26,8 @@ jobs:
       - name: Autotests (pytest)
         run: python -m pytest -q
       - name: Matriz de trazabilidad estricta
-        run: harness matrix --strict --output MATRIZ.md
+        # El CLI se instala en site-packages, que no incluye tests/fixtures: hay que apuntar al del repo.
+        run: harness matrix --strict --fixtures tests/fixtures --output MATRIZ.md
       - name: La matriz versionada está al día
         run: diff -u docs/MATRIZ.md MATRIZ.md
       - name: El ejemplo greenfield es conforme

@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   conformance:
-    uses: ALacambraPoCs/harness-standard-lab/.github/workflows/harness-conformance.yml@cli-v0.1.0
+    uses: ALacambraPoCs/harness-standard-lab/.github/workflows/harness-conformance.yml@cli-v0.1.1
     with:
       standard-repository: ALacambraPoCs/harness-standard-lab
-      cli-ref: cli-v0.1.0
+      cli-ref: cli-v0.1.1

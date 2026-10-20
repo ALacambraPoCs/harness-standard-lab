@@ -9,18 +9,26 @@ permissions:
   contents: read
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # fijado: ubuntu-latest migra a Ubuntu 26 desde el 2026-10-19
     timeout-minutes: 15
     strategy:
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Rutas portables (Windows, macOS y Linux)
+        shell: bash
+        run: |
+          # Rechaza nombres que no se pueden clonar en Windows (p. ej. metadatos ADS 'archivo:Zone.Identifier').
+          if git ls-files | grep -nE '[:<>"|?*\\]|[ .]$|[ .]/'; then
+            echo "::error::Hay rutas no portables en el repositorio (ver arriba)."
+            exit 1
+          fi
       - name: Instalar
         run: python -m pip install --disable-pip-version-check ".[test]"
       - name: Autotests (pytest)

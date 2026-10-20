@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-20 (Fase 1 aprobada; preparando publicación en GitHub)
+actualizado: 2026-10-20 (repo central publicado; CI en verde; pendiente prueba de extremo a extremo)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -25,6 +25,7 @@ actualizado: 2026-10-20 (Fase 1 aprobada; preparando publicación en GitHub)
 | D-013 | **ADR-013 aprobado** sin cambios: CODEOWNERS obligatorio y no exentable sobre AGENTS.md/CLAUDE.md, `.claude/`, `.agents/`, `.mcp.json`, `.harness/`, `.github/workflows/`, `CODEOWNERS`; ruleset con revisión de code owner y aprobación del último push por otra persona; agentes en CI con `claude -p --bare` y config explícita, job del agente `contents: read` separado del job que aplica cambios, secretos por paso / OIDC, `permissions:` explícitos; MCP catalogado y no confiable; revisión de agente solo informativa. | 2026-10-19 | Usuario |
 | D-014 | **ADR-008 aprobado parcialmente**: la CLI se implementa en **Python ≥ 3.11** (pyyaml, jsonschema). Distribución por `pip install` desde el repo central y workflow reutilizable. Mecanismo de actualización de instancias (Copier o propio) sigue pendiente (F7). Resuelve Q-03. | 2026-10-19 | Usuario |
 | D-015 | **Los 23 requisitos de `standard/requirements.yaml` (v0.1.0, nivel N0) quedan aprobados** sin cambios (estado `aprobado`). | 2026-10-20 | Usuario |
+| E-001 | **Evidencia:** `ALacambraPoCs/harness-standard-lab` publicado; workflow `ci` en verde en Python 3.11/3.12/3.13 (reportado por el usuario, 2026-10-20). Avisos: deprecación de Node 20 en `actions/checkout@v4`/`setup-python@v5` y migración de `ubuntu-latest` a Ubuntu 26 → corregidos en cli 0.1.1. | 2026-10-20 | Usuario (reporte) |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
@@ -57,8 +58,9 @@ actualizado: 2026-10-20 (Fase 1 aprobada; preparando publicación en GitHub)
 | R-05 | Fricción de adopción en brownfield grande. | Alta | Alto | Entrada por N0, manifiesto con rutas existentes, waivers que caducan |
 | R-06 | Importar como normas cifras o umbrales del curso (T4) sin evidencia. | Media | Medio | Solo como valores por defecto ajustables y marcados así |
 | R-07 | La configuración de agentes del repositorio como vector de ataque (hooks, MCP, instrucciones modificadas en un PR). | Media | Alto | ADR-013 |
-| R-09 | El workflow reutilizable y la CI del repo central están validados con actionlint pero no ejecutados en GitHub (no hay repo publicado). | Media | Medio | Ejecutarlos al publicar el repo (Q-10) antes de cerrar F2 |
+| R-09 | ~~CI del repo central sin ejecutar~~ (ejecutada, E-001). Sigue abierto: el workflow reutilizable no se ha ejecutado aún desde una instancia. | Media | Medio | Ejecutarlos al publicar el repo (Q-10) antes de cerrar F2 |
 | R-10 | Laboratorio con un único mantenedor: no se pueden exigir aprobaciones ni revisión de code owner (GitHub no permite autoaprobar). Los controles L5 de revisión quedan sin ejercitar. | Alta | Medio | Desviación documentada en `fase-1/PUBLICACION.md` §6; se corrige con un segundo mantenedor o en el piloto (F8) |
+| R-11 | Copiar archivos de Windows a WSL añade metadatos ADS (`*:Zone.Identifier`, `*:sec.endpointdlp`) que se versionan y rompen el clonado en Windows. Ocurrió en la primera subida (171 archivos). | Media | Medio | Eliminados por el usuario; `.gitignore` los ignora y la CI central rechaza rutas no portables (cli 0.1.1). Propuesta para F2: requisito de rutas portables en instancias. |
 | R-08 | Afirmaciones sobre la documentación oficial obtenidas por un subagente que no se han revisado a mano. | Media | Medio | Se revisaron a mano las críticas para ADR-003 y ADR-012 (memoria y skills de Claude Code). El resto se reverifica en la fase en que se norme. |
 
 ## Próximos pasos

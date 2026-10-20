@@ -7,7 +7,7 @@ Repositorio central del **Estándar de Harness** para el desarrollo de software 
 | Producto | Qué es | Dónde está | Versión actual |
 |---|---|---|---|
 | **A · Estándar** | Normas: requisitos identificados (`HS-<DOMINIO>-NNN`), especificaciones de archivos y componentes, niveles de conformidad y procedimientos | `standard/`, `schemas/`, `adr/` | `0.1.0` (N0 aprobado; ver `standard/VERSION`) |
-| **B · Plantilla ejecutable** | CLI de conformidad, reglas, scaffold, workflows reutilizables, ejemplos y fixtures | `tools/harness-cli/`, `template/`, `.github/workflows/`, `examples/`, `tests/` | `0.1.0` (ver `pyproject.toml`) |
+| **B · Plantilla ejecutable** | CLI de conformidad, reglas, scaffold, workflows reutilizables, ejemplos y fixtures | `tools/harness-cli/`, `template/`, `.github/workflows/`, `examples/`, `tests/` | `0.1.1` (ver `pyproject.toml`) |
 
 El tercer producto, **C · Instancia**, vive en cada repositorio de proyecto. Se identifica por su archivo `.harness/manifest.yaml`.
 
@@ -52,7 +52,7 @@ docs/                documentos de trabajo por fase y REGISTRO
 ## Uso rápido de la CLI
 
 ```bash
-pip install "git+https://github.com/ALacambraPoCs/harness-standard-lab@cli-v0.1.0"
+pip install "git+https://github.com/ALacambraPoCs/harness-standard-lab@cli-v0.1.1"
 harness check                   # valida el repositorio actual
 harness check --format json     # salida para CI
 harness check --path ../otro-repo
@@ -69,10 +69,10 @@ permissions:
   contents: read
 jobs:
   conformance:
-    uses: ALacambraPoCs/harness-standard-lab/.github/workflows/harness-conformance.yml@cli-v0.1.0
+    uses: ALacambraPoCs/harness-standard-lab/.github/workflows/harness-conformance.yml@cli-v0.1.1
     with:
       standard-repository: ALacambraPoCs/harness-standard-lab
-      cli-ref: cli-v0.1.0
+      cli-ref: cli-v0.1.1
 ```
 
 ## Contribuir

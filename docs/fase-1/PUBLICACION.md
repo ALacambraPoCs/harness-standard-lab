@@ -40,7 +40,7 @@ git clone harness-standard.bundle harness-standard-lab
 cd harness-standard-lab
 git remote set-url origin https://github.com/ALacambraPoCs/harness-standard-lab.git
 git push -u origin main
-git push origin --tags        # cli-v0.1.0 y standard-v0.1.0 (los usa el workflow reutilizable)
+git push origin --tags        # cli-v0.1.0/cli-v0.1.1 y standard-v0.1.0 (los usa el workflow reutilizable)
 ```
 
 Comprobación: en *Actions* aparece el workflow `ci` en verde en sus tres versiones de Python. Si falla, envíame el log del job.
@@ -93,4 +93,4 @@ Envíame el resultado de cada paso (captura del check o enlace al run) y lo regi
 |---|---|---|---|
 | Ninguna aprobación humana obligatoria y no se exige revisión de code owner | Hay un solo mantenedor y GitHub no permite aprobar un PR propio | Los controles L5 de revisión no se ejercitan, solo los checks requeridos | Cuando se incorpore un segundo mantenedor (Q-01) o en el piloto (F8) |
 | CODEOWNERS con usuario personal (`@AlbertoLacambra`) en lugar de equipos | La organización no tiene equipos | Ninguno en el laboratorio | Al crear los equipos `harness-owners`, `platform` y `security` |
-| Acciones referenciadas por tag (`@v4`, `@v5`) y no por SHA | Simplicidad en v0.1 | Que una acción comprometida cambie el tag | Fase 5 (requisito de fijar acciones por SHA) |
+| ~~Acciones referenciadas por tag~~ | Resuelto en cli 0.1.1: acciones fijadas por SHA y runner `ubuntu-24.04` | — | El requisito normativo para instancias se define en la Fase 5 |

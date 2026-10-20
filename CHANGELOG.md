@@ -2,6 +2,16 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Hay dos líneas de versión: **standard** (A) y **cli** (B).
 
+## [cli 0.1.1] — 2026-10-20
+
+### Cambiado
+- Acciones de GitHub fijadas por SHA a versiones con runtime Node 24: `actions/checkout` v7.0.1, `actions/setup-python` v7.0.0 y `actions/upload-artifact` v7.0.2. Elimina el aviso de deprecación de Node 20 que apareció en la primera ejecución de la CI.
+- Runner fijado a `ubuntu-24.04`, porque `ubuntu-latest` migra a Ubuntu 26 desde el 2026-10-19.
+- El workflow reutilizable usa por defecto `cli-ref: cli-v0.1.1`.
+
+### Añadido
+- La CI del repositorio central rechaza rutas no portables a Windows (`:`, `<>"|?*\`, espacio o punto final). Así se detecta el incidente de los metadatos ADS del 2026-10-20.
+
 ## [standard 0.1.0] [cli 0.1.0] — 2026-10-20 — Fase 1
 
 ### Cambiado (2026-10-20)

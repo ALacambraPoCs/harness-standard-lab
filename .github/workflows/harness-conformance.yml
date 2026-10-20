@@ -2,10 +2,10 @@
 #
 #   jobs:
 #     conformance:
-#       uses: <owner>/<repo-estandar>/.github/workflows/harness-conformance.yml@cli-v0.1.0
+#       uses: <owner>/<repo-estandar>/.github/workflows/harness-conformance.yml@cli-v0.1.1
 #       with:
 #         standard-repository: <owner>/<repo-estandar>   # p. ej. ALacambraPoCs/harness-standard-lab
-#         cli-ref: cli-v0.1.0                            # mantener igual que el ref de `uses`
+#         cli-ref: cli-v0.1.1                            # mantener igual que el ref de `uses`
 #
 # Seguridad (ADR-013): sin secretos del modelo, `contents: read`, credenciales de checkout no persistidas.
 # Nota: con run-commands=true se ejecutan `setup` y `check` del PR, como en cualquier CI de PR;
@@ -22,7 +22,7 @@ on:
       cli-ref:
         description: Tag o SHA del estándar/CLI a usar. Debe coincidir con el ref de `uses`.
         type: string
-        default: cli-v0.1.0
+        default: cli-v0.1.1
       run-commands:
         description: Ejecutar setup/check del contrato de comandos (HS-VER-002/003).
         type: boolean
@@ -45,16 +45,16 @@ permissions:
 jobs:
   harness-check:
     name: harness check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # fijado: ubuntu-latest migra a Ubuntu 26 desde el 2026-10-19
     timeout-minutes: 30
     steps:
       - name: Checkout instancia
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Checkout estándar
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ inputs.standard-repository != '' && inputs.standard-repository || format('{0}/harness-standard', github.repository_owner) }}
           ref: ${{ inputs.cli-ref }}
@@ -62,7 +62,7 @@ jobs:
           token: ${{ secrets.standard-token || github.token }}
           persist-credentials: false
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ inputs.python-version }}
 
@@ -84,7 +84,7 @@ jobs:
 
       - name: Publicar informe
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: harness-report
           path: |

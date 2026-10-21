@@ -1,7 +1,7 @@
 ---
 id: ADR-016
 titulo: "La transición a done ocurre en el propio PR y la verifica un check requerido"
-estado: propuesto
+estado: aprobado
 fecha: 2026-10-21
 origen: F2.4 (concreta ADR-005 sobre cómo "solo la CI marca done")
 ---

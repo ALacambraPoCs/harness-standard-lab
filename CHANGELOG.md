@@ -27,7 +27,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ### Añadido (F2.4, 2026-10-21)
 - `schemas/task.schema.json` (esquema de tarea, ADR-005) y ficha `standard/04-archivos/plans.dir.md` (cubre `plans.active`, `plans.completed` y `plans.index`).
-- ADR-016 (propuesto): la transición a `done` va en el propio PR y la verifica un check requerido que re-ejecuta los criterios de aceptación.
+- ADR-016 (aprobado, D-027): la transición a `done` va en el propio PR y la verifica un check requerido que re-ejecuta los criterios de aceptación.
 - `roles.yaml`: `patrones_sensibles` y `patrones_triviales` (D-023, ADR-013); manifiesto: `tasks.trivial_paths` y `tasks.acceptance_timeout`.
 - CLI: `harness tasks validate [--base --run-acceptance --pr-number --approvers]`, `harness tasks index [--write|--check]`, `harness tasks issue-sync [--dry-run]` (X-01) y `harness pr check`.
 - Workflow reutilizable `.github/workflows/harness-tasks-lifecycle.yml` (jobs `verify` y `sync-issues`) y plantilla `template/niveles/n1/` (plantilla de tarea, índice y workflow que lo llama).

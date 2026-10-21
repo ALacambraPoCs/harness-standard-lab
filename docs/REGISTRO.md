@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-21 (Fase 2 en preparación)
+actualizado: 2026-10-21 (F2.1 aprobada; F2.2 en curso)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -39,6 +39,8 @@ actualizado: 2026-10-21 (Fase 2 en preparación)
 | D-021 | **Q-04 resuelta como experimento:** el estado de las tareas se enlaza con **GitHub Issues** de forma provisional para evaluar si aporta y es eficiente. El diseño del experimento y su criterio de retirada se fijan en la Fase 2. | 2026-10-21 | Usuario |
 | D-022 | **Experimento X-01 aprobado** sin cambios: issue como espejo del archivo de tarea (dirección única archivo→issue), `Closes #n` para cerrar, job de CI con `issues: write` separado, métricas y criterio de adopción/retirada (`docs/experimentos/X-01-tareas-y-github-issues.md`). | 2026-10-21 | Usuario |
 | D-023 | **Q-11 resuelta:** requiere archivo de tarea si cambia comportamiento del código, toca > 1 segmento, riesgo medio/alto, > 1 sesión o la ejecuta un agente sin supervisión paso a paso. Exentas: documentación, formato/lint, parches de dependencias y reverts, con etiqueta `trivial` en el PR verificada por CI contra las rutas del diff. | 2026-10-21 | Usuario |
+| D-024 | **F2.1 aprobada** (estructura canónica, roles N1, plantilla y esquema de ficha). Fusionada en `harness-standard-lab` (PR #2, commit `7ee8b5f`, 3 checks en verde). | 2026-10-21 | Usuario |
+| E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
@@ -76,6 +78,7 @@ actualizado: 2026-10-21 (Fase 2 en preparación)
 | R-10 | Laboratorio con un único mantenedor: no se pueden exigir aprobaciones ni revisión de code owner (GitHub no permite autoaprobar). Los controles L5 de revisión quedan sin ejercitar. | Alta | Medio | Desviación documentada en `fase-1/PUBLICACION.md` §6; se corrige con un segundo mantenedor o en el piloto (F8) |
 | R-11 | Copiar archivos de Windows a WSL añade metadatos ADS (`*:Zone.Identifier`, `*:sec.endpointdlp`) que se versionan y rompen el clonado en Windows. Ocurrió en la primera subida (171 archivos). | Media | Medio | Eliminados por el usuario; `.gitignore` los ignora y la CI central rechaza rutas no portables (cli 0.1.1). Propuesta para F2: requisito de rutas portables en instancias. |
 | R-12 | ~~Mitigado por D-018 (repos públicos: no hace falta token)~~. En privado, la instancia lee el repo del estándar con un **PAT fine-grained personal** (Contents: read, 1 repo, caducidad ≤ 90 días): credencial de larga duración ligada a una persona. | Media | Medio | Aceptado para el laboratorio. F5: sustituir por GitHub App de solo lectura o publicar la CLI como paquete interno. |
+| R-13 | **Hallazgo F2.2:** con el `CLAUDE.md` raíz que exige ADR-003, Claude Code (ajuste por defecto) **no carga** los `AGENTS.md` de subdirectorios (S-CC-MEM). Sin mitigación, las instrucciones de segmento serían invisibles para Claude. | Alta (si hay segmentos) | Alto | `<segmento>/CLAUDE.md` con `@AGENTS.md` obligatorio (fichas F2.2; requisito candidato C-07 en F2.5) |
 | R-08 | Afirmaciones sobre la documentación oficial obtenidas por un subagente que no se han revisado a mano. | Media | Medio | Se revisaron a mano las críticas para ADR-003 y ADR-012 (memoria y skills de Claude Code). El resto se reverifica en la fase en que se norme. |
 
 ## Próximos pasos

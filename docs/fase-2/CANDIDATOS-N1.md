@@ -2,7 +2,7 @@
 documento: F2-CANDIDATOS
 titulo: Requisitos candidatos que surgen de las fichas (se formalizan en F2.5)
 estado: lista viva
-actualizado: 2026-10-21 (F2.2)
+actualizado: 2026-10-21 (F2.3)
 ---
 
 # Requisitos candidatos para la F2.5
@@ -21,5 +21,15 @@ Cada candidato tiene su origen en una ficha. En la F2.5 recibirá ID, regla y fi
 | C-08 | `@AGENTS.md` es la primera línea no vacía de cada CLAUDE.md | DEBERÍA | N0+ | automática | adapter.claude |
 | C-09 | No existe `.claude/CLAUDE.md` (una sola ubicación del adaptador) | DEBERÍA | N0+ | automática | adapter.claude |
 | C-10 | Rutas versionadas portables: sin `:<>"\|?*\` y sin segmentos acabados en espacio o punto | DEBE | N0+ | automática | 03 §5, R-11 |
+| C-11 | `project.docs_language` declarado en el manifiesto | DEBERÍA | N1+ | automática | manifest (D-020) |
+| C-12 | Mapa de arquitectura con anclas `vision`, `mapa-codigo`, `limites`, `invariantes` | DEBE | N1+ | automática | architecture.map |
+| C-13 | `decisions.dir/README.md` con ancla `indice`, coherente con los ADR existentes | DEBE | N1+ | automática | decisions.dir |
+| C-14 | Cada ADR `NNNN-*.md` con frontmatter válido (esquema `adr`) e `id` = número de archivo | DEBE | N1+ | automática | decisions.dir |
+| C-15 | Un ADR `aceptada` no cambia su contenido salvo `estado`/`reemplazada_por` | DEBERÍA | N1+ | automática (diff de PR) | decisions.dir |
+| C-16 | Política de seguridad con anclas `secretos`, `entradas-no-confiables`, `aprobaciones`, `controles` | DEBE | N1+ | automática | security.policy |
+| C-17 | `references.dir` (si existe) con índice y cada archivo con `Fuente:` y fecha | DEBERÍA | N0+ | automática | references.dir |
+| C-18 | Existe la plantilla de PR con anclas `tarea`, `riesgo`, `evidencia`, `sensible` | DEBE | N1+ | automática | pr.template |
+| C-19 | El cuerpo de cada PR declara `tarea` válida (archivo existente o `trivial` coherente con el diff, D-023) y `riesgo` válido | DEBE | N1+ | automática en CI de tareas | pr.template / F2.4 |
+| C-20 | `sensible: no` en un PR que toca rutas sensibles se marca como error | DEBE | N1+ | automática (diff) | pr.template / ADR-013 |
 
 Nota sobre compatibilidad: añadir un DEBE a N0 es un cambio MAJOR (`GOVERNANCE.md` §3), admitido mientras el estándar sea 0.x. C-05, C-07 y C-10 no rompen ninguna instancia actual: ninguna tiene segmentos y todas las rutas son portables.

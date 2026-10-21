@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-21 (F2.1 aprobada; F2.2 en curso)
+actualizado: 2026-10-21 (F2.3 entregada; pendiente de aprobación)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -40,6 +40,7 @@ actualizado: 2026-10-21 (F2.1 aprobada; F2.2 en curso)
 | D-022 | **Experimento X-01 aprobado** sin cambios: issue como espejo del archivo de tarea (dirección única archivo→issue), `Closes #n` para cerrar, job de CI con `issues: write` separado, métricas y criterio de adopción/retirada (`docs/experimentos/X-01-tareas-y-github-issues.md`). | 2026-10-21 | Usuario |
 | D-023 | **Q-11 resuelta:** requiere archivo de tarea si cambia comportamiento del código, toca > 1 segmento, riesgo medio/alto, > 1 sesión o la ejecuta un agente sin supervisión paso a paso. Exentas: documentación, formato/lint, parches de dependencias y reverts, con etiqueta `trivial` en el PR verificada por CI contra las rutas del diff. | 2026-10-21 | Usuario |
 | D-024 | **F2.1 aprobada** (estructura canónica, roles N1, plantilla y esquema de ficha). Fusionada en `harness-standard-lab` (PR #2, commit `7ee8b5f`, 3 checks en verde). | 2026-10-21 | Usuario |
+| D-025 | **F2.2 aprobada** (fichas de AGENTS.md raíz, de segmento y CLAUDE.md; anclas; candidatos C-01…C-10). Fusionada en `harness-standard-lab`. | 2026-10-21 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 

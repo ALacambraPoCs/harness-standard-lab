@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [agentes, personas]
 dependencias: [decisions.dir, instructions.root, segments.map, project.rules]
 propietario: Tech lead del repositorio
-requisitos: [HS-ARC-001, HS-INS-008, "pendiente:F2.5"]
+requisitos: [HS-ARC-001, HS-INS-008, HS-ARC-003]
 reglas: [core.architecture.map-exists]
 ejemplo_canonico: template/core/docs/architecture/ARCHITECTURE.md
 fuentes: [S-MATKLAD-ARCH, S-OAI-HE#p6, S-OAI-HE#p8, S-LHE#L03]
@@ -31,10 +31,10 @@ Es *"un mapa del país, no un atlas de cada región"*. Fija además los **límit
 
 | Elemento | Ancla | Requisito | Verificación |
 |---|---|---|---|
-| Visión: qué problema resuelve el sistema y sus piezas principales, en un párrafo | `<!-- harness:vision -->` | pendiente:F2.5 | Ancla + revisión |
-| Mapa del código: módulos o directorios de primer nivel con una línea cada uno. Se **nombran**, no se enlazan | `<!-- harness:mapa-codigo -->` | pendiente:F2.5 | Ancla + revisión |
-| Límites y dependencias permitidas: qué puede depender de qué, y qué está prohibido | `<!-- harness:limites -->` | pendiente:F2.5 | Ancla + revisión. Desde N1, recomendado imponerlo con `.harness/rules/` o un linter |
-| Invariantes: reglas que siempre se cumplen, sobre todo las que se expresan como **ausencia** ("X nunca llama a Y") | `<!-- harness:invariantes -->` | pendiente:F2.5 | Ancla + revisión |
+| Visión: qué problema resuelve el sistema y sus piezas principales, en un párrafo | `<!-- harness:vision -->` | HS-ARC-003 | Ancla + revisión |
+| Mapa del código: módulos o directorios de primer nivel con una línea cada uno. Se **nombran**, no se enlazan | `<!-- harness:mapa-codigo -->` | HS-ARC-003 | Ancla + revisión |
+| Límites y dependencias permitidas: qué puede depender de qué, y qué está prohibido | `<!-- harness:limites -->` | HS-ARC-003 | Ancla + revisión. Desde N1, recomendado imponerlo con `.harness/rules/` o un linter |
+| Invariantes: reglas que siempre se cumplen, sobre todo las que se expresan como **ausencia** ("X nunca llama a Y") | `<!-- harness:invariantes -->` | HS-ARC-003 | Ancla + revisión |
 
 ## Contenido recomendado y opcional
 
@@ -92,7 +92,7 @@ payments-api calcula y liquida pagos de comercios. Recibe órdenes del backoffic
 |---|---|---|
 | Existe (en su ruta por defecto o reubicada) | L4 (`core.architecture.map-exists`) | Vigente |
 | Enlazado desde `AGENTS.md` | L4 (`core.instructions.links-core-docs`) | Vigente (DEBERÍA) |
-| Anclas obligatorias presentes | L4 | Pendiente F2.5 (propuesta: N1) |
+| Anclas obligatorias presentes | L4 | HS-ARC-003 (N1), `core.architecture.anchors` |
 | Límites impuestos de forma mecánica | L4 (`.harness/rules/`, linters) | Fase 4 |
 | Contenido correcto y actual | Revisión humana periódica | Manual |
 

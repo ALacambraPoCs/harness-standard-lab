@@ -1,9 +1,11 @@
 # Registro de requisitos del Estándar de Harness.
 # Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
 # Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
-version_estandar: 0.1.0
+version_estandar: 0.2.0
 # Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
-niveles_definidos: [N0]
+niveles_definidos: [N0, N1]
+# Versión del estándar desde la que existe cada nivel (D-029). N1 exige declarar `standard.version` ≥ 0.2.0.
+niveles_desde: {N0: 0.1.0, N1: 0.2.0}
 requisitos:
 
   # ───────────────────────── GOBIERNO ─────────────────────────
@@ -418,3 +420,423 @@ requisitos:
     estado: aprobado
     desde: 0.1.0
     retirada: Nunca.
+
+  # ───────────────────────── NUEVOS EN 0.2.0 (F2.5) ─────────────────────────
+
+  - id: HS-GOV-007
+    titulo: El manifiesto declara el idioma de la documentación
+    texto: El manifiesto DEBERÍA declarar `project.docs_language` (idioma de los documentos de la instancia).
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.manifest.docs-language]
+    fuentes: [D-020, C-11]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si el idioma pasa a ser fijo para toda la organización.
+
+  - id: HS-GOV-008
+    titulo: Las rutas versionadas son portables
+    texto: Ninguna ruta versionada DEBE contener `:<>"|?*\` ni caracteres de control, ni un segmento que termine en espacio o punto.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [core.paths.portable]
+    fuentes: [R-11, E-008, C-10]
+    nota: 'Incidente del 2026-10-20: 171 archivos `*:Zone.Identifier` versionados al copiar desde Windows.'
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Nunca mientras haya personas o agentes trabajando en Windows.
+
+  - id: HS-INS-009
+    titulo: AGENTS.md raíz tiene las secciones obligatorias
+    texto: AGENTS.md raíz DEBE contener, con contenido, las anclas `harness:resumen`, `harness:comandos`, `harness:restricciones` y `harness:mapa`.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.root-anchors]
+    fuentes: [S-AGENTSMD, S-OAI-HE#p5, C-01]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si la evaluación por ablación (F6) muestra que una sección no aporta.
+
+  - id: HS-INS-010
+    titulo: AGENTS.md raíz describe el flujo de trabajo
+    texto: 'AGENTS.md raíz DEBERÍA contener el ancla `harness:flujo`: dónde está la tarea, una tarea por rama y PR, y que `done` lo verifica la CI.'
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.flow-anchor]
+    fuentes: [ADR-005, ADR-016, C-03]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si el flujo se carga desde una skill o un hook de inicio de sesión equivalente.
+
+  - id: HS-INS-011
+    titulo: Las instrucciones de segmento declaran su ámbito
+    texto: Cada `<segmento>/AGENTS.md` DEBE contener `harness:ambito` y al menos otra sección con contenido.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.segment-anchors]
+    fuentes: [S-AGENTSMD, C-05]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si se sustituyen por `segments.yaml` (N2).
+
+  - id: HS-INS-012
+    titulo: Las instrucciones de segmento no duplican la raíz
+    texto: Un `<segmento>/AGENTS.md` NO DEBERÍA repetir líneas sustantivas de AGENTS.md raíz.
+    nivel: NO DEBERÍA
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.segment-no-duplication]
+    fuentes: [S-CC-MEM, C-06]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si los agentes dejan de cargar la raíz junto al segmento.
+
+  - id: HS-INS-013
+    titulo: Cada segmento con AGENTS.md tiene su adaptador CLAUDE.md
+    texto: Con el adaptador `claude-code`, cada `<segmento>/AGENTS.md` DEBE tener al lado un `<segmento>/CLAUDE.md` que importe `@AGENTS.md`.
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: false
+    reglas: [adapter.claude.segment-adapter]
+    fuentes: [S-CC-MEM, R-13, C-07]
+    nota: Sin él, Claude Code no carga las instrucciones del segmento cuando existe un CLAUDE.md raíz (R-13).
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si Claude Code carga AGENTS.md de subdirectorios de forma nativa.
+
+  - id: HS-INS-014
+    titulo: '@AGENTS.md es la primera línea de cada CLAUDE.md'
+    texto: En cada CLAUDE.md versionado, `@AGENTS.md` DEBERÍA ser la primera línea no vacía.
+    nivel: DEBERÍA
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.import-first]
+    fuentes: [ADR-003, C-08]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si el adaptador deja de basarse en imports.
+
+  - id: HS-INS-015
+    titulo: El adaptador de Claude Code tiene una sola ubicación
+    texto: NO DEBERÍA existir `.claude/CLAUDE.md`; el adaptador raíz es `CLAUDE.md`.
+    nivel: NO DEBERÍA
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.single-location]
+    fuentes: [S-CC-MEM, C-09]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si el estándar adopta `.claude/CLAUDE.md` como ubicación canónica.
+
+  - id: HS-CTX-002
+    titulo: Las restricciones duras caben en su presupuesto
+    texto: El número de restricciones duras de AGENTS.md raíz DEBERÍA ser como máximo `budgets.instructions_max_constraints` (15 por defecto).
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.constraints-budget]
+    fuentes: [S-OAI-HE#p5, C-02]
+    nota: Valor por defecto ajustable; la evidencia sobre el óptimo es débil.
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si la ablación (F6) muestra que el número no influye en la adherencia.
+
+  - id: HS-CTX-003
+    titulo: La cadena de AGENTS.md cabe en 32 KiB
+    texto: La suma de bytes de AGENTS.md raíz más los AGENTS.md de segmento hasta el más profundo DEBERÍA ser como máximo 32 KiB.
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.instructions.chain-bytes]
+    fuentes: [S-CODEX-AGENTSMD, C-04]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si Codex cambia `project_doc_max_bytes` o deja de ser un agente soportado.
+
+  - id: HS-CTX-004
+    titulo: Las referencias externas indican su procedencia
+    texto: Si existe `references.dir`, DEBERÍA tener un README con `harness:indice` y cada archivo DEBERÍA indicar `Fuente:` y fecha de captura y figurar en el índice.
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.references.provenance]
+    fuentes: [S-OAI-HE#p5, C-17]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si las referencias se sirven por un MCP con procedencia propia.
+
+  - id: HS-ARC-003
+    titulo: El mapa de arquitectura tiene las secciones obligatorias
+    texto: El mapa de arquitectura DEBE contener, con contenido, `harness:vision`, `harness:mapa-codigo`, `harness:limites` y `harness:invariantes`.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.architecture.anchors]
+    fuentes: [S-MATKLAD-ARCH, C-12]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si la ablación (F6) muestra que una sección no aporta.
+
+  - id: HS-ARC-004
+    titulo: El índice de decisiones enumera todos los ADR
+    texto: '`decisions.dir/README.md` DEBE contener `harness:indice` y enlazar cada ADR `NNNN-*.md`.'
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.decisions.index]
+    fuentes: [S-NYGARD-ADR, C-13]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si el índice pasa a generarse.
+
+  - id: HS-ARC-005
+    titulo: Cada ADR tiene frontmatter válido
+    texto: Cada ADR `NNNN-*.md` DEBE tener frontmatter válido según `schemas/adr.schema.json` con `id` igual a `ADR-NNNN`.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.decisions.frontmatter]
+    fuentes: [S-NYGARD-ADR, C-14]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Nunca mientras los ADR sean la fuente de decisiones.
+
+  - id: HS-ARC-006
+    titulo: Un ADR aceptado no se reescribe
+    texto: En un PR, un ADR que en la base está `aceptada` NO DEBERÍA cambiar salvo en `estado` y `reemplazada_por`.
+    nivel: NO DEBERÍA
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [pr.adr-immutable]
+    fuentes: [S-NYGARD-ADR, C-15]
+    nota: 'Se verifica en el PR (`harness pr check`). No distingue correcciones editoriales: aviso, no error.'
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si se adopta otro modelo de versionado de decisiones.
+
+  - id: HS-SEC-005
+    titulo: La política de seguridad tiene las secciones obligatorias
+    texto: La política de seguridad DEBE contener, con contenido, `harness:secretos`, `harness:entradas-no-confiables`, `harness:aprobaciones` y `harness:controles`.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.security.anchors]
+    fuentes: [ADR-013, C-16]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Nunca.
+
+  - id: HS-SEC-006
+    titulo: Un PR no oculta que toca rutas sensibles
+    texto: 'Un PR que toca rutas de `patrones_sensibles` NO DEBE declarar `sensible: no` y NO DEBERÍA declararse de riesgo `bajo`.'
+    nivel: NO DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [pr.sensitive, pr.risk-sensitive]
+    fuentes: [ADR-013, C-20]
+    nota: Se verifica en el PR (`harness pr check`), check requerido por HS-CI-003.
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Nunca mientras exista configuración de agentes versionada.
+
+  - id: HS-CI-001
+    titulo: Existe la plantilla de PR
+    texto: Con plataforma `github`, DEBE existir la plantilla de PR (rol `pr.template`) con `harness:tarea`, `harness:riesgo`, `harness:evidencia` y `harness:sensible`.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.pr.template]
+    fuentes: [S-GH-PRTEMPLATE, C-18]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si el cuerpo del PR se genera por herramienta.
+
+  - id: HS-CI-002
+    titulo: El cuerpo del PR declara tarea y riesgo
+    texto: Cada PR DEBE declarar en `harness:tarea` una tarea existente (`T-NNNN`) o `trivial` coherente con el diff (D-023), y en `harness:riesgo` una única clase `bajo`, `medio` o `alto`. Los reverts están exentos de tarea.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [pr.anchors, pr.task, pr.trivial, pr.risk]
+    fuentes: [D-023, C-19]
+    nota: Se verifica en el PR (`harness pr check`).
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si la tarea se vincula al PR por otro mecanismo verificable.
+
+  - id: HS-CI-003
+    titulo: El ciclo de vida de tareas es un check requerido
+    texto: Un workflow DEBE ejecutar el ciclo de vida de tareas (`harness-tasks-lifecycle.yml` o `harness tasks validate`) en `pull_request`, y el ruleset de la rama principal DEBE exigirlo como check requerido.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: semiautomatica
+    verificacion_manual: Hasta la Fase 5, el propietario de la instancia confirma en el ruleset que `harness tasks` es requerido. La regla solo comprueba que el workflow existe y se dispara en PR.
+    exentable: false
+    reglas: [core.ci.tasks-workflow]
+    fuentes: [ADR-016, E-006, C-26]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si `done` deja de escribirse en el repositorio.
+
+  - id: HS-STA-001
+    titulo: Existe la estructura de tareas
+    texto: La instancia DEBE tener los directorios `plans.dir`, `plans.active` y `plans.completed`.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.plans.structure]
+    fuentes: [ADR-005]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si la fuente de verdad de las tareas pasa a un sistema externo (X-01).
+
+  - id: HS-STA-002
+    titulo: Cada tarea es válida
+    texto: Cada archivo de tarea DEBE validar contra `schemas/task.schema.json`, llamarse `T-NNNN-<slug>.md` con el mismo id, tener id único, contener las secciones obligatorias y depender solo de tareas existentes.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [tasks.schema, tasks.naming, tasks.unique, tasks.body, tasks.depends]
+    fuentes: [ADR-005, C-21]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si la fuente de verdad de las tareas pasa a un sistema externo (X-01).
+
+  - id: HS-STA-003
+    titulo: Las tareas están en su carpeta y no se borran
+    texto: Las tareas terminales DEBEN estar en `plans.completed` y las demás en `plans.active`; ninguna tarea DEBE desaparecer (se cancela).
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [tasks.location, tasks.deleted]
+    fuentes: [ADR-005, C-22]
+    nota: '`tasks.deleted` se verifica en el PR (`harness tasks validate --base`).'
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si se adopta una política de archivo aprobada por ADR.
+
+  - id: HS-STA-004
+    titulo: Solo hay transiciones de estado permitidas
+    texto: Respecto a la base del PR, cada tarea DEBE cambiar de estado solo según las transiciones de la ficha `plans.dir`.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [tasks.transition]
+    fuentes: [ADR-005, C-23]
+    nota: Se verifica en el PR (`harness tasks validate --base`).
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Nunca mientras exista el ciclo de vida.
+
+  - id: HS-STA-005
+    titulo: done solo con aceptación verificada por la CI
+    texto: Una tarea DEBE pasar a `done` solo en un PR cuyo check vuelva a ejecutar con éxito todos sus criterios ejecutables, con `done_pr` igual a ese PR y con cada criterio `manual` verificado (`verified_by`) por alguien que haya aprobado el PR.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [tasks.acceptance, tasks.done-pr]
+    fuentes: [ADR-016, C-24]
+    nota: La re-ejecución y los aprobadores se verifican en el PR (`harness tasks validate --base --run-acceptance`).
+    estado: propuesto
+    desde: 0.2.0
+    retirada: 'Nunca: es la definición verificable de terminado.'
+
+  - id: HS-STA-006
+    titulo: El índice de tareas está al día
+    texto: '`plans.index` DEBERÍA coincidir con la salida de `harness tasks index`.'
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [tasks.index]
+    fuentes: [ADR-005, C-25]
+    estado: propuesto
+    desde: 0.2.0
+    retirada: Si el índice deja de versionarse.

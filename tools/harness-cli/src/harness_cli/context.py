@@ -58,6 +58,14 @@ class Context:
             return "N0"
 
     @property
+    def declared_version(self) -> str | None:
+        try:
+            v = self.manifest["standard"]["version"]
+            return v if isinstance(v, str) else None
+        except (TypeError, KeyError):
+            return None
+
+    @property
     def adapters(self) -> set[str]:
         try:
             return {a["id"] for a in self.manifest["adapters"]["agents"] if isinstance(a, dict) and "id" in a}

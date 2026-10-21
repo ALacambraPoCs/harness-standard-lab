@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [agentes, personas, cli]
 dependencias: [manifest, architecture.map, decisions.dir, security.policy, plans.dir, instructions.segment]
 propietario: Tech lead del repositorio (revisión obligatoria de plataforma/harness por CODEOWNERS, ADR-013)
-requisitos: [HS-INS-001, HS-INS-002, HS-INS-004, HS-INS-005, HS-INS-008, HS-CTX-001, "pendiente:F2.5"]
+requisitos: [HS-INS-001, HS-INS-002, HS-INS-004, HS-INS-005, HS-INS-008, HS-CTX-001, HS-INS-009, HS-INS-010, HS-CTX-002, HS-CTX-003]
 reglas: [core.instructions.root-exists, core.instructions.commands-match, core.instructions.references-resolve, core.instructions.links-core-docs, core.instructions.size-budget]
 ejemplo_canonico: template/core/AGENTS.md
 fuentes: [S-AGENTSMD, S-OAI-HE#p5, S-CC-MEM, S-ETH-AGENTSMD, S-LULLA-AGENTSMD, S-LHE#L04, ADR-003, ADR-009]
@@ -35,16 +35,16 @@ Las anclas son comentarios HTML en una línea propia, justo antes de la sección
 
 | Elemento | Ancla | Requisito | Verificación |
 |---|---|---|---|
-| Qué es el proyecto, en 1–3 frases (propósito y usuarios), sin historia ni marketing | `<!-- harness:resumen -->` | pendiente:F2.5 | Automática (ancla presente) + revisión |
+| Qué es el proyecto, en 1–3 frases (propósito y usuarios), sin historia ni marketing | `<!-- harness:resumen -->` | HS-INS-009 | Automática (ancla presente) + revisión |
 | Comandos canónicos `setup`, `check` y `test`, **literalmente** iguales a los del manifiesto, y cuándo ejecutar cada uno | `<!-- harness:comandos -->` | HS-INS-002 | Automática |
-| Restricciones duras: lo que el agente **nunca** debe hacer, en imperativo, una por línea | `<!-- harness:restricciones -->` | pendiente:F2.5 | Automática (ancla y n.º de elementos) + revisión |
+| Restricciones duras: lo que el agente **nunca** debe hacer, en imperativo, una por línea | `<!-- harness:restricciones -->` | HS-INS-009, HS-CTX-002 | Automática (ancla y n.º de elementos) + revisión |
 | Mapa: enlaces relativos al mapa de arquitectura, a las decisiones y a la política de seguridad, con una línea sobre cuándo leer cada uno | `<!-- harness:mapa -->` | HS-INS-008, HS-INS-005 | Automática |
 
 ## Contenido recomendado y opcional
 
 | Elemento | Ancla | Cuándo |
 |---|---|---|
-| Flujo de trabajo: dónde está la tarea (`plans.active`), una tarea por rama y PR, quién marca `done` | `<!-- harness:flujo -->` | **Recomendado desde N1** (pendiente:F2.5) |
+| Flujo de trabajo: dónde está la tarea (`plans.active`), una tarea por rama y PR, quién marca `done` | `<!-- harness:flujo -->` | **Recomendado desde N1** (HS-INS-010) |
 | Índice de instrucciones de segmento (`<segmento>/AGENTS.md`) | `<!-- harness:segmentos -->` | Si existen instrucciones de segmento (útil también para herramientas que no cargan AGENTS.md anidados) |
 | Convenciones **no evidentes** del código (las que un linter no impone) | `<!-- harness:convenciones -->` | Opcional, solo si no caben en un linter |
 
@@ -73,7 +73,7 @@ Las anclas son comentarios HTML en una línea propia, justo antes de la sección
 
 - **Markdown** según S-AGENTSMD, sin frontmatter. El nombre de archivo es exactamente `AGENTS.md`.
 - **Presupuesto**: como máximo **200 líneas** por defecto (HS-CTX-001, alineado con S-CC-MEM). Recomendación interna: **100 líneas o menos**, el tamaño que describe S-OAI-HE p.5.
-- **Presupuesto acumulado** (pendiente:F2.5): la suma de bytes de la cadena raíz más el segmento más profundo DEBERÍA ser como máximo **32 KiB**. Codex deja de cargar AGENTS.md al alcanzar ese límite y trunca en silencio los niveles más profundos (`project_doc_max_bytes`, verificado en la documentación oficial por el informe de especificaciones de F0).
+- **Presupuesto acumulado** (HS-CTX-003): la suma de bytes de la cadena raíz más el segmento más profundo DEBERÍA ser como máximo **32 KiB**. Codex deja de cargar AGENTS.md al alcanzar ese límite y trunca en silencio los niveles más profundos (`project_doc_max_bytes`, verificado en la documentación oficial por el informe de especificaciones de F0).
 - **Orden recomendado**: resumen → comandos → restricciones → flujo → mapa. Lo crítico va arriba (S-LHE L04, *lost in the middle*).
 - **Idioma libre** (D-020); las anclas y los comandos no se traducen.
 - **Enlaces relativos** al propio archivo. Sin rutas absolutas ni `~` (HS-INS-005).
@@ -124,9 +124,9 @@ Tu tarea está en `docs/plans/active/T-NNNN-*.md`: respeta su alcance y criterio
 | Enlaces e imports se resuelven | L4 (`core.instructions.references-resolve`) | Vigente (N0) |
 | Enlaza los documentos núcleo | L4 (`core.instructions.links-core-docs`) | Vigente (N0, DEBERÍA) |
 | Presupuesto de líneas | L4 (`core.instructions.size-budget`) | Vigente (N0, DEBERÍA) |
-| Anclas `resumen`, `comandos`, `restricciones` y `mapa` presentes | L4 | Pendiente F2.5 (propuesta: N1) |
-| N.º de restricciones como máximo el presupuesto | L4 | Pendiente F2.5 (DEBERÍA) |
-| Presupuesto acumulado de 32 KiB | L4 | Pendiente F2.5 (DEBERÍA) |
+| Anclas `resumen`, `comandos`, `restricciones` y `mapa` presentes | L4 | HS-INS-009 (N1), `core.instructions.root-anchors` |
+| N.º de restricciones como máximo el presupuesto | L4 | HS-CTX-002 (N1, DEBERÍA), `core.instructions.constraints-budget` |
+| Presupuesto acumulado de 32 KiB | L4 | HS-CTX-003 (DEBERÍA), `core.instructions.chain-bytes` |
 | Sin estado de tareas ni consejos genéricos | Revisión humana (CODEOWNERS, L5) | Vigente (manual) |
 | Cambios revisados por propietario de plataforma/harness | L5 (CODEOWNERS + ruleset) | Vigente (ADR-013) |
 

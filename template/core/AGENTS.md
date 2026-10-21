@@ -19,6 +19,13 @@
 - No leas, muestres ni escribas secretos ni archivos `.env`.
 - Toda decisión de arquitectura nueva se registra en [decisiones](docs/decisions/README.md).
 
+<!-- harness:flujo -->
+## Flujo de trabajo
+
+- Cada cambio no trivial tiene un archivo de tarea en `docs/plans/active/` (N1) y va en su propia rama y PR.
+- Actualiza la sección de progreso de la tarea en cada sesión; la plantilla de PR indica tarea, riesgo y evidencia.
+- El paso a `done` va en el PR que completa la tarea y lo verifica la CI, que vuelve a ejecutar los criterios de aceptación.
+
 <!-- harness:mapa -->
 ## Dónde está el detalle
 

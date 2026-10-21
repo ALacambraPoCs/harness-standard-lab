@@ -43,23 +43,47 @@ class Standard:
     sensitive_patterns: list[str] = field(default_factory=list)
     trivial_patterns: list[str] = field(default_factory=list)
     defined_levels: tuple[str, ...] = ("N0",)
+    levels_since: dict[str, str] = field(default_factory=dict)
     schemas: dict[str, dict[str, Any]] = field(default_factory=dict)
+
+    def level_defined(self, level: str, version: str | None) -> bool:
+        """El nivel existe en la versión declarada (niveles_desde; por defecto, desde 0.1.0)."""
+        if level not in self.defined_levels:
+            return False
+        since = semver(self.levels_since.get(level, "0.1.0"))
+        declared = semver(version) if version else None
+        return declared is None or since is None or declared >= since
 
     def validator(self, name: str) -> Draft202012Validator:
         return Draft202012Validator(self.schemas[name], format_checker=FormatChecker())
 
-    def applicable(self, level: str, adapters: set[str]) -> list[dict[str, Any]]:
-        """Requisitos de ámbito instancia que aplican al nivel declarado y adaptadores."""
+    def applicable(self, level: str, adapters: set[str], version: str | None = None) -> list[dict[str, Any]]:
+        """Requisitos de ámbito instancia que aplican al nivel, adaptadores y versión declarados.
+
+        Con `version`, un requisito solo aplica si `desde` ≤ versión declarada: una instancia que
+        declara 0.1.0 no queda obligada por requisitos introducidos en 0.2.0 hasta que migra (D-029).
+        """
         out = []
+        declared = semver(version) if version else None
         for req in self.requirements.values():
             if req["ambito"] != "instancia" or req["estado"] in ("retirado",):
                 continue
             if level not in req["conformidad"]:
                 continue
+            if declared and (semver(req["desde"]) or (0, 0, 0)) > declared:
+                continue
             if req.get("adaptador") and req["adaptador"] not in adapters:
                 continue
             out.append(req)
         return out
+
+
+def semver(v: Any) -> tuple[int, int, int] | None:
+    try:
+        a, b, c = (int(x) for x in str(v).split("."))
+        return a, b, c
+    except (ValueError, AttributeError):
+        return None
 
 
 def _load_yaml(path: Path) -> Any:
@@ -70,7 +94,7 @@ def _load_yaml(path: Path) -> Any:
 def load_standard(root: Path | None = None) -> Standard:
     root = root or find_standard_root()
     schemas = {}
-    for name in ("manifest", "requirement", "roles", "task"):
+    for name in ("manifest", "requirement", "roles", "task", "adr"):
         with (root / "schemas" / f"{name}.schema.json").open(encoding="utf-8") as fh:
             schemas[name] = json.load(fh)
     reqs_doc = _load_yaml(root / "standard" / "requirements.yaml")
@@ -82,6 +106,7 @@ def load_standard(root: Path | None = None) -> Standard:
         roles=roles_doc["roles"],
         sensitive_paths=roles_doc["rutas_sensibles"],
         defined_levels=tuple(reqs_doc["niveles_definidos"]),
+        levels_since=reqs_doc.get("niveles_desde") or {},
         sensitive_patterns=roles_doc["patrones_sensibles"],
         trivial_patterns=roles_doc["patrones_triviales"],
         schemas=schemas,

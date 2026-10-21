@@ -57,7 +57,11 @@ def standard_version(ctx: Context):
                       f"La instancia declara {declared}, posterior al estándar cargado ({ctx.standard.version}).",
                       "Actualiza la CLI a una versión que incluya ese estándar.", path)
     level = ctx.manifest["standard"]["level"]
-    if level not in ctx.standard.defined_levels:
+    if level in ctx.standard.defined_levels and not ctx.standard.level_defined(level, declared):
+        yield Finding("core.manifest.standard-version", "HS-GOV-002",
+                      f"El nivel {level} se define a partir del estándar {ctx.standard.levels_since.get(level)}; la instancia declara {declared}.",
+                      f"Declara `standard.version: {ctx.standard.levels_since.get(level)}` o posterior (y cumple sus requisitos), o baja el nivel.", path)
+    elif level not in ctx.standard.defined_levels:
         yield Finding("core.manifest.standard-version", "HS-GOV-002",
                       f"El nivel {level} no tiene requisitos definidos en el estándar {ctx.standard.version} "
                       f"(definidos: {', '.join(ctx.standard.defined_levels)}).",

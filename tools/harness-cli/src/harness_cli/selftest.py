@@ -41,7 +41,7 @@ def _mutate(root: Path, mutations: list[dict]) -> None:
         elif "append" in m:
             p = root / m["append"]["path"]
             with p.open("a", encoding="utf-8") as fh:
-                fh.write(m["append"]["content"])
+                fh.write(m["append"]["content"] * int(m["append"].get("repeat", 1)))
         elif "replace" in m:
             p = root / m["replace"]["path"]
             text = p.read_text(encoding="utf-8")

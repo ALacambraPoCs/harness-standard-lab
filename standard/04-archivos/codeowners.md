@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [plataforma, cli, personas]
 dependencias: [instructions.root, adapter.claude.instructions, adapter.claude.settings, manifest, ci.workflows]
 propietario: Equipo de plataforma y seguridad (el propio CODEOWNERS se protege a sí mismo)
-requisitos: [HS-SEC-002, "pendiente:F2.5"]
+requisitos: [HS-SEC-002]
 reglas: [core.codeowners.sensitive-paths]
 ejemplo_canonico: template/adapters/github/.github/CODEOWNERS
 fuentes: [S-GH, S-VILA#p29, ADR-013]

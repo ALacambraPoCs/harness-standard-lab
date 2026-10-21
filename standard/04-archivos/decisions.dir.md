@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [personas, agentes]
 dependencias: [architecture.map, instructions.root]
 propietario: Tech lead del repositorio (aprueba los ADR del proyecto)
-requisitos: [HS-ARC-002, "pendiente:F2.5"]
+requisitos: [HS-ARC-002, HS-ARC-004, HS-ARC-005, HS-ARC-006]
 reglas: [core.decisions.exists]
 ejemplo_canonico: template/core/docs/decisions/_plantilla.md
 fuentes: [S-NYGARD-ADR, S-LHE#L05, S-OAI-HE#p6]
@@ -32,7 +32,7 @@ Responde a un fallo documentado: la compactación de contexto conserva el "qué"
 
 | Elemento | Ancla | Requisito | Verificación |
 |---|---|---|---|
-| `README.md` índice con una tabla: número, título, estado | `<!-- harness:indice -->` | HS-ARC-002 (existencia); índice pendiente:F2.5 | Automática |
+| `README.md` índice con una tabla: número, título, estado | `<!-- harness:indice -->` | HS-ARC-002 (existencia); índice HS-ARC-004 | Automática |
 | Al menos un ADR. En la adopción, el ADR de "adoptar el estándar" | — | HS-ARC-002 | Automática |
 
 **Cada ADR** (`NNNN-<slug>.md`) con frontmatter:
@@ -78,9 +78,9 @@ Plantilla: `template/core/docs/decisions/_plantilla.md`. Ejemplo de adopción: `
 | Validación | Capa | Estado |
 |---|---|---|
 | Existe el directorio con al menos un `.md` | L4 (`core.decisions.exists`) | Vigente |
-| `README.md` índice con ancla; índice coherente con los archivos | L4 | Pendiente F2.5 |
-| Frontmatter válido (esquema `adr`), `id` igual al número de archivo | L4 | Pendiente F2.5 |
-| Un ADR `aceptada` no cambia de contenido salvo `estado` | L4 (diff en PR) | Pendiente F2.5 (DEBERÍA) |
+| `README.md` índice con ancla; índice coherente con los archivos | L4 | HS-ARC-004 (N1), `core.decisions.index` |
+| Frontmatter válido (esquema `adr`), `id` igual al número de archivo | L4 | HS-ARC-005 (N1), `core.decisions.frontmatter`, `schemas/adr.schema.json` |
+| Un ADR `aceptada` no cambia de contenido salvo `estado` | L4 (diff en PR) | HS-ARC-006 (N1, NO DEBERÍA), `pr.adr-immutable` |
 | La aceptación la hace una persona | L5 (revisión del PR, CODEOWNERS) | Vigente si CODEOWNERS asigna el directorio |
 
 ## Criterios de aceptación

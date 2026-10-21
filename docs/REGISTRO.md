@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-20 (repo central publicado; CI en verde; pendiente prueba de extremo a extremo)
+actualizado: 2026-10-20 (Fase 1 CERRADA; siguiente: Fase 2)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -25,7 +25,16 @@ actualizado: 2026-10-20 (repo central publicado; CI en verde; pendiente prueba d
 | D-013 | **ADR-013 aprobado** sin cambios: CODEOWNERS obligatorio y no exentable sobre AGENTS.md/CLAUDE.md, `.claude/`, `.agents/`, `.mcp.json`, `.harness/`, `.github/workflows/`, `CODEOWNERS`; ruleset con revisión de code owner y aprobación del último push por otra persona; agentes en CI con `claude -p --bare` y config explícita, job del agente `contents: read` separado del job que aplica cambios, secretos por paso / OIDC, `permissions:` explícitos; MCP catalogado y no confiable; revisión de agente solo informativa. | 2026-10-19 | Usuario |
 | D-014 | **ADR-008 aprobado parcialmente**: la CLI se implementa en **Python ≥ 3.11** (pyyaml, jsonschema). Distribución por `pip install` desde el repo central y workflow reutilizable. Mecanismo de actualización de instancias (Copier o propio) sigue pendiente (F7). Resuelve Q-03. | 2026-10-19 | Usuario |
 | D-015 | **Los 23 requisitos de `standard/requirements.yaml` (v0.1.0, nivel N0) quedan aprobados** sin cambios (estado `aprobado`). | 2026-10-20 | Usuario |
+| D-017 | ~~Reemplazada por D-018.~~ Los repositorios del laboratorio son **privados** y la organización `ALacambraPoCs` pasa a **GitHub Team** para disponer de rulesets, checks requeridos y code owners en privado (reproduce el entorno corporativo). | 2026-10-20 | Usuario |
+| D-018 | El usuario descarta el plan Team (no quiere pagar). Los repositorios del laboratorio pasan a **públicos** en la org Free `ALacambraPoCs` (central hecho el 2026-10-20; ejemplo pendiente). Con repos públicos: rulesets, checks requeridos, secret scanning y push protection disponibles sin coste; el token de lectura deja de ser necesario. | 2026-10-20 | Usuario |
 | E-001 | **Evidencia:** `ALacambraPoCs/harness-standard-lab` publicado; workflow `ci` en verde en Python 3.11/3.12/3.13 (reportado por el usuario, 2026-10-20). Avisos: deprecación de Node 20 en `actions/checkout@v4`/`setup-python@v5` y migración de `ubuntu-latest` a Ubuntu 26 → corregidos en cli 0.1.1. | 2026-10-20 | Usuario (reporte) |
+| E-002 | **Evidencia:** cli 0.1.1 publicada; `ci` en verde en los 3 jobs (3.11/3.12/3.13) sin avisos de Node 20 (reportado por el usuario, 2026-10-20). | 2026-10-20 | Usuario (reporte) |
+| E-003 | **Evidencia L5:** con `harness-standard-lab` público, el ruleset `main-protegida` rechaza un push directo a `main`: `GH013 … Changes must be made through a pull request` y `3 of 3 required status checks are expected` (salida aportada por el usuario, 2026-10-20). Verifica HS-GOV-004 (parte ruleset) en el repo central. | 2026-10-20 | Usuario (reporte) |
+| E-004 | **Evidencia de extremo a extremo (fallo):** en `harness-example-greenfield` (público), el PR `prueba/hs-ins-002` ejecuta el workflow reutilizable `harness-conformance.yml@cli-v0.1.1` del repo central; `harness check` (CLI 0.1.1, estándar 0.1.0) detecta `core.instructions.commands-match` (HS-INS-002) con QUÉ/POR QUÉ/CÓMO y nivel efectivo «ninguno»; 20 reglas ejecutadas (informe aportado por el usuario, 2026-10-20). Cierra la parte «workflow reutilizable sin ejecutar desde una instancia» de R-09. | 2026-10-20 | Usuario (reporte) |
+| E-005 | **Evidencia negativa (valida ADR-009):** el PR #1 de `harness-example-greenfield` se fusionó en `main` con el check `conformance / harness check` en rojo, porque aún no existía el ruleset. Un check de CI (L4) que no es *requerido* por la plataforma (L5) solo informa: no impide integrar código no conforme. `main` del ejemplo queda temporalmente no conforme (HS-INS-002) hasta el revert. | 2026-10-20 | Usuario (captura) |
+| E-006 | **Evidencia L5 en instancia:** con el ruleset `main-protegida` activo en `harness-example-greenfield`, el PR #2 muestra `harness / conformance / harness check (pull_request)` fallido y marcado **Required**; el botón *Merge pull request* queda deshabilitado (captura del usuario, 2026-10-20). Verifica HS-GOV-004 completo (check ejecutado + requerido) en una instancia. | 2026-10-20 | Usuario (captura) |
+| E-007 | **Evidencia de corrección:** el PR #3 (revert de #1) pasa `harness / conformance / harness check` (**Required**, 12 s) y el merge queda habilitado (captura del usuario, 2026-10-20). Ciclo completo demostrado: incumplimiento detectado → merge bloqueado → corrección → merge permitido. | 2026-10-20 | Usuario (captura) |
+| D-019 | **Fase 1 cerrada** con los criterios de aceptación cumplidos (ver `fase-1/INFORME.md` §6). | 2026-10-20 | Usuario (validación de evidencias) |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
@@ -44,7 +53,7 @@ actualizado: 2026-10-20 (repo central publicado; CI en verde; pendiente prueba d
 | Q-06 | Fuente de la telemetría de coste y tokens del agente (consola de la organización, OpenTelemetry, logs de CI). | F6 | Por verificar qué expone Claude Code |
 | Q-07 | En la v1, ¿skills en `.agents/skills` con sincronización o directamente en `.claude/skills`? | F3 | ADR-012 |
 | Q-08 | ¿Hay requisitos regulatorios o de cliente (datos, auditoría, EU AI Act) que afecten al uso de agentes? | F5 | Por confirmar con seguridad y legal |
-| Q-10 | Organización de GitHub: **`ALacambraPoCs`**, repo central `harness-standard-lab` (respondida 2026-10-20). Pendiente: **visibilidad** (público recomendado, ver `fase-1/PUBLICACION.md` §1) y equipos (se usa `@AlbertoLacambra` mientras tanto). | F1 | Público en Free |
+| Q-10 | ~~Organización y visibilidad~~ **Resuelta:** `ALacambraPoCs`, repos públicos, plan Free (D-018). Pendiente solo: equipos (se usa `@AlbertoLacambra`). | F2 | — |
 | Q-09 | Repositorios candidatos para el piloto (1 greenfield + 1 brownfield grande). | F8 (identificar en F2) | Por designar |
 
 ## Riesgos
@@ -58,13 +67,14 @@ actualizado: 2026-10-20 (repo central publicado; CI en verde; pendiente prueba d
 | R-05 | Fricción de adopción en brownfield grande. | Alta | Alto | Entrada por N0, manifiesto con rutas existentes, waivers que caducan |
 | R-06 | Importar como normas cifras o umbrales del curso (T4) sin evidencia. | Media | Medio | Solo como valores por defecto ajustables y marcados así |
 | R-07 | La configuración de agentes del repositorio como vector de ataque (hooks, MCP, instrucciones modificadas en un PR). | Media | Alto | ADR-013 |
-| R-09 | ~~CI del repo central sin ejecutar~~ (ejecutada, E-001). Sigue abierto: el workflow reutilizable no se ha ejecutado aún desde una instancia. | Media | Medio | Ejecutarlos al publicar el repo (Q-10) antes de cerrar F2 |
+| R-09 | **Cerrado** (E-001, E-003, E-004, E-006, E-007). | Media | Medio | Ejecutarlos al publicar el repo (Q-10) antes de cerrar F2 |
 | R-10 | Laboratorio con un único mantenedor: no se pueden exigir aprobaciones ni revisión de code owner (GitHub no permite autoaprobar). Los controles L5 de revisión quedan sin ejercitar. | Alta | Medio | Desviación documentada en `fase-1/PUBLICACION.md` §6; se corrige con un segundo mantenedor o en el piloto (F8) |
 | R-11 | Copiar archivos de Windows a WSL añade metadatos ADS (`*:Zone.Identifier`, `*:sec.endpointdlp`) que se versionan y rompen el clonado en Windows. Ocurrió en la primera subida (171 archivos). | Media | Medio | Eliminados por el usuario; `.gitignore` los ignora y la CI central rechaza rutas no portables (cli 0.1.1). Propuesta para F2: requisito de rutas portables en instancias. |
+| R-12 | ~~Mitigado por D-018 (repos públicos: no hace falta token)~~. En privado, la instancia lee el repo del estándar con un **PAT fine-grained personal** (Contents: read, 1 repo, caducidad ≤ 90 días): credencial de larga duración ligada a una persona. | Media | Medio | Aceptado para el laboratorio. F5: sustituir por GitHub App de solo lectura o publicar la CLI como paquete interno. |
 | R-08 | Afirmaciones sobre la documentación oficial obtenidas por un subagente que no se han revisado a mano. | Media | Medio | Se revisaron a mano las críticas para ADR-003 y ADR-012 (memoria y skills de Claude Code). El resto se reverifica en la fase en que se norme. |
 
 ## Próximos pasos
 
-1. **Usuario:** ejecutar `docs/fase-1/PUBLICACION.md` (push de los dos repositorios, rulesets, prueba de extremo a extremo) y devolver los resultados para registrarlos como evidencia (cierra R-09).
-2. **Fase 2** (estructura canónica y fichas de archivo del núcleo): fichas de AGENTS.md, mapa de arquitectura, ADR, tareas/planes (esquema de tarea, ADR-005), seguridad, contrato de comandos, CODEOWNERS y plantilla de PR; requisitos N1; reglas y fixtures asociados.
-3. Leer para F2: cookbook de planes de ejecución de OpenAI; estudio ETH Zurich sobre AGENTS.md; matklad ARCHITECTURE.md.
+1. **Usuario:** fusionar el PR #3 del ejemplo y subir al repo central, mediante PR, la actualización documental (`fase1-cierre.patch`).
+2. **Fase 2** — estructura canónica y fichas de archivo del núcleo + requisitos N1 (alcance propuesto en `fase-1/INFORME.md` §7).
+3. Pendientes heredados: Secret Protection/push protection en repos públicos (verificar UI), requisito de rutas portables en instancias (R-11), escáner de secretos en CI (F5), sustituir PAT si vuelve a haber repos privados (R-12).

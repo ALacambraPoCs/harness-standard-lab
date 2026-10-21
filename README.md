@@ -15,7 +15,7 @@ El tercer producto, **C · Instancia**, vive en cada repositorio de proyecto. Se
 
 ## Estado
 
-**Fase 1 (fundamentos normativos) completada en borrador.** Incluye:
+**Fase 1 (fundamentos normativos) cerrada el 2026-10-20** con evidencias de extremo a extremo (ver `docs/REGISTRO.md`, E-001…E-007). Incluye:
 
 - terminología;
 - modelo conceptual;

@@ -1,7 +1,7 @@
 ---
 documento: F1-INFORME
 titulo: Informe de cierre de la Fase 1 — Fundamentos normativos
-estado: entregado en borrador; requisitos pendientes de aprobación
+estado: CERRADA (2026-10-20)
 fecha: 2026-10-19
 ---
 
@@ -70,3 +70,29 @@ Son decisiones menores que no requerían ADR y se pueden revertir.
 1. **Revisar los 23 requisitos N0** (resumen en `standard/02-niveles-de-conformidad.md` §3). Para cada uno: aprobarlo, ajustarlo o rechazarlo. Puedo presentártelos por bloques: gobierno, instrucciones, arquitectura y seguridad, comandos.
 2. **Q-01:** composición del grupo de gobierno.
 3. **Q-10:** organización de GitHub donde publicar `harness-standard` y nombres de los equipos, para ejecutar la CI y el workflow reutilizable de verdad.
+
+## 6. Cierre de la fase (2026-10-20)
+
+| Criterio | Estado | Evidencia |
+|---|---|---|
+| Requisitos N0 aprobados | ✅ | D-015 (23 requisitos) |
+| Repositorio central publicado con CI en verde | ✅ | E-001, E-002 (cli 0.1.1, sin avisos) |
+| El push directo a `main` lo bloquea la plataforma | ✅ | E-003 (`GH013`) |
+| Una instancia separada usa el workflow reutilizable y detecta incumplimientos | ✅ | E-004 (HS-INS-002 detectado) |
+| Un check no requerido no basta: hace falta L5 | ✅ (lección) | E-005 (merge con check rojo antes del ruleset) |
+| El check requerido bloquea el merge | ✅ | E-006 |
+| La corrección desbloquea el merge | ✅ | E-007 |
+
+Lecciones incorporadas:
+
+1. **Las copias Windows→WSL añaden metadatos ADS** que rompen el clonado en Windows. La CI central rechaza ya rutas no portables (R-11, cli 0.1.1).
+2. **En una organización Free, los repos privados no aplican los rulesets.** El laboratorio usa repos públicos (D-018).
+3. **El orden importa:** sin el ruleset activo, un check rojo no impide fusionar (E-005). El runbook de adopción debe exigir crear el ruleset **antes** del primer PR. Esto se lleva a la Fase 9.
+
+## 7. Propuesta de alcance de la Fase 2
+
+1. Estructura canónica N0–N1 (`standard/03-estructura-canonica.md`).
+2. Fichas de archivo (`standard/04-archivos/`): AGENTS.md raíz y local, CLAUDE.md, mapa de arquitectura, ADR del proyecto, política de seguridad, contrato de comandos, CODEOWNERS y plantilla de PR.
+3. **Esquema de tarea y plan** (ADR-005): estados, transiciones, evidencia y su verificación por CI. Base de N1.
+4. Requisitos **N1** con reglas y fixtures, incluido el de rutas portables en instancias.
+5. Decisiones que tomar: Q-02 (idioma de los archivos de instancia), umbral de "tarea trivial" sin archivo, y si el estado de las tareas se enlaza con GitHub Issues (Q-04).

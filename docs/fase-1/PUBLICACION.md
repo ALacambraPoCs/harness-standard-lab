@@ -30,6 +30,19 @@ Fuente: [Managing rulesets](https://docs.github.com/en/repositories/configuring-
 - En *Settings → Actions → General → Access*, elegir "Accessible from repositories in the ALacambraPoCs organization". Sin esto, la instancia no puede llamar al workflow reutilizable.
 - Crear un token fine-grained de solo lectura (Contents: Read) sobre `harness-standard-lab` y guardarlo en la instancia como secreto `HARNESS_STANDARD_TOKEN`. Después, añadir `secrets: { standard-token: ${{ secrets.HARNESS_STANDARD_TOKEN }} }` en el `uses:` de la instancia.
 
+### 1.1 Variante elegida (D-017): privado + GitHub Team
+
+1. Organización → *Settings* → *Billing and plans* (o *Billing and licensing*) → **Upgrade** a **Team**.
+2. `harness-standard-lab` → *Settings* → *Actions* → *General* → sección **Access** → "Accessible from repositories in the 'ALacambraPoCs' organization" → **Save**.
+3. Token fine-grained (https://github.com/settings/personal-access-tokens/new): *Resource owner* `ALacambraPoCs`; *Expiration* ≤ 90 días; *Repository access* → *Only select repositories* → `harness-standard-lab`; *Permissions* → *Contents: Read-only*. Si la org exige aprobación de tokens, apruébalo en *Org Settings → Personal access tokens → Pending requests*.
+4. `harness-example-greenfield` → *Settings* → *Secrets and variables* → *Actions* → **New repository secret** `HARNESS_STANDARD_TOKEN` con el token.
+5. Pasar el secreto al workflow reutilizable en `.github/workflows/harness.yml` de la instancia:
+   ```yaml
+       secrets:
+         standard-token: ${{ secrets.HARNESS_STANDARD_TOKEN }}
+   ```
+6. Secret scanning / push protection en repos privados: gratuitos solo en públicos (GitHub, 2023); en privados dependen del complemento de pago de seguridad de GitHub (*Secret Protection*, antes *Advanced Security*) — **pendiente de verificar** en *Settings → Advanced Security*. Opcional en el laboratorio; HS-SEC-004 mantiene verificación manual.
+
 ## 2. Subir el repositorio central (PowerShell)
 
 `harness-standard-lab` debe existir **vacío**, sin README ni licencia.

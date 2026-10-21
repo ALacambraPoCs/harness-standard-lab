@@ -6,7 +6,9 @@
   "required": [
     "version_estandar",
     "roles",
-    "rutas_sensibles"
+    "rutas_sensibles",
+    "patrones_sensibles",
+    "patrones_triviales"
   ],
   "additionalProperties": false,
   "properties": {
@@ -120,6 +122,22 @@
       "items": {
         "type": "string"
       }
+    },
+    "patrones_sensibles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "Patrones (sintaxis CODEOWNERS) de rutas sensibles, para comparar con el diff de un PR."
+    },
+    "patrones_triviales": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "Patrones por defecto que puede tocar un PR trivial (D-023)."
     }
   }
 }

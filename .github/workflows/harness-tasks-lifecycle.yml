@@ -1,0 +1,130 @@
+# Workflow reutilizable del ciclo de vida de tareas (N1). Lo llaman las instancias desde
+# .github/workflows/harness-tasks.yml (plantilla: template/niveles/n1/).
+#
+#  - verify (pull_request, merge_group): valida tareas y transiciones, RE-EJECUTA los criterios de
+#    aceptación de las tareas que pasan a done (ADR-016), comprueba el cuerpo del PR contra el diff
+#    (pr.template, D-023) y que el índice esté al día. Debe ser check requerido en el ruleset.
+#  - sync-issues (push a la rama por defecto): experimento X-01, refleja estado/responsable en la issue
+#    enlazada y deja el enlace a la ejecución como evidencia. No escribe en el repositorio.
+#
+# Seguridad (ADR-013): sin secretos del modelo; el cuerpo y el título del PR se pasan por variables
+# de entorno (nunca interpolados en el script); cada job pide solo los permisos que usa.
+name: harness-tasks-lifecycle
+
+on:
+  workflow_call:
+    inputs:
+      standard-repository:
+        type: string
+        default: ""
+      cli-ref:
+        type: string
+        default: cli-v0.2.0-rc.1
+      python-version:
+        type: string
+        default: "3.12"
+    secrets:
+      standard-token:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: harness tasks
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout instancia (historial completo para comparar con la base)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Checkout estándar
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ inputs.standard-repository != '' && inputs.standard-repository || format('{0}/harness-standard', github.repository_owner) }}
+          ref: ${{ inputs.cli-ref }}
+          path: .harness-standard
+          token: ${{ secrets.standard-token || github.token }}
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Instalar CLI
+        run: python -m pip install --disable-pip-version-check ./.harness-standard
+
+      - name: Aprobaciones del PR (para criterios manuales)
+        id: approvers
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          logins=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate --jq '[.[] | select(.state=="APPROVED") | .user.login] | unique | join(",")' || true)
+          echo "list=$logins" >> "$GITHUB_OUTPUT"
+
+      - name: Validar tareas y transiciones; ejecutar aceptación de las que pasan a done
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+          PR: ${{ github.event.pull_request.number }}
+          APPROVERS: ${{ steps.approvers.outputs.list }}
+        run: |
+          args=(tasks validate --base "$BASE_SHA" --run-acceptance)
+          [ -n "$PR" ] && args+=(--pr-number "$PR" --approvers "$APPROVERS")
+          harness "${args[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+          exit "${PIPESTATUS[0]}"
+
+      - name: Comprobar el cuerpo del PR contra el diff
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          harness pr check --base "$BASE_SHA" --body-env PR_BODY --title-env PR_TITLE | tee -a "$GITHUB_STEP_SUMMARY"
+          exit "${PIPESTATUS[0]}"
+
+      - name: Índice de tareas al día
+        run: harness tasks index --check
+
+  sync-issues:
+    name: harness tasks · issues (X-01)
+    if: github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Checkout estándar
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ inputs.standard-repository != '' && inputs.standard-repository || format('{0}/harness-standard', github.repository_owner) }}
+          ref: ${{ inputs.cli-ref }}
+          path: .harness-standard
+          token: ${{ secrets.standard-token || github.token }}
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ inputs.python-version }}
+      - run: python -m pip install --disable-pip-version-check ./.harness-standard
+      - name: Reflejar tareas en issues
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BEFORE: ${{ github.event.before }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: harness tasks issue-sync --base "$BEFORE" --run-url "$RUN_URL" | tee -a "$GITHUB_STEP_SUMMARY"

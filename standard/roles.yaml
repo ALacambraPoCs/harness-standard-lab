@@ -130,7 +130,7 @@ roles:
     obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N1
-    ficha: pendiente:F2.4
+    ficha: standard/04-archivos/plans.dir.md
     descripcion: Raíz de tareas y planes de ejecución (ADR-005).
   plans.active:
     ruta: active
@@ -140,7 +140,7 @@ roles:
     obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N1
-    ficha: pendiente:F2.4
+    ficha: standard/04-archivos/plans.dir.md
     descripcion: Un archivo por tarea en curso o pendiente (T-NNNN-slug.md).
   plans.completed:
     ruta: completed
@@ -150,7 +150,7 @@ roles:
     obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N1
-    ficha: pendiente:F2.4
+    ficha: standard/04-archivos/plans.dir.md
     descripcion: Tareas en estado terminal (done, cancelled).
   plans.index:
     ruta: INDEX.md
@@ -161,7 +161,7 @@ roles:
     condicion: Lo genera la CLI a partir de los archivos de tarea; no se edita a mano.
     capa: nucleo
     nivel_minimo: N1
-    ficha: pendiente:F2.4
+    ficha: standard/04-archivos/plans.dir.md
     descripcion: Índice de tareas generado (estado, propietario, segmento, issue).
 
   # ─────────────── Reglas mecánicas del proyecto ───────────────
@@ -243,3 +243,35 @@ rutas_sensibles:
   - .harness/manifest.yaml
   - .github/workflows/ejemplo.yml
   - .github/CODEOWNERS
+
+# Patrones (sintaxis CODEOWNERS) de rutas sensibles: un PR que toque alguno debe declarar
+# `sensible: sí` en su plantilla (pr.template) y pasa por CODEOWNERS de plataforma/seguridad.
+patrones_sensibles:
+  - AGENTS.md
+  - "**/AGENTS.md"
+  - CLAUDE.md
+  - "**/CLAUDE.md"
+  - /.claude/
+  - /.agents/
+  - /.mcp.json
+  - /.harness/
+  - /.github/workflows/
+  - /.github/CODEOWNERS
+
+# Patrones por defecto que puede tocar un PR declarado `trivial` (D-023): documentación y
+# lockfiles de dependencias. Excluye los sensibles (se comprueba aparte). Ajustable en
+# `tasks.trivial_paths` del manifiesto. Los reverts ("Reverts #N") están exentos de esta lista.
+patrones_triviales:
+  - "*.md"
+  - /docs/
+  - LICENSE
+  - package-lock.json
+  - pnpm-lock.yaml
+  - yarn.lock
+  - poetry.lock
+  - uv.lock
+  - Pipfile.lock
+  - go.sum
+  - Cargo.lock
+  - Gemfile.lock
+  - composer.lock

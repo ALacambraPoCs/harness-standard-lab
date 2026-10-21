@@ -31,7 +31,7 @@ roles:
     obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
-    ficha: pendiente:F2.2
+    ficha: standard/04-archivos/instructions.root.md
     descripcion: Índice de instrucciones para agentes (AGENTS.md raíz).
   instructions.segment:
     ruta: <segmento>/AGENTS.md
@@ -42,7 +42,7 @@ roles:
     condicion: El segmento tiene reglas, comandos o límites propios que no aplican al resto del repositorio.
     capa: nucleo
     nivel_minimo: N0
-    ficha: pendiente:F2.2
+    ficha: standard/04-archivos/instructions.segment.md
     descripcion: Instrucciones locales de un segmento (AGENTS.md anidado; gana el más cercano).
   adapter.claude.instructions:
     ruta: CLAUDE.md
@@ -52,7 +52,7 @@ roles:
     condicion: El manifiesto declara el adaptador claude-code.
     capa: adaptador:claude-code
     nivel_minimo: N0
-    ficha: pendiente:F2.2
+    ficha: standard/04-archivos/adapter.claude.instructions.md
     descripcion: Adaptador fino de Claude Code; contiene `@AGENTS.md` (ADR-003).
   adapter.claude.local:
     ruta: CLAUDE.local.md
@@ -62,7 +62,7 @@ roles:
     condicion: Preferencias personales de cada persona; DEBE estar en .gitignore (HS-SEC-003).
     capa: adaptador:claude-code
     nivel_minimo: N0
-    ficha: pendiente:F2.2
+    ficha: standard/04-archivos/adapter.claude.instructions.md
     descripcion: Instrucciones personales de Claude Code, nunca versionadas.
 
   # ─────────────── Conocimiento estable ───────────────

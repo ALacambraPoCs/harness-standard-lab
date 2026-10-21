@@ -1,7 +1,9 @@
 # harness-example-greenfield
 
+<!-- harness:resumen -->
 Servicio de ejemplo que calcula totales de pedidos. Instancia N0 de ejemplo del Estándar de Harness (repositorio de pruebas de extremo a extremo).
 
+<!-- harness:comandos -->
 ## Comandos
 
 | Rol | Comando |
@@ -12,12 +14,14 @@ Servicio de ejemplo que calcula totales de pedidos. Instancia N0 de ejemplo del 
 
 Ejecuta `check` después de cada cambio y `test` antes de pedir revisión.
 
+<!-- harness:restricciones -->
 ## Restricciones duras
 
 - No añadas dependencias sin un ADR en [decisiones](docs/decisions/README.md).
 - No leas ni escribas archivos `.env` ni credenciales.
 - No declares una tarea terminada: la CI lo decide.
 
+<!-- harness:mapa -->
 ## Dónde está el detalle
 
 - Arquitectura y límites: [ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)

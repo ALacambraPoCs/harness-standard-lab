@@ -65,10 +65,10 @@ Leyenda: **O** obligatorio · **C** condicional · **R** recomendado · **P** op
 | Rol | Ruta por defecto | Tipo | Oblig. | Nivel | Capa | Reubicable | Condición | Ficha |
 |---|---|---|---|---|---|---|---|---|
 | `manifest` | `.harness/manifest.yaml` | archivo | O | N0 | nucleo | no | — | pendiente:F2.3 |
-| `instructions.root` | `AGENTS.md` | archivo | O | N0 | nucleo | no | — | pendiente:F2.2 |
-| `instructions.segment` | `<segmento>/AGENTS.md` | archivo | C | N0 | nucleo | no | El segmento tiene reglas, comandos o límites propios que no aplican al resto del repositorio. | pendiente:F2.2 |
-| `adapter.claude.instructions` | `CLAUDE.md` | archivo | C | N0 | adaptador:claude-code | no | El manifiesto declara el adaptador claude-code. | pendiente:F2.2 |
-| `adapter.claude.local` | `CLAUDE.local.md` | archivo | X | N0 | adaptador:claude-code | no | Preferencias personales de cada persona; DEBE estar en .gitignore (HS-SEC-003). | pendiente:F2.2 |
+| `instructions.root` | `AGENTS.md` | archivo | O | N0 | nucleo | no | — | [ficha](04-archivos/instructions.root.md) |
+| `instructions.segment` | `<segmento>/AGENTS.md` | archivo | C | N0 | nucleo | no | El segmento tiene reglas, comandos o límites propios que no aplican al resto del repositorio. | [ficha](04-archivos/instructions.segment.md) |
+| `adapter.claude.instructions` | `CLAUDE.md` | archivo | C | N0 | adaptador:claude-code | no | El manifiesto declara el adaptador claude-code. | [ficha](04-archivos/adapter.claude.instructions.md) |
+| `adapter.claude.local` | `CLAUDE.local.md` | archivo | X | N0 | adaptador:claude-code | no | Preferencias personales de cada persona; DEBE estar en .gitignore (HS-SEC-003). | [ficha](04-archivos/adapter.claude.instructions.md) |
 | `architecture.map` | `docs/architecture/ARCHITECTURE.md` | archivo | O | N0 | nucleo | sí | — | pendiente:F2.3 |
 | `decisions.dir` | `docs/decisions` | directorio | O | N0 | nucleo | sí | — | pendiente:F2.3 |
 | `security.policy` | `docs/security/SECURITY.md` | archivo | O | N0 | nucleo | sí | — | pendiente:F2.3 |
@@ -122,9 +122,9 @@ Esta tabla es la regla de ubicación. Se convertirá en requisitos en la F2.5. S
 
 ## 7. Instrucciones locales de segmento
 
-- Un `AGENTS.md` en un subdirectorio aplica a ese subárbol y prevalece sobre el raíz cuando entran en conflicto. Es la semántica de S-AGENTSMD ("gana el más cercano"). Claude Code lo carga bajo demanda al trabajar en ese subdirectorio (S-CC-MEM).
+- Un `AGENTS.md` en un subdirectorio aplica a ese subárbol y prevalece sobre el raíz cuando entran en conflicto. Es la semántica de S-AGENTSMD ("gana el más cercano"). **Claude Code no lo carga por sí solo** cuando existe un `CLAUDE.md` raíz (S-CC-MEM, verificado 2026-10-21), así que con el adaptador `claude-code` cada `<segmento>/AGENTS.md` necesita al lado un `<segmento>/CLAUDE.md` con `@AGENTS.md` (ficha `instructions.segment`).
 - Solo se crea si el segmento tiene reglas, comandos o límites propios. No se crean `AGENTS.md` vacíos o redundantes.
-- Si existe adaptador claude-code, el `CLAUDE.md` del segmento, cuando haga falta, contiene solo `@AGENTS.md` y lo exclusivo de Claude (ADR-003). Lo valida la misma regla que en la raíz (F2.5).
+- Ese `<segmento>/CLAUDE.md` contiene solo `@AGENTS.md` y lo exclusivo de Claude (ADR-003). Lo valida una regla de la F2.5.
 - En N2 los segmentos se declaran en `segments.yaml` y las instrucciones locales se validan contra él (Fase 4).
 
 ## 8. Repositorios existentes (brownfield)

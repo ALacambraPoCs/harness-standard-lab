@@ -12,6 +12,16 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 - Tests: integridad de fichas frente a `roles.yaml` y tabla de roles al día; paso de CI equivalente.
 - Decisiones D-020…D-023 y experimento X-01 (`docs/experimentos/`).
 
+### Añadido (F2.2, 2026-10-21)
+- Fichas `standard/04-archivos/instructions.root.md`, `instructions.segment.md` y `adapter.claude.instructions.md` (incluye `CLAUDE.local.md`).
+- Anclas de contenido `<!-- harness:… -->` en la plantilla y en el ejemplo greenfield (resumen, comandos, restricciones, mapa; `claude` en CLAUDE.md).
+- `examples/fragmentos/` con el ejemplo canónico de segmento (`AGENTS.md` + `CLAUDE.md`).
+- `docs/fase-2/CANDIDATOS-N1.md`: requisitos candidatos C-01…C-10 para la F2.5.
+- Fuentes S-ETH-AGENTSMD y S-LULLA-AGENTSMD en el inventario.
+
+### Corregido (F2.2)
+- `03-estructura-canonica.md` §7 afirmaba que Claude Code carga `<segmento>/AGENTS.md` bajo demanda: con un `CLAUDE.md` raíz no lo hace (S-CC-MEM, verificado 2026-10-21). Ahora se exige `<segmento>/CLAUDE.md` con `@AGENTS.md`.
+
 ### Corregido
 - Con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada del estándar (sin `tests/`) y fallaba en la CI. Lo detectó y corrigió el usuario con `--fixtures tests/fixtures`. Se generaliza a `harness --standard-root . …` en la CI central (también para `roles`). `matrix` y `roles` muestran un error explicativo si no encuentran sus archivos. No se busca el estándar en el directorio actual a propósito: una instancia podría aportar un `standard/` propio para relajar las reglas.
 

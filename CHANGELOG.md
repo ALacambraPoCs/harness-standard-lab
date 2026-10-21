@@ -19,6 +19,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 - `docs/fase-2/CANDIDATOS-N1.md`: requisitos candidatos C-01…C-10 para la F2.5.
 - Fuentes S-ETH-AGENTSMD y S-LULLA-AGENTSMD en el inventario.
 
+### Añadido (F2.3, 2026-10-21)
+- Fichas `manifest` (incluye el contrato de comandos), `architecture.map`, `decisions.dir`, `security.policy`, `references.dir`, `codeowners` y `pr.template`.
+- Plantilla: `docs/decisions/_plantilla.md` (ADR con frontmatter), ADR-0001 con frontmatter, anclas en ARCHITECTURE.md y SECURITY.md (tabla riesgo → control), `.github/pull_request_template.md` con anclas `tarea`, `riesgo`, `evidencia`, `sensible`.
+- Ejemplo greenfield con anclas en arquitectura, seguridad y decisiones; fragmento `examples/fragmentos/references-README.md`.
+- Candidatos C-11…C-20; fuentes S-MATKLAD-ARCH, S-NYGARD-ADR y S-GH-PRTEMPLATE.
+
 ### Corregido (F2.2)
 - `03-estructura-canonica.md` §7 afirmaba que Claude Code carga `<segmento>/AGENTS.md` bajo demanda: con un `CLAUDE.md` raíz no lo hace (S-CC-MEM, verificado 2026-10-21). Ahora se exige `<segmento>/CLAUDE.md` con `@AGENTS.md`.
 

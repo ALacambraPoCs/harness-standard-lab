@@ -64,17 +64,17 @@ Leyenda: **O** obligatorio · **C** condicional · **R** recomendado · **P** op
 <!-- generado:roles:inicio (harness roles --write) -->
 | Rol | Ruta por defecto | Tipo | Oblig. | Nivel | Capa | Reubicable | Condición | Ficha |
 |---|---|---|---|---|---|---|---|---|
-| `manifest` | `.harness/manifest.yaml` | archivo | O | N0 | nucleo | no | — | pendiente:F2.3 |
+| `manifest` | `.harness/manifest.yaml` | archivo | O | N0 | nucleo | no | — | [ficha](04-archivos/manifest.md) |
 | `instructions.root` | `AGENTS.md` | archivo | O | N0 | nucleo | no | — | [ficha](04-archivos/instructions.root.md) |
 | `instructions.segment` | `<segmento>/AGENTS.md` | archivo | C | N0 | nucleo | no | El segmento tiene reglas, comandos o límites propios que no aplican al resto del repositorio. | [ficha](04-archivos/instructions.segment.md) |
 | `adapter.claude.instructions` | `CLAUDE.md` | archivo | C | N0 | adaptador:claude-code | no | El manifiesto declara el adaptador claude-code. | [ficha](04-archivos/adapter.claude.instructions.md) |
 | `adapter.claude.local` | `CLAUDE.local.md` | archivo | X | N0 | adaptador:claude-code | no | Preferencias personales de cada persona; DEBE estar en .gitignore (HS-SEC-003). | [ficha](04-archivos/adapter.claude.instructions.md) |
-| `architecture.map` | `docs/architecture/ARCHITECTURE.md` | archivo | O | N0 | nucleo | sí | — | pendiente:F2.3 |
-| `decisions.dir` | `docs/decisions` | directorio | O | N0 | nucleo | sí | — | pendiente:F2.3 |
-| `security.policy` | `docs/security/SECURITY.md` | archivo | O | N0 | nucleo | sí | — | pendiente:F2.3 |
+| `architecture.map` | `docs/architecture/ARCHITECTURE.md` | archivo | O | N0 | nucleo | sí | — | [ficha](04-archivos/architecture.map.md) |
+| `decisions.dir` | `docs/decisions` | directorio | O | N0 | nucleo | sí | — | [ficha](04-archivos/decisions.dir.md) |
+| `security.policy` | `docs/security/SECURITY.md` | archivo | O | N0 | nucleo | sí | — | [ficha](04-archivos/security.policy.md) |
 | `quality.doc` | `docs/quality/QUALITY.md` | archivo | R | N1 | nucleo | sí | — | pendiente:F6 |
 | `runbooks.dir` | `docs/runbooks` | directorio | C | N1 | nucleo | sí | El repositorio se despliega o se opera en un entorno compartido. | pendiente:F5 |
-| `references.dir` | `docs/references` | directorio | P | N0 | nucleo | sí | — | pendiente:F2.3 |
+| `references.dir` | `docs/references` | directorio | P | N0 | nucleo | sí | — | [ficha](04-archivos/references.dir.md) |
 | `plans.dir` | `docs/plans` | directorio | O | N1 | nucleo | sí | — | pendiente:F2.4 |
 | `plans.active` | `{plans.dir}/active` | directorio | O | N1 | nucleo | no | — | pendiente:F2.4 |
 | `plans.completed` | `{plans.dir}/completed` | directorio | O | N1 | nucleo | no | — | pendiente:F2.4 |
@@ -82,8 +82,8 @@ Leyenda: **O** obligatorio · **C** condicional · **R** recomendado · **P** op
 | `project.rules` | `.harness/rules` | directorio | C | N1 | nucleo | no | El proyecto declara límites de arquitectura que se verifican de forma mecánica. | pendiente:F4 |
 | `segments.map` | `.harness/segments.yaml` | archivo | O | N2 | nucleo | no | — | pendiente:F4 |
 | `adapter.claude.settings` | `.claude/settings.json` | archivo | C | N1 | adaptador:claude-code | no | El manifiesto declara claude-code y el nivel es N1 o superior. | pendiente:F3 |
-| `codeowners` | `.github/CODEOWNERS` (alt.: CODEOWNERS, docs/CODEOWNERS) | archivo | O | N0 | adaptador:github | no | — | pendiente:F2.3 |
-| `pr.template` | `.github/pull_request_template.md` (alt.: pull_request_template.md, docs/pull_request_template.md) | archivo | O | N1 | adaptador:github | no | — | pendiente:F2.3 |
+| `codeowners` | `.github/CODEOWNERS` (alt.: CODEOWNERS, docs/CODEOWNERS) | archivo | O | N0 | adaptador:github | no | — | [ficha](04-archivos/codeowners.md) |
+| `pr.template` | `.github/pull_request_template.md` (alt.: pull_request_template.md, docs/pull_request_template.md) | archivo | O | N1 | adaptador:github | no | — | [ficha](04-archivos/pr.template.md) |
 | `ci.workflows` | `.github/workflows` | directorio | O | N0 | adaptador:github | no | — | pendiente:F5 |
 <!-- generado:roles:fin -->
 

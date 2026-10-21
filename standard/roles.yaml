@@ -20,7 +20,7 @@ roles:
     obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
-    ficha: pendiente:F2.3
+    ficha: standard/04-archivos/manifest.md
     descripcion: Manifiesto de la instancia (versión, nivel, adaptadores, comandos, roles, waivers).
 
   # ─────────────── Instrucciones ───────────────
@@ -73,7 +73,7 @@ roles:
     obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
-    ficha: pendiente:F2.3
+    ficha: standard/04-archivos/architecture.map.md
     descripcion: Mapa de dominios, capas, límites y dependencias.
   decisions.dir:
     ruta: docs/decisions
@@ -82,7 +82,7 @@ roles:
     obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
-    ficha: pendiente:F2.3
+    ficha: standard/04-archivos/decisions.dir.md
     descripcion: Registro de decisiones (ADR) del proyecto, con README.md como índice.
   security.policy:
     ruta: docs/security/SECURITY.md
@@ -91,7 +91,7 @@ roles:
     obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
-    ficha: pendiente:F2.3
+    ficha: standard/04-archivos/security.policy.md
     descripcion: Política de seguridad del repositorio y del uso de agentes.
   quality.doc:
     ruta: docs/quality/QUALITY.md
@@ -119,7 +119,7 @@ roles:
     obligatoriedad: opcional
     capa: nucleo
     nivel_minimo: N0
-    ficha: pendiente:F2.3
+    ficha: standard/04-archivos/references.dir.md
     descripcion: Documentación externa condensada para el modelo (p. ej. *-llms.txt), con fuente y fecha.
 
   # ─────────────── Estado de tareas (N1) ───────────────
@@ -206,7 +206,7 @@ roles:
     obligatoriedad: obligatorio
     capa: adaptador:github
     nivel_minimo: N0
-    ficha: pendiente:F2.3
+    ficha: standard/04-archivos/codeowners.md
     descripcion: Propietarios de código; GitHub usa el primero que encuentra en el orden de `alternativas`.
   pr.template:
     ruta: .github/pull_request_template.md
@@ -216,7 +216,7 @@ roles:
     obligatoriedad: obligatorio
     capa: adaptador:github
     nivel_minimo: N1
-    ficha: pendiente:F2.3
+    ficha: standard/04-archivos/pr.template.md
     descripcion: Plantilla de PR que enlaza tarea, clase de riesgo y evidencia.
   ci.workflows:
     ruta: .github/workflows

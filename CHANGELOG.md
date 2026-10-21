@@ -2,6 +2,19 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Hay dos líneas de versión: **standard** (A) y **cli** (B).
 
+## [Sin publicar] — Fase 2 (en curso)
+
+### Añadido (F2.1, 2026-10-21)
+- `standard/03-estructura-canonica.md`: árbol N0–N1, regla de ubicación del conocimiento, convenciones de nombres y rutas, archivos generados, instrucciones de segmento, brownfield.
+- `standard/roles.yaml`: nuevos roles `instructions.segment`, `adapter.claude.local`, `quality.doc`, `runbooks.dir`, `references.dir`, `plans.active`, `plans.completed`, `plans.index`, `project.rules`, `pr.template`; campos `obligatoriedad`, `condicion`, `ficha`, `patron`, `relativa_a`.
+- `schemas/ficha.schema.json` y `standard/04-archivos/_PLANTILLA.md` (plantilla de ficha de archivo).
+- CLI: `harness roles [--write [--check]]` genera la tabla de roles; `role_path` resuelve roles relativos (`relativa_a`).
+- Tests: integridad de fichas frente a `roles.yaml` y tabla de roles al día; paso de CI equivalente.
+- Decisiones D-020…D-023 y experimento X-01 (`docs/experimentos/`).
+
+### Corregido
+- Con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada del estándar (sin `tests/`) y fallaba en la CI. Lo detectó y corrigió el usuario con `--fixtures tests/fixtures`. Se generaliza a `harness --standard-root . …` en la CI central (también para `roles`). `matrix` y `roles` muestran un error explicativo si no encuentran sus archivos. No se busca el estándar en el directorio actual a propósito: una instancia podría aportar un `standard/` propio para relajar las reglas.
+
 ## [cli 0.1.1] — 2026-10-20
 
 ### Cambiado

@@ -82,6 +82,8 @@ class Context:
     def role_path(self, role: str) -> str:
         """Ruta efectiva de un rol: reubicación válida del manifiesto o ruta por defecto."""
         spec = self.standard.roles[role]
+        if spec.get("relativa_a"):
+            return f"{self.role_path(spec['relativa_a']).rstrip('/')}/{spec['ruta']}"
         if spec.get("alternativas"):
             for alt in spec["alternativas"]:
                 if (self.root / alt).exists():

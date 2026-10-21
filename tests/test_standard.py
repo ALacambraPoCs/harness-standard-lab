@@ -22,3 +22,11 @@ def test_traceability_has_no_gaps():
 def test_every_rule_documents_itself():
     for rule in load_all().values():
         assert rule.doc, f"{rule.id} sin docstring"
+
+
+def test_tabla_de_roles_al_dia():
+    from harness_cli.roles_table import render_into
+    std = load_standard()
+    doc = std.root / "standard" / "03-estructura-canonica.md"
+    text = doc.read_text(encoding="utf-8")
+    assert render_into(text, std) == text, "Ejecuta `harness roles --write`"

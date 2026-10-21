@@ -28,6 +28,9 @@ def _cmd_matrix(args) -> int:
     from .matrix import blocking, run, to_markdown
     std = load_standard(Path(args.standard_root) if args.standard_root else None)
     fixtures = Path(args.fixtures) if args.fixtures else std.root / "tests" / "fixtures"
+    if not (fixtures / "cases.yaml").is_file():
+        print(f"No existe {fixtures / 'cases.yaml'}. En el repo central usa: harness --standard-root . matrix", file=sys.stderr)
+        return 2
     rows, problems, outcomes = run(std, fixtures, execute=args.strict)
     md = to_markdown(rows, problems, outcomes)
     if args.output:
@@ -61,6 +64,28 @@ def _cmd_explain(args) -> int:
     return 2
 
 
+def _cmd_roles(args) -> int:
+    from .roles_table import render_into, table
+    std = load_standard(Path(args.standard_root) if args.standard_root else None)
+    if not args.write:
+        print(table(std))
+        return 0
+    doc = std.root / "standard" / "03-estructura-canonica.md"
+    if not doc.is_file():
+        print(f"No existe {doc}. En el repo central usa: harness --standard-root . roles --write", file=sys.stderr)
+        return 2
+    old = doc.read_text(encoding="utf-8")
+    new = render_into(old, std)
+    if args.check:
+        if new != old:
+            print(f"{doc} está desactualizado: ejecuta `harness roles --write`.", file=sys.stderr)
+            return 1
+        return 0
+    doc.write_text(new, encoding="utf-8")
+    print(f"Tabla de roles actualizada en {doc}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="harness", description="CLI de conformidad del Estándar de Harness.")
     p.add_argument("--version", action="version",
@@ -85,6 +110,11 @@ def main(argv: list[str] | None = None) -> int:
     m.add_argument("--output", help="Archivo Markdown de salida.")
     m.add_argument("--strict", action="store_true", help="Ejecuta los fixtures y falla si hay huecos de trazabilidad.")
     m.set_defaults(func=_cmd_matrix)
+
+    r = sub.add_parser("roles", help="Tabla de roles (estructura canónica) desde standard/roles.yaml.")
+    r.add_argument("--write", action="store_true", help="Actualiza la tabla generada en standard/03-estructura-canonica.md.")
+    r.add_argument("--check", action="store_true", help="Con --write: no escribe; falla si la tabla está desactualizada.")
+    r.set_defaults(func=_cmd_roles)
 
     e = sub.add_parser("explain", help="Muestra un requisito o una regla.")
     e.add_argument("id")

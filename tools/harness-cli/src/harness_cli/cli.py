@@ -86,6 +86,83 @@ def _cmd_roles(args) -> int:
     return 0
 
 
+def _print_findings(findings, title: str, fmt: str) -> int:
+    import json
+    errors = [f for f in findings if f.severity == "error"]
+    if fmt == "json":
+        print(json.dumps({"title": title, "errors": len(errors), "warnings": len(findings) - len(errors),
+                          "findings": [f.to_dict() for f in findings]}, ensure_ascii=False, indent=2))
+    else:
+        print(title)
+        for f in findings:
+            print(f"{'✗' if f.severity == 'error' else '!'} [{f.severity.upper()}] {f.rule}" + (f"  ({f.path})" if f.path else ""))
+            print(f"    QUÉ:   {f.message}")
+            print(f"    CÓMO:  {f.remedy}")
+        print(f"Resultado: {len(errors)} error(es), {len(findings) - len(errors)} aviso(s).")
+    return 1 if errors else 0
+
+
+def _ctx(args):
+    from .context import Context
+    std = load_standard(Path(args.standard_root) if args.standard_root else None)
+    return Context.build(Path(args.path), std, dt.date.today())
+
+
+def _cmd_tasks(args) -> int:
+    from . import tasks as T
+    ctx = _ctx(args)
+    if args.tasks_cmd == "validate":
+        approvers = {a.strip().lstrip("@").lower() for a in args.approvers.split(",") if a.strip()} if args.approvers is not None else None
+        findings, found = T.validate(ctx, base=args.base, pr_number=args.pr_number, run_acceptance=args.run_acceptance,
+                                     approvers=approvers)
+        return _print_findings(findings, f"harness tasks validate · {len(found)} tarea(s)", args.format)
+    if args.tasks_cmd == "issue-sync":
+        import json
+        import os
+        base = None if (args.base or "").strip("0") == "" else args.base
+        ops = T.plan_issue_sync(ctx, base, run_url=args.run_url or "")
+        if args.dry_run:
+            print(json.dumps(ops, ensure_ascii=False, indent=2))
+            return 0
+        token, repo = os.environ.get("GITHUB_TOKEN", ""), os.environ.get("GITHUB_REPOSITORY", "")
+        if not token or not repo:
+            print("Faltan GITHUB_TOKEN o GITHUB_REPOSITORY.", file=sys.stderr)
+            return 2
+        for line in T.apply_issue_ops(ops, repo, token) or ["Sin cambios que reflejar."]:
+            print(line)
+        return 0
+    # index
+    findings, found = T.validate(ctx)
+    path = ctx.root / ctx.role_path("plans.index")
+    new = T.render_index(found)
+    if args.check:
+        old = path.read_text(encoding="utf-8") if path.is_file() else ""
+        if old != new:
+            print(f"{path.relative_to(ctx.root)} está desactualizado: ejecuta `harness tasks index --write`.", file=sys.stderr)
+            return 1
+        print("Índice de tareas al día.")
+        return 0
+    if args.write:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(new, encoding="utf-8")
+        print(f"Índice escrito en {path.relative_to(ctx.root)} ({len(found)} tarea(s)).")
+        return 0
+    print(new)
+    return 0
+
+
+def _cmd_pr(args) -> int:
+    import os
+    from . import tasks as T
+    ctx = _ctx(args)
+    if args.body_file:
+        body = Path(args.body_file).read_text(encoding="utf-8")
+    else:
+        body = os.environ.get(args.body_env, "")
+    title = os.environ.get(args.title_env, "") if args.title_env else ""
+    return _print_findings(T.check_pr(ctx, body, args.base, title=title), "harness pr check", args.format)
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="harness", description="CLI de conformidad del Estándar de Harness.")
     p.add_argument("--version", action="version",
@@ -115,6 +192,40 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--write", action="store_true", help="Actualiza la tabla generada en standard/03-estructura-canonica.md.")
     r.add_argument("--check", action="store_true", help="Con --write: no escribe; falla si la tabla está desactualizada.")
     r.set_defaults(func=_cmd_roles)
+
+    t = sub.add_parser("tasks", help="Ciclo de vida de tareas (ADR-005, ADR-016).")
+    tsub = t.add_subparsers(dest="tasks_cmd", required=True)
+    tv = tsub.add_parser("validate", help="Valida archivos de tarea y, con --base, sus transiciones.")
+    tv.add_argument("--path", default=".")
+    tv.add_argument("--base", help="Referencia git base (p. ej. origin/main) para validar transiciones.")
+    tv.add_argument("--pr-number", type=int, help="Número del PR (exige done_pr igual).")
+    tv.add_argument("--run-acceptance", action="store_true", help="Ejecuta los criterios de aceptación de las tareas que pasan a done.")
+    tv.add_argument("--approvers", help="Logins (separados por comas) que han aprobado el PR, para criterios manuales.")
+    tv.add_argument("--format", choices=["text", "json"], default="text")
+    tv.set_defaults(func=_cmd_tasks)
+    ts = tsub.add_parser("issue-sync", help="X-01: refleja estado y responsable de las tareas cambiadas en sus issues.")
+    ts.add_argument("--path", default=".")
+    ts.add_argument("--base", help="Commit anterior (p. ej. github.event.before). Vacío o ceros = todas.")
+    ts.add_argument("--run-url", help="URL de la ejecución de CI para el comentario de evidencia.")
+    ts.add_argument("--dry-run", action="store_true", help="Solo muestra las operaciones.")
+    ts.set_defaults(func=_cmd_tasks)
+    ti = tsub.add_parser("index", help="Genera o comprueba el índice de tareas (plans.index).")
+    ti.add_argument("--path", default=".")
+    ti.add_argument("--write", action="store_true")
+    ti.add_argument("--check", action="store_true")
+    ti.set_defaults(func=_cmd_tasks)
+
+    pr = sub.add_parser("pr", help="Comprobaciones de pull request.")
+    prsub = pr.add_subparsers(dest="pr_cmd", required=True)
+    pc = prsub.add_parser("check", help="Valida el cuerpo del PR contra el diff y las tareas (pr.template, D-023).")
+    pc.add_argument("--path", default=".")
+    pc.add_argument("--base", required=True, help="Referencia git base del PR (p. ej. origin/main).")
+    g = pc.add_mutually_exclusive_group(required=True)
+    g.add_argument("--body-file")
+    g.add_argument("--body-env", help="Variable de entorno con el cuerpo del PR (evita inyección en el shell).")
+    pc.add_argument("--title-env", help="Variable de entorno con el título del PR.")
+    pc.add_argument("--format", choices=["text", "json"], default="text")
+    pc.set_defaults(func=_cmd_pr)
 
     e = sub.add_parser("explain", help="Muestra un requisito o una regla.")
     e.add_argument("id")

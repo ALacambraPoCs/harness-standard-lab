@@ -40,6 +40,8 @@ class Standard:
     requirements: dict[str, dict[str, Any]]
     roles: dict[str, dict[str, Any]]
     sensitive_paths: list[str]
+    sensitive_patterns: list[str] = field(default_factory=list)
+    trivial_patterns: list[str] = field(default_factory=list)
     defined_levels: tuple[str, ...] = ("N0",)
     schemas: dict[str, dict[str, Any]] = field(default_factory=dict)
 
@@ -68,7 +70,7 @@ def _load_yaml(path: Path) -> Any:
 def load_standard(root: Path | None = None) -> Standard:
     root = root or find_standard_root()
     schemas = {}
-    for name in ("manifest", "requirement", "roles"):
+    for name in ("manifest", "requirement", "roles", "task"):
         with (root / "schemas" / f"{name}.schema.json").open(encoding="utf-8") as fh:
             schemas[name] = json.load(fh)
     reqs_doc = _load_yaml(root / "standard" / "requirements.yaml")
@@ -80,6 +82,8 @@ def load_standard(root: Path | None = None) -> Standard:
         roles=roles_doc["roles"],
         sensitive_paths=roles_doc["rutas_sensibles"],
         defined_levels=tuple(reqs_doc["niveles_definidos"]),
+        sensitive_patterns=roles_doc["patrones_sensibles"],
+        trivial_patterns=roles_doc["patrones_triviales"],
         schemas=schemas,
     )
     # El propio estándar debe ser válido: si no, es un defecto del producto A.

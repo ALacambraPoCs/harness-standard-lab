@@ -19,10 +19,10 @@ sin coste de sincronización apreciable y sin crear una segunda fuente de verdad
 | Enlace | Campo opcional `issue: <número>` en el frontmatter durante el experimento. |
 | Dirección | Solo archivo → issue. Nunca al revés. |
 | Cierre | El PR que completa la tarea incluye `Closes #<n>`; GitHub cierra la issue al fusionar. |
-| Estado intermedio | Job de CI posterior al merge: refleja `status` como etiqueta `status:<valor>` y el titular del `lease` como asignado. |
+| Estado intermedio | Job `sync-issues` de `harness-tasks-lifecycle.yml` (push a la rama por defecto): `harness tasks issue-sync --base <before>` refleja `status` como etiqueta `status:<valor>` (sustituye la anterior) y el `owner` como asignado; en `done` comenta el enlace al run. Solo actúa sobre tareas cambiadas en el push. El titular del `lease` no se usa como asignado: puede ser un agente, que no es usuario de GitHub. |
 | Permisos | Job separado con solo `issues: write`, sin credenciales del modelo (ADR-013). |
 | Divergencia | Prevalece el archivo; la CI sobrescribe la issue. |
-| Regla CLI | Si existe `issue:`, debe ser un entero positivo; la existencia en el mismo repositorio se comprueba en CI con la API. |
+| Regla CLI | Si existe `issue:`, debe ser un entero positivo (esquema). `pr.issue`: un PR que lleva a `done` una tarea con `issue` debe incluir `Closes #<n>`. La existencia de la issue se comprueba al sincronizar (error de API visible en el run). `--dry-run` muestra las operaciones sin llamar a la API. |
 | Seguridad | Una issue es entrada no confiable (PR-7): un agente no toma instrucciones de una issue sin que una persona responsable la convierta en archivo de tarea. |
 
 ## Métricas (≥ 4 semanas o ≥ 20 tareas en el piloto)

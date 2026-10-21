@@ -75,10 +75,10 @@ Leyenda: **O** obligatorio · **C** condicional · **R** recomendado · **P** op
 | `quality.doc` | `docs/quality/QUALITY.md` | archivo | R | N1 | nucleo | sí | — | pendiente:F6 |
 | `runbooks.dir` | `docs/runbooks` | directorio | C | N1 | nucleo | sí | El repositorio se despliega o se opera en un entorno compartido. | pendiente:F5 |
 | `references.dir` | `docs/references` | directorio | P | N0 | nucleo | sí | — | [ficha](04-archivos/references.dir.md) |
-| `plans.dir` | `docs/plans` | directorio | O | N1 | nucleo | sí | — | pendiente:F2.4 |
-| `plans.active` | `{plans.dir}/active` | directorio | O | N1 | nucleo | no | — | pendiente:F2.4 |
-| `plans.completed` | `{plans.dir}/completed` | directorio | O | N1 | nucleo | no | — | pendiente:F2.4 |
-| `plans.index` | `{plans.dir}/INDEX.md` | archivo | G | N1 | nucleo | no | Lo genera la CLI a partir de los archivos de tarea; no se edita a mano. | pendiente:F2.4 |
+| `plans.dir` | `docs/plans` | directorio | O | N1 | nucleo | sí | — | [ficha](04-archivos/plans.dir.md) |
+| `plans.active` | `{plans.dir}/active` | directorio | O | N1 | nucleo | no | — | [ficha](04-archivos/plans.dir.md) |
+| `plans.completed` | `{plans.dir}/completed` | directorio | O | N1 | nucleo | no | — | [ficha](04-archivos/plans.dir.md) |
+| `plans.index` | `{plans.dir}/INDEX.md` | archivo | G | N1 | nucleo | no | Lo genera la CLI a partir de los archivos de tarea; no se edita a mano. | [ficha](04-archivos/plans.dir.md) |
 | `project.rules` | `.harness/rules` | directorio | C | N1 | nucleo | no | El proyecto declara límites de arquitectura que se verifican de forma mecánica. | pendiente:F4 |
 | `segments.map` | `.harness/segments.yaml` | archivo | O | N2 | nucleo | no | — | pendiente:F4 |
 | `adapter.claude.settings` | `.claude/settings.json` | archivo | C | N1 | adaptador:claude-code | no | El manifiesto declara claude-code y el nivel es N1 o superior. | pendiente:F3 |

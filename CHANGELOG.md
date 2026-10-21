@@ -25,6 +25,17 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 - Ejemplo greenfield con anclas en arquitectura, seguridad y decisiones; fragmento `examples/fragmentos/references-README.md`.
 - Candidatos C-11…C-20; fuentes S-MATKLAD-ARCH, S-NYGARD-ADR y S-GH-PRTEMPLATE.
 
+### Añadido (F2.4, 2026-10-21)
+- `schemas/task.schema.json` (esquema de tarea, ADR-005) y ficha `standard/04-archivos/plans.dir.md` (cubre `plans.active`, `plans.completed` y `plans.index`).
+- ADR-016 (aprobado, D-027): la transición a `done` va en el propio PR y la verifica un check requerido que re-ejecuta los criterios de aceptación.
+- `roles.yaml`: `patrones_sensibles` y `patrones_triviales` (D-023, ADR-013); manifiesto: `tasks.trivial_paths` y `tasks.acceptance_timeout`.
+- CLI: `harness tasks validate [--base --run-acceptance --pr-number --approvers]`, `harness tasks index [--write|--check]`, `harness tasks issue-sync [--dry-run]` (X-01) y `harness pr check`.
+- Workflow reutilizable `.github/workflows/harness-tasks-lifecycle.yml` (jobs `verify` y `sync-issues`) y plantilla `template/niveles/n1/` (plantilla de tarea, índice y workflow que lo llama).
+- `tests/test_tasks.py` (29 casos sobre repos git temporales). Candidatos C-21…C-26.
+
+### Cambiado (F2.4)
+- CLI 0.2.0rc1. El workflow de tareas usa por defecto `cli-ref: cli-v0.2.0-rc.1`, tag que hay que crear tras fusionar F2.4. `harness-conformance.yml` sigue en `cli-v0.1.1`.
+
 ### Corregido (F2.2)
 - `03-estructura-canonica.md` §7 afirmaba que Claude Code carga `<segmento>/AGENTS.md` bajo demanda: con un `CLAUDE.md` raíz no lo hace (S-CC-MEM, verificado 2026-10-21). Ahora se exige `<segmento>/CLAUDE.md` con `@AGENTS.md`.
 

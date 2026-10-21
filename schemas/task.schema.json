@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harness-standard.local/schemas/task/0.1.0",
+  "title": "Frontmatter de un archivo de tarea (plans.active / plans.completed)",
+  "description": "ADR-005 y ADR-016. El cuerpo Markdown se valida aparte (anclas).",
+  "type": "object",
+  "required": ["id", "title", "owner", "status", "risk", "created", "acceptance"],
+  "additionalProperties": false,
+  "patternProperties": { "^x-": {} },
+  "properties": {
+    "id": { "type": "string", "pattern": "^T-\\d{4}$" },
+    "title": { "type": "string", "minLength": 5, "maxLength": 120 },
+    "owner": { "type": "string", "pattern": "^@[A-Za-z0-9][A-Za-z0-9-]*(/[A-Za-z0-9._-]+)?$", "description": "Persona responsable (o equipo). Un agente siempre actúa a nombre de una persona." },
+    "status": { "enum": ["proposed", "ready", "in_progress", "blocked", "in_review", "done", "regressed", "cancelled"] },
+    "risk": { "enum": ["bajo", "medio", "alto"] },
+    "created": { "type": "string", "format": "date" },
+    "segments": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "depends_on": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^T-\\d{4}$" } },
+    "issue": { "type": "integer", "minimum": 1, "description": "Experimento X-01: issue espejo en el mismo repositorio." },
+    "lease": {
+      "type": "object",
+      "required": ["holder", "expires"],
+      "additionalProperties": false,
+      "properties": {
+        "holder": { "type": "string", "minLength": 3, "description": "p. ej. agent:claude-code@ana o @ana" },
+        "expires": { "type": "string", "format": "date-time" }
+      }
+    },
+    "blocked_reason": { "type": "string", "minLength": 5 },
+    "done_pr": { "type": "integer", "minimum": 1, "description": "PR que verificó y fusionó la tarea (ADR-016)." },
+    "acceptance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "check"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^AC\\d+$" },
+          "description": { "type": "string", "minLength": 5 },
+          "check": { "type": "string", "minLength": 1, "description": "Comando ejecutable (código 0 = cumple) o la palabra manual." },
+          "verified_by": { "type": "string", "pattern": "^@[A-Za-z0-9][A-Za-z0-9-]*$", "description": "Solo para check: manual. Debe haber aprobado el PR." }
+        }
+      }
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "status": { "const": "done" } } }, "then": { "required": ["done_pr"] } },
+    { "if": { "properties": { "status": { "const": "blocked" } } }, "then": { "required": ["blocked_reason"] } }
+  ]
+}

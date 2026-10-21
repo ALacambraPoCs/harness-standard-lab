@@ -31,5 +31,11 @@ Cada candidato tiene su origen en una ficha. En la F2.5 recibirá ID, regla y fi
 | C-18 | Existe la plantilla de PR con anclas `tarea`, `riesgo`, `evidencia`, `sensible` | DEBE | N1+ | automática | pr.template |
 | C-19 | El cuerpo de cada PR declara `tarea` válida (archivo existente o `trivial` coherente con el diff, D-023) y `riesgo` válido | DEBE | N1+ | automática en CI de tareas | pr.template / F2.4 |
 | C-20 | `sensible: no` en un PR que toca rutas sensibles se marca como error | DEBE | N1+ | automática (diff) | pr.template / ADR-013 |
+| C-21 | Cada tarea de `plans.active`/`plans.completed` valida con `schemas/task.schema.json`, nombre `T-NNNN-<slug>.md`, id único y anclas de cuerpo | DEBE | N1+ | automática | plans.dir / F2.4 (`tasks.schema`, `naming`, `unique`, `body`) |
+| C-22 | Las tareas terminales están en `completed/` y las no terminales en `active/`; ninguna tarea se borra | DEBE | N1+ | automática (diff) | plans.dir (`tasks.location`, `tasks.deleted`) |
+| C-23 | Solo transiciones de estado permitidas respecto a la base del PR | DEBE | N1+ | automática (diff) | plans.dir (`tasks.transition`) |
+| C-24 | Una tarea pasa a `done` solo si el check del PR re-ejecuta con éxito sus criterios y `done_pr` es ese PR; los `manual` con `verified_by` aprobador | DEBE | N1+ | automática en CI de tareas | ADR-016 (`tasks.acceptance`, `tasks.done-pr`) |
+| C-25 | `plans.index` coincide con la salida de `harness tasks index` | DEBERÍA | N1+ | automática | plans.dir |
+| C-26 | `harness tasks` configurado como check requerido en el ruleset de la rama por defecto | DEBE | N1+ | semiautomática (API de rulesets) | ADR-016, E-006 |
 
 Nota sobre compatibilidad: añadir un DEBE a N0 es un cambio MAJOR (`GOVERNANCE.md` §3), admitido mientras el estándar sea 0.x. C-05, C-07 y C-10 no rompen ninguna instancia actual: ninguna tiene segmentos y todas las rutas son portables.

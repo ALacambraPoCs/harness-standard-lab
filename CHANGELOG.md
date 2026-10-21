@@ -25,6 +25,19 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 - Ejemplo greenfield con anclas en arquitectura, seguridad y decisiones; fragmento `examples/fragmentos/references-README.md`.
 - Candidatos C-11…C-20; fuentes S-MATKLAD-ARCH, S-NYGARD-ADR y S-GH-PRTEMPLATE.
 
+### Añadido (F2.5, 2026-10-21) — estándar 0.2.0 (sin publicar)
+- 26 requisitos nuevos en `standard/requirements.yaml` (estado `propuesto`, `desde: 0.2.0`): 7 que se añaden a N0 y 19 de N1. `niveles_definidos: [N0, N1]` y `niveles_desde: {N0: 0.1.0, N1: 0.2.0}`.
+- Aplicabilidad por versión (D-029, propuesta): la CLI solo aplica los requisitos con `desde` ≤ versión declarada; N1 exige declarar 0.2.0.
+- `schemas/adr.schema.json`; `budgets.instructions_max_constraints` en el manifiesto; `niveles_desde` en el esquema de requisitos.
+- Reglas nuevas (`rules/n1.py`, `rules/lifecycle.py`): anclas de AGENTS.md, arquitectura y seguridad; flujo; presupuesto de restricciones; cadena de 32 KiB; segmentos (ámbito, duplicación, CLAUDE.md); `@AGENTS.md` primero; `.claude/CLAUDE.md`; rutas portables; idioma; índice y frontmatter de ADR; procedencia de referencias; plantilla de PR; workflow de tareas; estructura de tareas; la parte estática de `harness tasks validate` y el índice dentro de `harness check`.
+- `harness pr check`: aviso si se reescribe un ADR aceptado (`pr.adr-immutable`). La regla de riesgo bajo en rutas sensibles pasa a llamarse `pr.risk-sensitive`.
+- Los hallazgos de `harness tasks` y `harness pr check` citan ya su requisito (antes `pendiente:F2.5`).
+- Fixture conforme `n1-basico` y 25 casos nuevos; la matriz cuenta como cobertura de las reglas de PR las pruebas de `tests/test_tasks.py`. La plantilla se valida en N0 y en N1 (`{{LEVEL}}`, `{{DOCS_LANGUAGE}}`, `{{DATE}}`; ancla `flujo` en AGENTS.md).
+- Fichas: los `pendiente:F2.5` se sustituyen por los IDs; `02-niveles-de-conformidad.md` §3b.
+
+### Cambiado (F2.5)
+- CLI 0.2.0rc2 (soporta estándar 0.1.x y 0.2.x). Los workflows reutilizables usan por defecto `cli-v0.2.0-rc.2`.
+
 ### Añadido (F2.4, 2026-10-21)
 - `schemas/task.schema.json` (esquema de tarea, ADR-005) y ficha `standard/04-archivos/plans.dir.md` (cubre `plans.active`, `plans.completed` y `plans.index`).
 - ADR-016 (aprobado, D-027): la transición a `done` va en el propio PR y la verifica un check requerido que re-ejecuta los criterios de aceptación.

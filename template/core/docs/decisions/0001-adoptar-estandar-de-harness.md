@@ -2,7 +2,7 @@
 id: ADR-0001
 titulo: Adoptar el Estándar de Harness
 estado: aceptada
-fecha: AAAA-MM-DD
+fecha: {{DATE}}
 decisores: ["{{OWNER}}"]
 ---
 
@@ -12,7 +12,7 @@ decisores: ["{{OWNER}}"]
 El equipo trabaja con agentes de programación y necesita normas comunes y verificables.
 
 ## Decisión
-El repositorio adopta el Estándar de Harness 0.1.0, nivel N0.
+El repositorio adopta el Estándar de Harness 0.2.0, nivel {{LEVEL}}.
 
 ## Consecuencias
 `harness check` es un check requerido en los PR; la configuración de agentes queda bajo CODEOWNERS.

@@ -1,7 +1,7 @@
 ---
 documento: HS-02
 titulo: Niveles de conformidad y waivers
-version_estandar: 0.1.0
+version_estandar: 0.2.0
 estado: borrador
 fecha: 2026-10-19
 adr: [ADR-004, ADR-007]
@@ -14,10 +14,10 @@ caracter: normativo
 
 Los niveles son **acumulativos**: cumplir un nivel exige cumplir todos los inferiores. Cada requisito declara en `conformidad` los niveles en los que aplica.
 
-| Nivel | Nombre | Garantía | Uso de agentes que habilita (máximo) | Estado en v0.1 |
+| Nivel | Nombre | Garantía | Uso de agentes que habilita (máximo) | Estado en 0.2.0 |
 |---|---|---|---|---|
 | **N0** | Legible por agentes | Una persona o un agente sin contexto previo entiende el repositorio, lo prepara y lo verifica sin preguntar a nadie. La configuración de agentes está protegida. | Asistencia interactiva, con la persona responsable supervisando cada paso | **Requisitos definidos** (§3) |
-| **N1** | Trabajo verificado | "Hecho" significa verificado por la CI con evidencia, no declarado por el agente. | Un agente por tarea; revisión humana del PR | Fase 2 |
+| **N1** | Trabajo verificado | "Hecho" significa verificado por la CI con evidencia, no declarado por el agente. | Un agente por tarea; revisión humana del PR | **Requisitos definidos** en 0.2.0 (§3b) |
 | **N2** | Concurrente | Varias personas y agentes trabajan en paralelo sin interferir. | Varios agentes en paralelo en segmentos distintos | Fase 4 |
 | **N3** | Autonomía supervisada | La supervisión humana se aplica según el riesgo y las excepciones. | Loops y automatizaciones; merge sin intervención humana solo en clases de riesgo bajo | Fases 5–6 |
 
@@ -29,6 +29,7 @@ Los niveles son **acumulativos**: cumplir un nivel exige cumplir todos los infer
 4. El uso de agentes que habilita cada nivel es un **máximo**. Lo que pueda imponerse técnicamente se impondrá en las Fases 4 y 5. El resto se audita.
 5. **Nivel efectivo.** La CLI calcula el nivel más alto en el que se cumplen todos los requisitos DEBE y NO DEBE aplicables, contando los waivers vigentes como cumplidos, y lo compara con el declarado.
 6. **Degradación.** Si el check de conformidad falla de forma sostenida en la rama principal, el nivel efectivo baja y se notifica al propietario de la instancia. El umbral y el mecanismo se definen en la Fase 9.
+7. **Versión declarada (D-029).** Un requisito solo aplica si su campo `desde` es menor o igual que `standard.version` del manifiesto. Cada nivel existe a partir de una versión (`niveles_desde` en `requirements.yaml`): N1 exige declarar 0.2.0 o posterior. Así, publicar requisitos nuevos no rompe instancias existentes: se adoptan al migrar la versión declarada.
 
 ## 3. Requisitos del nivel N0 (v0.1.0)
 
@@ -59,7 +60,48 @@ La fuente de verdad es `requirements.yaml`. Esta tabla es una vista resumida.
 | HS-VER-002 | DEBE | `setup` y `check` terminan con código 0 sin interacción en un entorno limpio | automática (con `--run-commands`) | sí |
 | HS-VER-003 | DEBERÍA | `setup` es idempotente | automática (con `--run-commands`) | sí |
 
-El contenido mínimo de cada archivo (mapa de arquitectura, política de seguridad…) se especifica en las fichas de la Fase 2. En la v0.1 solo se comprueba que existen.
+El contenido mínimo de cada archivo se especifica en las fichas (`standard/04-archivos/`). En 0.1.0 solo se comprueba que existen; 0.2.0 añade las anclas obligatorias (§3b).
+
+## 3b. Requisitos añadidos en 0.2.0 (F2.5) — estado: propuestos
+
+Aplican solo a instancias que declaran `standard.version` ≥ 0.2.0 (regla 7). «En el PR» significa que los verifican `harness tasks validate --base` y `harness pr check` en el workflow `harness-tasks-lifecycle.yml`, no `harness check`.
+
+**Nuevos en N0**
+
+| ID | Nivel | Requisito (resumen) | Verificación | Exentable |
+|---|---|---|---|---|
+| HS-GOV-008 | DEBE | Las rutas versionadas son portables | automática | no |
+| HS-INS-011 | DEBE | Las instrucciones de segmento declaran su ámbito | automática | sí |
+| HS-INS-012 | NO DEBERÍA | Las instrucciones de segmento no duplican la raíz | automática | sí |
+| HS-INS-013 | DEBE | (claude-code) Cada segmento con AGENTS.md tiene su adaptador CLAUDE.md | automática | no |
+| HS-INS-014 | DEBERÍA | (claude-code) @AGENTS.md es la primera línea de cada CLAUDE.md | automática | sí |
+| HS-INS-015 | NO DEBERÍA | (claude-code) El adaptador de Claude Code tiene una sola ubicación | automática | sí |
+| HS-CTX-003 | DEBERÍA | La cadena de AGENTS.md cabe en 32 KiB | automática | sí |
+| HS-CTX-004 | DEBERÍA | Las referencias externas indican su procedencia | automática | sí |
+
+**Nivel N1** (además de todos los de N0)
+
+| ID | Nivel | Requisito (resumen) | Verificación | Exentable |
+|---|---|---|---|---|
+| HS-GOV-007 | DEBERÍA | El manifiesto declara el idioma de la documentación | automática | sí |
+| HS-INS-009 | DEBE | AGENTS.md raíz tiene las secciones obligatorias | automática | sí |
+| HS-INS-010 | DEBERÍA | AGENTS.md raíz describe el flujo de trabajo | automática | sí |
+| HS-CTX-002 | DEBERÍA | Las restricciones duras caben en su presupuesto | automática | sí |
+| HS-ARC-003 | DEBE | El mapa de arquitectura tiene las secciones obligatorias | automática | sí |
+| HS-ARC-004 | DEBE | El índice de decisiones enumera todos los ADR | automática | sí |
+| HS-ARC-005 | DEBE | Cada ADR tiene frontmatter válido | automática | sí |
+| HS-ARC-006 | NO DEBERÍA | Un ADR aceptado no se reescribe | automática · en el PR | sí |
+| HS-SEC-005 | DEBE | La política de seguridad tiene las secciones obligatorias | automática | sí |
+| HS-SEC-006 | NO DEBE | Un PR no oculta que toca rutas sensibles | automática · en el PR | no |
+| HS-CI-001 | DEBE | Existe la plantilla de PR | automática | sí |
+| HS-CI-002 | DEBE | El cuerpo del PR declara tarea y riesgo | automática · en el PR | no |
+| HS-CI-003 | DEBE | El ciclo de vida de tareas es un check requerido | semiautomática | no |
+| HS-STA-001 | DEBE | Existe la estructura de tareas | automática | sí |
+| HS-STA-002 | DEBE | Cada tarea es válida | automática | no |
+| HS-STA-003 | DEBE | Las tareas están en su carpeta y no se borran | automática | no |
+| HS-STA-004 | DEBE | Solo hay transiciones de estado permitidas | automática · en el PR | no |
+| HS-STA-005 | DEBE | done solo con aceptación verificada por la CI | automática · en el PR | no |
+| HS-STA-006 | DEBERÍA | El índice de tareas está al día | automática | sí |
 
 ## 4. Waivers
 

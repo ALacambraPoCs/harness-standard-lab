@@ -21,22 +21,23 @@ class Rule:
     needs_commands: bool = False
     platform: str | None = None
     doc: str = ""
+    context: str = "check"   # check: harness check · pr: solo con base del PR (tasks validate --base, pr check)
 
 
 REGISTRY: dict[str, Rule] = {}
 
 
 def rule(rule_id: str, requirements: Iterable[str], *, needs_valid_manifest: bool = True,
-         needs_commands: bool = False, platform: str | None = None):
+         needs_commands: bool = False, platform: str | None = None, context: str = "check"):
     def deco(func):
         if rule_id in REGISTRY:
             raise ValueError(f"Regla duplicada: {rule_id}")
         REGISTRY[rule_id] = Rule(rule_id, tuple(requirements), func, needs_valid_manifest,
-                                 needs_commands, platform, (func.__doc__ or "").strip())
+                                 needs_commands, platform, (func.__doc__ or "").strip(), context)
         return func
     return deco
 
 
 def load_all() -> dict[str, Rule]:
-    from . import claude, core, github  # noqa: F401  (registran sus reglas al importarse)
+    from . import claude, core, github, lifecycle, n1  # noqa: F401  (registran sus reglas al importarse)
     return REGISTRY

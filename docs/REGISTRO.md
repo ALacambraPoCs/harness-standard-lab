@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-21 (F2.3 aprobada; ADR-016 aprobado; F2.4 pendiente de aprobación)
+actualizado: 2026-10-21 (F2.4 aprobada; F2.5 pendiente de aprobación)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -43,11 +43,14 @@ actualizado: 2026-10-21 (F2.3 aprobada; ADR-016 aprobado; F2.4 pendiente de apro
 | D-025 | **F2.2 aprobada** (fichas de AGENTS.md raíz, de segmento y CLAUDE.md; anclas; candidatos C-01…C-10). Fusionada en `harness-standard-lab`. | 2026-10-21 | Usuario |
 | D-026 | **F2.3 aprobada** (fichas de manifiesto/comandos, arquitectura, ADR, seguridad, referencias, CODEOWNERS y plantilla de PR; candidatos C-11…C-20). | 2026-10-21 | Usuario |
 | D-027 | **ADR-016 aprobado:** la transición a `done` va en el propio PR y la verifica el check requerido `harness tasks`, que re-ejecuta los criterios de aceptación; los `manual` exigen `verified_by` aprobador del PR. | 2026-10-21 | Usuario |
+| D-028 | **F2.4 aprobada** (esquema y ciclo de vida de tareas, `harness tasks`/`pr check`, workflow de tareas y plantilla N1). Fusionada en `harness-standard-lab` con la CI en verde; tag `cli-v0.2.0-rc.1`. | 2026-10-21 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
+- **F2.5** — 26 requisitos nuevos (HS-GOV-007/008, HS-INS-009…015, HS-CTX-002…004, HS-ARC-003…006, HS-SEC-005/006, HS-CI-001…003, HS-STA-001…006), estado `propuesto`, `desde: 0.2.0`; `niveles_definidos: [N0, N1]`.
+- **D-029 (propuesta)** — Aplicabilidad por versión: un requisito aplica solo si `desde` ≤ `standard.version` declarada; cada nivel existe desde una versión (`niveles_desde`, N1 desde 0.2.0). Publicar requisitos nuevos no rompe instancias existentes; se adoptan al migrar. Concreta parte de ADR-008 (actualización de instancias).
 - ADR-008 (parte de actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-012 → F3. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas

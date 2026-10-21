@@ -241,7 +241,7 @@ def test_pr_sensible_riesgo_bajo_avisa(repo):
     write(repo, ".github/workflows/x.yml", "on: push\n")
     commit(repo)
     f = T.check_pr(ctx(repo), pr(tarea="trivial — ci", sensible="sí"), base)
-    assert "pr.risk" in rules(f, "warning")
+    assert "pr.risk-sensitive" in rules(f, "warning")
 
 
 def test_pr_sin_anclas(repo):
@@ -273,3 +273,35 @@ def test_plan_issue_sync(repo):
     assert ops[0]["status"] == "done" and ops[0]["assignee"] == "ana"
     assert "https://run" in ops[1]["body"]
     assert T.plan_issue_sync(ctx(repo), git(repo, "rev-parse", "HEAD")) == []   # sin cambios
+
+
+def test_pr_riesgo_invalido(repo):
+    base = git(repo, "rev-parse", "HEAD")
+    write(repo, "docs/architecture/ARCHITECTURE.md", "# cambio\n")
+    commit(repo)
+    assert "pr.risk" in rules(T.check_pr(ctx(repo), pr(tarea="trivial — doc", riesgo="enorme"), base))
+
+
+# ─────────────── ADR aceptado inmutable (HS-ARC-006) ───────────────
+ADR = "---\nid: ADR-0002\ntitulo: Usar céntimos\nestado: {estado}\nfecha: 2026-10-01\ndecisores: [\"@ana\"]\n{extra}---\n\n## Decisión\n{decision}\n"
+
+
+def test_adr_aceptado_reescrito_avisa(repo):
+    write(repo, "docs/decisions/0002-centimos.md", ADR.format(estado="aceptada", extra="", decision="Enteros."))
+    commit(repo)
+    base = git(repo, "rev-parse", "HEAD")
+    write(repo, "docs/decisions/0002-centimos.md", ADR.format(estado="aceptada", extra="", decision="Decimal."))
+    commit(repo)
+    f = T.check_pr(ctx(repo), pr(tarea="trivial — doc"), base)
+    assert "pr.adr-immutable" in rules(f, "warning")
+
+
+def test_adr_aceptado_solo_cambia_estado(repo):
+    write(repo, "docs/decisions/0002-centimos.md", ADR.format(estado="aceptada", extra="", decision="Enteros."))
+    commit(repo)
+    base = git(repo, "rev-parse", "HEAD")
+    write(repo, "docs/decisions/0002-centimos.md",
+          ADR.format(estado="reemplazada", extra="reemplazada_por: ADR-0003\n", decision="Enteros."))
+    commit(repo)
+    f = T.check_pr(ctx(repo), pr(tarea="trivial — doc"), base)
+    assert "pr.adr-immutable" not in rules(f, "warning")

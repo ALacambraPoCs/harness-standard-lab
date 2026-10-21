@@ -9,7 +9,7 @@ version: 0.1.0
 consumidores: [agentes, personas, ci, cli]
 dependencias: []           # roles referenciados
 propietario: <rol organizativo en la instancia, p. ej. "tech lead del repositorio">
-requisitos: []             # HS-… que lo regulan (o "pendiente:F2.5")
+requisitos: []             # HS-… que lo regulan (o "pendiente:<fase>")
 reglas: []                 # reglas de la CLI que lo validan
 ejemplo_canonico: template/core/<ruta>
 fuentes: []                # IDs de fuentes (F0-01) o decision-propia + ADR

@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [agentes, personas]
 dependencias: [instructions.root, security.policy]
 propietario: Tech lead del repositorio
-requisitos: ["pendiente:F2.5"]
+requisitos: [HS-CTX-004]
 reglas: []
 ejemplo_canonico: examples/fragmentos/references-README.md
 fuentes: [S-OAI-HE#p5, S-LHE]
@@ -30,7 +30,7 @@ Si el directorio existe:
 
 | Elemento | Ancla | Requisito | Verificación |
 |---|---|---|---|
-| `README.md` índice: archivo · qué contiene · fuente (URL o repositorio) · versión o fecha de captura | `<!-- harness:indice -->` | pendiente:F2.5 | Ancla + revisión |
+| `README.md` índice: archivo · qué contiene · fuente (URL o repositorio) · versión o fecha de captura | `<!-- harness:indice -->` | HS-CTX-004 | Ancla + revisión |
 
 ## Contenido recomendado y opcional
 
@@ -60,7 +60,7 @@ Ver `examples/fragmentos/references-README.md`.
 
 | Validación | Capa | Estado |
 |---|---|---|
-| Índice presente y archivos con fuente y fecha | L4 | Pendiente F2.5 (DEBERÍA) |
+| Índice presente y archivos con fuente y fecha | L4 | HS-CTX-004 (DEBERÍA), `core.references.provenance` |
 | Revisión de su contenido en el PR | L5 | Vigente (revisión normal) |
 
 ## Criterios de aceptación

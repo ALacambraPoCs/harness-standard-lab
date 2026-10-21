@@ -80,7 +80,8 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "instructions_max_lines": { "type": "integer", "minimum": 20, "maximum": 2000 }
+        "instructions_max_lines": { "type": "integer", "minimum": 20, "maximum": 2000 },
+        "instructions_max_constraints": { "type": "integer", "minimum": 1, "maximum": 100, "description": "Máximo de restricciones duras en AGENTS.md raíz (HS-CTX-002; 15 por defecto)." }
       }
     },
     "waivers": {

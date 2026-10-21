@@ -2,10 +2,10 @@
 #
 #   jobs:
 #     conformance:
-#       uses: <owner>/<repo-estandar>/.github/workflows/harness-conformance.yml@cli-v0.1.1
+#       uses: <owner>/<repo-estandar>/.github/workflows/harness-conformance.yml@cli-v0.2.0-rc.2
 #       with:
 #         standard-repository: <owner>/<repo-estandar>   # p. ej. ALacambraPoCs/harness-standard-lab
-#         cli-ref: cli-v0.1.1                            # mantener igual que el ref de `uses`
+#         cli-ref: cli-v0.2.0-rc.2                            # mantener igual que el ref de `uses`
 #
 # Seguridad (ADR-013): sin secretos del modelo, `contents: read`, credenciales de checkout no persistidas.
 # Nota: con run-commands=true se ejecutan `setup` y `check` del PR, como en cualquier CI de PR;
@@ -22,7 +22,7 @@ on:
       cli-ref:
         description: Tag o SHA del estándar/CLI a usar. Debe coincidir con el ref de `uses`.
         type: string
-        default: cli-v0.1.1
+        default: cli-v0.2.0-rc.2
       run-commands:
         description: Ejecutar setup/check del contrato de comandos (HS-VER-002/003).
         type: boolean

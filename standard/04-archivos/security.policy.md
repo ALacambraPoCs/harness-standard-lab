@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [personas, agentes, ci]
 dependencias: [instructions.root, adapter.claude.settings, codeowners]
 propietario: Responsable de seguridad asignado al repositorio (CODEOWNERS), junto con el tech lead
-requisitos: [HS-SEC-001, HS-SEC-004, "pendiente:F2.5"]
+requisitos: [HS-SEC-001, HS-SEC-004, HS-SEC-005]
 reglas: [core.security.doc-exists]
 ejemplo_canonico: template/core/docs/security/SECURITY.md
 fuentes: [S-MCP, S-VILA#p29, S-CC-SET, S-OAI-HE, ADR-009, ADR-013]
@@ -35,10 +35,10 @@ Además, para cada riesgo dice **qué control lo impone de verdad**. Este docume
 
 | Elemento | Ancla | Requisito | Verificación |
 |---|---|---|---|
-| Secretos: dónde viven, cómo se inyectan, qué hacer si se filtra uno | `<!-- harness:secretos -->` | HS-SEC-004 (guidance); ancla pendiente:F2.5 | Ancla + revisión |
-| Entradas no confiables de este repositorio: issues, comentarios, web, MCP, datos de clientes… | `<!-- harness:entradas-no-confiables -->` | pendiente:F2.5 | Ancla + revisión |
-| Acciones que requieren aprobación humana y quién la da (despliegue, migraciones, dependencias nuevas, cambios en `.github/` o `.claude/`) | `<!-- harness:aprobaciones -->` | pendiente:F2.5 | Ancla + revisión |
-| Tabla riesgo → control: qué capa L2–L5 lo impone (permiso, hook, check, ruleset) | `<!-- harness:controles -->` | pendiente:F2.5 | Ancla + revisión. Cada fila con control L4/L5 o justificada |
+| Secretos: dónde viven, cómo se inyectan, qué hacer si se filtra uno | `<!-- harness:secretos -->` | HS-SEC-004 (guidance); ancla HS-SEC-005 | Ancla + revisión |
+| Entradas no confiables de este repositorio: issues, comentarios, web, MCP, datos de clientes… | `<!-- harness:entradas-no-confiables -->` | HS-SEC-005 | Ancla + revisión |
+| Acciones que requieren aprobación humana y quién la da (despliegue, migraciones, dependencias nuevas, cambios en `.github/` o `.claude/`) | `<!-- harness:aprobaciones -->` | HS-SEC-005 | Ancla + revisión |
+| Tabla riesgo → control: qué capa L2–L5 lo impone (permiso, hook, check, ruleset) | `<!-- harness:controles -->` | HS-SEC-005 | Ancla + revisión. Cada fila con control L4/L5 o justificada |
 
 ## Contenido recomendado y opcional
 
@@ -82,7 +82,7 @@ Ver `template/core/docs/security/SECURITY.md`. Fragmento de la tabla de controle
 | Validación | Capa | Estado |
 |---|---|---|
 | Existe | L4 (`core.security.doc-exists`) | Vigente |
-| Anclas obligatorias presentes | L4 | Pendiente F2.5 (propuesta: N1) |
+| Anclas obligatorias presentes | L4 | HS-SEC-005 (N1), `core.security.anchors` |
 | Cada riesgo alto tiene un control L4/L5 | Revisión humana; automatizable en parte en la Fase 5 | Manual |
 | Secret scanning y push protection activos | L5 (ajuste de la plataforma) | Manual (HS-SEC-004) |
 

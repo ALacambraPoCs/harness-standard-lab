@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [personas, agentes, ci]
 dependencias: [plans.active, security.policy, codeowners]
 propietario: Equipo de plataforma/harness
-requisitos: ["pendiente:F2.5"]
+requisitos: [HS-CI-001, HS-CI-002, HS-SEC-006]
 reglas: []
 ejemplo_canonico: template/adapters/github/.github/pull_request_template.md
 fuentes: [S-GH-PRTEMPLATE, ADR-005, ADR-010, D-023, X-01]
@@ -32,10 +32,10 @@ Con eso la revisión se apoya en el riesgo y en la evidencia, y no en la impresi
 
 | Elemento | Ancla | Requisito | Verificación |
 |---|---|---|---|
-| Tarea: `T-NNNN` (archivo en `plans.active`) **o** la palabra `trivial` con su motivo (D-023) | `<!-- harness:tarea -->` | pendiente:F2.5 | Automática en la CI de tareas (F2.4) |
-| Clase de riesgo: `bajo`, `medio` o `alto`, con una línea de justificación | `<!-- harness:riesgo -->` | pendiente:F2.5 | Automática (valor válido) |
-| Evidencia: comandos ejecutados y resultado, o enlace al run de CI | `<!-- harness:evidencia -->` | pendiente:F2.5 | Revisión. La evidencia que cuenta para `done` la escribe la CI (F2.4) |
-| ¿Toca configuración de agentes, CI o seguridad? (sí/no) | `<!-- harness:sensible -->` | pendiente:F2.5 | Automática: se contrasta con las rutas del diff |
+| Tarea: `T-NNNN` (archivo en `plans.active`) **o** la palabra `trivial` con su motivo (D-023) | `<!-- harness:tarea -->` | HS-CI-002 | Automática en la CI de tareas (F2.4) |
+| Clase de riesgo: `bajo`, `medio` o `alto`, con una línea de justificación | `<!-- harness:riesgo -->` | HS-CI-002 | Automática (valor válido) |
+| Evidencia: comandos ejecutados y resultado, o enlace al run de CI | `<!-- harness:evidencia -->` | HS-CI-001 (ancla) | Revisión. La evidencia que cuenta para `done` la escribe la CI (F2.4) |
+| ¿Toca configuración de agentes, CI o seguridad? (sí/no) | `<!-- harness:sensible -->` | HS-SEC-006 | Automática: se contrasta con las rutas del diff |
 | Línea `Closes #<n>` si la tarea tiene `issue:` (X-01) | dentro de `harness:tarea` | pendiente:F2.4 | Automática (X-01) |
 
 ## Contenido recomendado y opcional
@@ -67,7 +67,7 @@ Ver `template/adapters/github/.github/pull_request_template.md`.
 
 | Validación | Capa | Estado |
 |---|---|---|
-| Existe en la rama por defecto | L4 | Pendiente F2.5 (N1) |
+| Existe en la rama por defecto | L4 | HS-CI-001 (N1), `core.pr.template` |
 | `tarea` apunta a un archivo existente, o es `trivial` y el diff solo toca rutas permitidas (D-023) | L4 (workflow de tareas) | F2.4 |
 | `riesgo` válido; `sensible` coherente con el diff | L4 | F2.4/F2.5 |
 | La aprobación humana depende del riesgo | L5 | Fase 5 (ADR-010) |

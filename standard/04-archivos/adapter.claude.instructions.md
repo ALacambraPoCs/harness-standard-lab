@@ -7,7 +7,7 @@ version: 0.1.0
 consumidores: [agentes, cli]
 dependencias: [instructions.root, adapter.claude.settings]
 propietario: Propietario de plataforma/harness (CODEOWNERS, ADR-013); CLAUDE.local.md es de cada persona y no se versiona
-requisitos: [HS-INS-005, HS-INS-006, HS-INS-007, HS-SEC-003, HS-CTX-001, "pendiente:F2.5"]
+requisitos: [HS-INS-005, HS-INS-006, HS-INS-007, HS-SEC-003, HS-CTX-001, HS-INS-013, HS-INS-014, HS-INS-015]
 reglas: [adapter.claude.imports-agents, adapter.claude.no-duplication, adapter.claude.local-files-ignored, core.instructions.references-resolve, core.instructions.size-budget]
 ejemplo_canonico: template/adapters/claude-code/CLAUDE.md
 fuentes: [S-CC-MEM, S-CC-SET, ADR-003, ADR-013]
@@ -57,7 +57,7 @@ Solo contenido **exclusivo de Claude Code**, en una sección bajo `<!-- harness:
 - Recordatorio: **importar no ahorra contexto**. Todo lo importado se carga al arrancar (S-CC-MEM), así que el presupuesto se mide sobre `AGENTS.md` + `CLAUDE.md`.
 - **Presupuesto propio**: 200 líneas por defecto (HS-CTX-001). Recomendación interna: **20 líneas o menos**. Si crece, probablemente contiene contenido agnóstico.
 - Versión mínima de Claude Code: la declarada en `adapters.agents[claude-code].min_version` del manifiesto (2.1.277 en las plantillas, por la lectura nativa de AGENTS.md).
-- **Segmentos — obligatorio:** cada `<segmento>/AGENTS.md` DEBE tener al lado un `<segmento>/CLAUDE.md` con `@AGENTS.md` (pendiente:F2.5). Motivo (S-CC-MEM, verificado 2026-10-21): con un `CLAUDE.md` raíz, Claude no lee AGENTS.md de subdirectorios; en cambio carga bajo demanda los `CLAUDE.md` de subdirectorios, y el import resuelve relativo al archivo.
+- **Segmentos — obligatorio:** cada `<segmento>/AGENTS.md` DEBE tener al lado un `<segmento>/CLAUDE.md` con `@AGENTS.md` (HS-INS-013). Motivo (S-CC-MEM, verificado 2026-10-21): con un `CLAUDE.md` raíz, Claude no lee AGENTS.md de subdirectorios; en cambio carga bajo demanda los `CLAUDE.md` de subdirectorios, y el import resuelve relativo al archivo.
 
 ### CLAUDE.local.md
 
@@ -84,9 +84,9 @@ Solo contenido **exclusivo de Claude Code**, en una sección bajo `<!-- harness:
 | No duplica encabezados ni líneas de AGENTS.md | L4 (`adapter.claude.no-duplication`) | Vigente (N0) |
 | `CLAUDE.local.md` y `settings.local.json` en `.gitignore` | L4 (`adapter.claude.local-files-ignored`) | Vigente (N0) |
 | Imports resolubles y sin rutas personales | L4 (`core.instructions.references-resolve`) | Vigente (N0) |
-| `@AGENTS.md` como primera línea no vacía | L4 | Pendiente F2.5 (DEBERÍA) |
-| Cada `<segmento>/AGENTS.md` tiene `<segmento>/CLAUDE.md` con `@AGENTS.md` | L4 | Pendiente F2.5 (DEBE) |
-| `.claude/CLAUDE.md` ausente (una sola ubicación) | L4 | Pendiente F2.5 (DEBERÍA) |
+| `@AGENTS.md` como primera línea no vacía | L4 | HS-INS-014 (DEBERÍA), `adapter.claude.import-first` |
+| Cada `<segmento>/AGENTS.md` tiene `<segmento>/CLAUDE.md` con `@AGENTS.md` | L4 | HS-INS-013 (DEBE), `adapter.claude.segment-adapter` |
+| `.claude/CLAUDE.md` ausente (una sola ubicación) | L4 | HS-INS-015 (DEBERÍA), `adapter.claude.single-location` |
 | Revisión por propietario de plataforma | L5 (CODEOWNERS + ruleset) | Vigente (ADR-013) |
 
 ## Criterios de aceptación

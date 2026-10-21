@@ -1,11 +1,12 @@
 # Manifiesto de instancia — Estándar de Harness (ADR-004). Esquema: schemas/manifest.schema.json
 standard:
-  version: 0.1.0
-  level: N0
+  version: 0.2.0
+  level: {{LEVEL}}            # N0 | N1 (N1: copia también niveles/n1/)
 project:
   name: {{PROJECT_NAME}}
   owner: "{{OWNER}}"
   kind: {{KIND}}
+  docs_language: {{DOCS_LANGUAGE}}
 adapters:
   agents:
     - id: claude-code

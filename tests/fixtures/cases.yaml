@@ -2,7 +2,7 @@
 # Cada caso copia una instancia base, aplica mutaciones y comprueba qué reglas fallan.
 # - conforming: true  → no debe fallar ninguna regla (ni avisos).
 # - expect_fail       → conjunto EXACTO de reglas que deben fallar (más `allow_also`).
-# Operaciones: delete | write {path, content} | append {path, content} | replace {path, old, new}
+# Operaciones: delete | write {path, content} | append {path, content[, repeat]} | replace {path, old, new}
 casos:
   # ─────────────── Conformes ───────────────
   - id: c-n0-basico
@@ -248,3 +248,180 @@ casos:
                 sys.exit("setup ya ejecutado")
             marker.write_text("ok")
     expect_fail: [core.commands.idempotent]
+
+  # ─────────────── Estándar 0.2.0 · N1 (F2.5) ───────────────
+  - id: c-n1-basico
+    base: conforming/n1-basico
+    conforming: true
+    run_commands: true
+    today: 2026-10-21
+    expect_effective_level: N1
+
+  - id: c-n0-basico-version-0-2
+    base: conforming/n0-basico
+    conforming: true
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.1.0", new: "version: 0.2.0"}
+    expect_effective_level: N0
+
+  - id: nc-n1-con-version-0-1
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.2.0", new: "version: 0.1.0"}
+    expect_fail: [core.manifest.standard-version]
+    expect_effective_level: null
+
+  - id: nc-ruta-no-portable
+    base: conforming/n1-basico
+    mutations:
+      - write: {path: "docs/nota.md:Zone.Identifier", content: "[ZoneTransfer]\n"}
+      - write: {path: "docs/borrador. ", content: "x\n"}
+    expect_fail: [core.paths.portable]
+    expect_effective_level: null
+
+  - id: nc-sin-idioma
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "  docs_language: es\n", new: ""}
+    expect_fail: [core.manifest.docs-language]
+
+  - id: nc-agents-sin-anclas
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: AGENTS.md, old: "<!-- harness:resumen -->\n", new: ""}
+    expect_fail: [core.instructions.root-anchors]
+
+  - id: nc-agents-sin-flujo
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: AGENTS.md, old: "<!-- harness:flujo -->", new: "<!-- flujo -->"}
+    expect_fail: [core.instructions.flow-anchor]
+
+  - id: nc-demasiadas-restricciones
+    base: conforming/n1-basico
+    mutations:
+      - append: {path: .harness/manifest.yaml, content: "budgets:\n  instructions_max_constraints: 2\n"}
+    expect_fail: [core.instructions.constraints-budget]
+
+  - id: nc-cadena-agents-32k
+    base: conforming/n1-basico
+    mutations:
+      - write: {path: pkg/AGENTS.md, content: "<!-- harness:ambito -->\nSegmento pkg.\n<!-- harness:limites -->\nNo depende de src/.\n"}
+      - write: {path: pkg/CLAUDE.md, content: "@AGENTS.md\n"}
+      - write: {path: pkg/sub/CLAUDE.md, content: "@AGENTS.md\n"}
+      - write: {path: pkg/sub/AGENTS.md, content: "<!-- harness:ambito -->\nSub.\n<!-- harness:limites -->\n"}
+      - append: {path: pkg/sub/AGENTS.md, content: "relleno ", repeat: 4500}
+    expect_fail: [core.instructions.chain-bytes]
+
+  - id: nc-segmento-sin-ambito
+    base: conforming/n1-basico
+    mutations:
+      - write: {path: pkg/AGENTS.md, content: "# pkg\n\nReglas del paquete sin anclas.\n"}
+      - write: {path: pkg/CLAUDE.md, content: "@AGENTS.md\n"}
+    expect_fail: [core.instructions.segment-anchors]
+
+  - id: nc-segmento-duplica-raiz
+    base: conforming/n1-basico
+    mutations:
+      - write:
+          path: pkg/AGENTS.md
+          content: "<!-- harness:ambito -->\nPaquete pkg.\n<!-- harness:restricciones -->\n- No leas ni escribas archivos `.env` ni credenciales.\n- No añadas dependencias sin un ADR en [decisiones](../docs/decisions/README.md).\n"
+      - write: {path: pkg/CLAUDE.md, content: "@AGENTS.md\n"}
+    expect_fail: [core.instructions.segment-no-duplication]
+
+  - id: nc-segmento-sin-claude
+    base: conforming/n1-basico
+    mutations:
+      - write: {path: pkg/AGENTS.md, content: "<!-- harness:ambito -->\nPaquete pkg.\n<!-- harness:limites -->\nNo depende de src/.\n"}
+    expect_fail: [adapter.claude.segment-adapter]
+
+  - id: nc-claude-import-no-primero
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: CLAUDE.md, old: "@AGENTS.md\n", new: "# Claude\n\n@AGENTS.md\n"}
+    expect_fail: [adapter.claude.import-first]
+
+  - id: nc-claude-dos-ubicaciones
+    base: conforming/n1-basico
+    mutations:
+      - write: {path: .claude/CLAUDE.md, content: "@../AGENTS.md\n"}
+    expect_fail: [adapter.claude.single-location]
+
+  - id: nc-referencias-sin-procedencia
+    base: conforming/n1-basico
+    mutations:
+      - write: {path: docs/references/README.md, content: "# Referencias\n\n<!-- harness:indice -->\n| Archivo | Fuente |\n|---|---|\n| libx-llms.md | https://ejemplo |\n"}
+      - write: {path: docs/references/libx-llms.md, content: "# libx\n\nUso básico.\n"}
+    expect_fail: [core.references.provenance]
+
+  - id: nc-arquitectura-sin-invariantes
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: docs/architecture/ARCHITECTURE.md, old: "<!-- harness:invariantes -->", new: ""}
+    expect_fail: [core.architecture.anchors]
+
+  - id: nc-adr-fuera-del-indice
+    base: conforming/n1-basico
+    mutations:
+      - write:
+          path: docs/decisions/0002-usar-decimal.md
+          content: "---\nid: ADR-0002\ntitulo: Usar enteros en céntimos\nestado: propuesta\nfecha: 2026-10-20\ndecisores: [\"@ana\"]\n---\n\n# ADR-0002\n"
+    expect_fail: [core.decisions.index]
+
+  - id: nc-adr-frontmatter
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: docs/decisions/0001-registrar-decisiones.md, old: "id: ADR-0001\n", new: "id: ADR-0009\n"}
+      - replace: {path: docs/decisions/0001-registrar-decisiones.md, old: "estado: aceptada", new: "estado: vigente"}
+    expect_fail: [core.decisions.frontmatter]
+
+  - id: nc-seguridad-sin-controles
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: docs/security/SECURITY.md, old: "<!-- harness:controles -->", new: ""}
+    expect_fail: [core.security.anchors]
+
+  - id: nc-sin-plantilla-pr
+    base: conforming/n1-basico
+    mutations: [{delete: .github/pull_request_template.md}]
+    expect_fail: [core.pr.template]
+
+  - id: nc-sin-workflow-tareas
+    base: conforming/n1-basico
+    mutations: [{delete: .github/workflows/harness-tasks.yml}]
+    expect_fail: [core.ci.tasks-workflow]
+
+  - id: nc-sin-plans
+    base: conforming/n1-basico
+    mutations: [{delete: docs/plans}]
+    expect_fail: [core.plans.structure]
+    allow_also: [core.instructions.references-resolve]
+
+  - id: nc-tarea-invalida
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: docs/plans/active/T-0001-redondeo.md, old: "risk: bajo", new: "risk: enorme"}
+      - write: {path: docs/plans/active/T-0002-copia.md, content: "---\nid: T-0001\ntitle: Copia\nowner: \"@ana\"\nstatus: ready\nrisk: bajo\ncreated: 2026-10-15\ndepends_on: [T-0042]\nacceptance:\n  - id: AC1\n    description: x\n    check: \"true\"\n---\nSin secciones.\n"}
+      - write: {path: docs/plans/active/tarea2.md, content: "sin frontmatter\n"}
+    expect_fail: [tasks.schema, tasks.naming, tasks.unique, tasks.body, tasks.depends, tasks.index]
+
+  - id: nc-tarea-mal-ubicada
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: docs/plans/active/T-0001-redondeo.md, old: "status: in_progress", new: "status: cancelled"}
+    expect_fail: [tasks.location, tasks.index]
+
+  - id: nc-tarea-manual-sin-verificador
+    base: conforming/n1-basico
+    mutations:
+      - delete: docs/plans/active/T-0001-redondeo.md
+      - write:
+          path: docs/plans/completed/T-0001-redondeo.md
+          content: "---\nid: T-0001\ntitle: Redondear totales a céntimos\nowner: \"@ana\"\nstatus: done\nrisk: bajo\ncreated: 2026-10-15\ndone_pr: 4\nacceptance:\n  - id: AC1\n    description: Revisado en staging\n    check: manual\n---\n<!-- harness:objetivo -->\nx\n<!-- harness:alcance -->\nx\n<!-- harness:plan -->\nx\n<!-- harness:progreso -->\nx\n<!-- harness:decisiones -->\nx\n<!-- harness:resultado -->\nHecho.\n"
+    expect_fail: [tasks.acceptance, tasks.index]
+
+  - id: nc-indice-tareas-desactualizado
+    base: conforming/n1-basico
+    mutations:
+      - replace: {path: docs/plans/active/T-0001-redondeo.md, old: "title: Redondear totales a céntimos", new: "title: Redondear totales"}
+    expect_fail: [tasks.index]

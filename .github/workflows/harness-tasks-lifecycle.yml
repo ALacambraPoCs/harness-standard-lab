@@ -19,7 +19,7 @@ on:
         default: ""
       cli-ref:
         type: string
-        default: cli-v0.2.0-rc.1
+        default: cli-v0.2.0-rc.2
       python-version:
         type: string
         default: "3.12"

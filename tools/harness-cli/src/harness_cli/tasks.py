@@ -16,7 +16,7 @@ import yaml
 
 from .context import Context, _StrDateLoader
 from .matchers import compile_pattern
-from .model import Finding
+from .model import SEVERITY_BY_LEVEL, Finding
 
 FRONT = re.compile(r"^---\n(.*?)\n---\n", re.S)
 TASK_FILE = re.compile(r"^(T-\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
@@ -35,6 +35,27 @@ ALLOWED = {
 BODY_ANCHORS = ["objetivo", "alcance", "plan", "progreso", "decisiones"]
 DONE_ANCHORS = ["resultado"]
 INDEX_HEADER = "<!-- generado por harness tasks index; no editar -->"
+
+# Regla → requisito (F2.5). pr.issue pertenece al experimento X-01: no es requisito normativo.
+RULE_REQ = {
+    "tasks.schema": "HS-STA-002", "tasks.naming": "HS-STA-002", "tasks.unique": "HS-STA-002",
+    "tasks.body": "HS-STA-002", "tasks.depends": "HS-STA-002",
+    "tasks.location": "HS-STA-003", "tasks.deleted": "HS-STA-003",
+    "tasks.transition": "HS-STA-004",
+    "tasks.acceptance": "HS-STA-005", "tasks.done-pr": "HS-STA-005",
+    "pr.anchors": "HS-CI-002", "pr.task": "HS-CI-002", "pr.trivial": "HS-CI-002", "pr.risk": "HS-CI-002",
+    "pr.sensitive": "HS-SEC-006", "pr.risk-sensitive": "HS-SEC-006",
+    "pr.adr-immutable": "HS-ARC-006",
+    "pr.issue": "X-01",
+}
+
+
+def _finding(ctx: Context, rule: str, msg: str, remedy: str, path: str | None, severity: str | None = None) -> Finding:
+    req = RULE_REQ[rule]
+    spec = ctx.standard.requirements.get(req)
+    sev = severity or (SEVERITY_BY_LEVEL[spec["nivel"]] if spec else "error")
+    why = f"{req} ({spec['nivel']}): {spec['titulo']}" if spec else req
+    return Finding(rule, req, msg, remedy, path, severity=sev, why=why)
 
 
 @dataclass
@@ -131,7 +152,7 @@ def validate(ctx: Context, *, base: str | None = None, pr_number: int | None = N
     timeout = timeout or ((ctx.manifest or {}).get("tasks") or {}).get("acceptance_timeout", 600)
 
     def f(rule, msg, remedy, path):
-        findings.append(Finding(rule, "pendiente:F2.5", msg, remedy, path, severity="error"))
+        findings.append(_finding(ctx, rule, msg, remedy, path))
 
     ids: dict[str, str] = {}
     for t in tasks:
@@ -236,8 +257,8 @@ def check_pr(ctx: Context, body: str, base: str, *, title: str = "") -> list[Fin
     """Comprueba el cuerpo del PR contra el diff y las tareas (pr.template, D-023)."""
     findings: list[Finding] = []
 
-    def f(rule, msg, remedy, severity="error"):
-        findings.append(Finding(rule, "pendiente:F2.5", msg, remedy, ".github/pull_request_template.md", severity=severity))
+    def f(rule, msg, remedy, severity=None):
+        findings.append(_finding(ctx, rule, msg, remedy, None, severity))
 
     paths = changed_paths(ctx, base)
     sensitive = [p for p in paths if _matches_any(ctx.standard.sensitive_patterns, p)]
@@ -264,7 +285,7 @@ def check_pr(ctx: Context, body: str, base: str, *, title: str = "") -> list[Fin
         f("pr.sensitive", f"El PR declara `sensible: no` pero toca rutas sensibles: {', '.join(sensitive[:5])}.",
           "Declara `sí` y describe el cambio; requiere revisión de plataforma/seguridad (ADR-013).")
     if sensitive and m_r and m_r.group(1) == "bajo":
-        f("pr.risk", "Un PR que toca rutas sensibles no debería declararse de riesgo `bajo`.",
+        f("pr.risk-sensitive", "Un PR que toca rutas sensibles no debería declararse de riesgo `bajo`.",
           "Usa al menos `medio`.", severity="warning")
 
     is_revert = bool(re.search(r"^\s*Reverts\s+#\d+", body, re.M)) or title.startswith("Revert")
@@ -292,7 +313,39 @@ def check_pr(ctx: Context, body: str, base: str, *, title: str = "") -> list[Fin
             if issue and t.status == "done" and not re.search(rf"\b(close[sd]?|fix(e[sd])?|resolve[sd]?)\s*:?\s*#{issue}\b", body, re.I):
                 f("pr.issue", f"La tarea `{tid}` pasa a done y tiene `issue: {issue}`, pero el PR no incluye `Closes #{issue}`.",
                   f"Añade `Closes #{issue}` al cuerpo del PR (X-01).")
+    findings += adr_immutable(ctx, base, paths)
     return findings
+
+
+ADR_FILE = re.compile(r"^\d{4}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
+ADR_MUTABLE_KEYS = {"estado", "reemplazada_por"}
+
+
+def adr_immutable(ctx: Context, base: str, paths: list[str]) -> list[Finding]:
+    """Un ADR `aceptada` en la base solo cambia `estado`/`reemplazada_por` (C-15, HS-ARC-006)."""
+    out = []
+    ddir = ctx.role_path("decisions.dir").rstrip("/")
+    for p in paths:
+        if Path(p).parent.as_posix() != ddir or not ADR_FILE.match(Path(p).name):
+            continue
+        try:
+            old = parse_task(_git(ctx, "show", f"{base}:{p}"), p)
+        except subprocess.CalledProcessError:
+            continue  # ADR nuevo
+        if old.errors or old.meta.get("estado") != "aceptada":
+            continue
+        cur = ctx.root / p
+        if not cur.is_file():
+            out.append(_finding(ctx, "pr.adr-immutable", f"Se ha borrado el ADR aceptado {p}.",
+                                "Un ADR aceptado no se borra: márcalo `reemplazada` o `deprecada` y crea uno nuevo.", p))
+            continue
+        new = parse_task(cur.read_text(encoding="utf-8"), p)
+        strip = lambda m: {k: v for k, v in m.items() if k not in ADR_MUTABLE_KEYS}
+        norm = lambda s: re.sub(r"\s+", " ", s).strip()
+        if new.errors or strip(new.meta) != strip(old.meta) or norm(new.body) != norm(old.body):
+            out.append(_finding(ctx, "pr.adr-immutable", f"{p} estaba `aceptada` y su contenido ha cambiado.",
+                                "No reescribas un ADR aceptado: crea uno nuevo que lo reemplace (`reemplaza`) y cambia aquí solo `estado` y `reemplazada_por`.", p))
+    return out
 
 
 # ─────────────────────────── espejo en issues (X-01) ───────────────────────────

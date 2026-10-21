@@ -7,7 +7,7 @@ version: 0.1.0
 consumidores: [agentes, personas, cli, ci]
 dependencias: [manifest, pr.template, instructions.root]
 propietario: Propietario de cada tarea (campo owner); la estructura y el workflow, propietario de plataforma/harness (CODEOWNERS)
-requisitos: ["pendiente:F2.5"]
+requisitos: [HS-STA-001, HS-STA-002, HS-STA-003, HS-STA-004, HS-STA-005, HS-STA-006, HS-CI-002, HS-CI-003, HS-SEC-006]
 reglas: [tasks.schema, tasks.naming, tasks.unique, tasks.location, tasks.body, tasks.acceptance, tasks.depends, tasks.transition, tasks.done-pr, tasks.deleted, pr.anchors, pr.risk, pr.sensitive, pr.trivial, pr.task, pr.issue]
 ejemplo_canonico: template/niveles/n1/docs/plans/_plantilla-tarea.md
 fuentes: [ADR-005, ADR-016, D-023, X-01, S-OAI-HE, S-LHE]
@@ -95,7 +95,7 @@ Ver `template/niveles/n1/docs/plans/_plantilla-tarea.md`. Las pruebas `tests/tes
 
 | Validación | Capa | Estado |
 |---|---|---|
-| Esquema, nombre, ubicación, anclas y dependencias (`harness tasks validate`) | L4 | Implementada (F2.4); requisito en F2.5 |
+| Esquema, nombre, ubicación, anclas y dependencias (`harness check` y `harness tasks validate`) | L4 | HS-STA-001…003, HS-STA-006 |
 | Transiciones frente a la base del PR y re-ejecución de la aceptación (`--base --run-acceptance`) | L4 | Implementada (F2.4) |
 | Criterios `manual` verificados por un aprobador del PR | L4 + L5 | Implementada (F2.4) |
 | Cuerpo del PR coherente con el diff (`harness pr check`) | L4 | Implementada (F2.4) |

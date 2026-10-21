@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [agentes, personas, cli]
 dependencias: [instructions.root, adapter.claude.instructions, architecture.map, segments.map]
 propietario: Propietario del segmento (según CODEOWNERS del subárbol; desde N2, según segments.yaml)
-requisitos: [HS-INS-004, HS-INS-005, HS-CTX-001, "pendiente:F2.5"]
+requisitos: [HS-INS-004, HS-INS-005, HS-CTX-001, HS-INS-011, HS-INS-012, HS-INS-013, HS-CTX-003]
 reglas: [core.instructions.references-resolve, core.instructions.size-budget]
 ejemplo_canonico: examples/fragmentos/segmento-AGENTS.md
 fuentes: [S-AGENTSMD, S-CC-MEM, S-OAI-HE#p5, ADR-003, ADR-014]
@@ -25,14 +25,14 @@ Dar a los agentes las reglas que **solo aplican a una parte del repositorio**, s
 
 **Cómo lo cargan las herramientas** (verificado en S-CC-MEM el 2026-10-21):
 - **S-AGENTSMD** y **Codex**: admiten AGENTS.md anidados; Codex concatena de la raíz al directorio actual (límite 32 KiB, ver ficha raíz); en conflicto gana el más cercano.
-- **Claude Code — atención:** con el ajuste por defecto (`claude-md-or-agents-md`), Claude **solo** lee AGENTS.md (también los de subdirectorios) si **no** hay ningún `CLAUDE.md`/`CLAUDE.local.md` en el directorio de trabajo o por encima. Como el estándar exige un `CLAUDE.md` raíz (ADR-003), **Claude no cargará `<segmento>/AGENTS.md` por sí solo**. Por eso, con el adaptador `claude-code`, **cada `<segmento>/AGENTS.md` DEBE ir acompañado de `<segmento>/CLAUDE.md` con `@AGENTS.md`** (pendiente:F2.5): los `CLAUDE.md` de subdirectorios sí se cargan bajo demanda al leer o editar un archivo de ese subdirectorio, y el import resuelve relativo al archivo.
+- **Claude Code — atención:** con el ajuste por defecto (`claude-md-or-agents-md`), Claude **solo** lee AGENTS.md (también los de subdirectorios) si **no** hay ningún `CLAUDE.md`/`CLAUDE.local.md` en el directorio de trabajo o por encima. Como el estándar exige un `CLAUDE.md` raíz (ADR-003), **Claude no cargará `<segmento>/AGENTS.md` por sí solo**. Por eso, con el adaptador `claude-code`, **cada `<segmento>/AGENTS.md` DEBE ir acompañado de `<segmento>/CLAUDE.md` con `@AGENTS.md`** (HS-INS-013): los `CLAUDE.md` de subdirectorios sí se cargan bajo demanda al leer o editar un archivo de ese subdirectorio, y el import resuelve relativo al archivo.
 
 ## Contenido requerido
 
 | Elemento | Ancla | Requisito | Verificación |
 |---|---|---|---|
-| Ámbito: qué cubre el segmento (ruta, propósito en una frase) y su propietario | `<!-- harness:ambito -->` | pendiente:F2.5 | Automática (ancla) |
-| Al menos una regla, comando o límite **propio** del segmento | Cualquier ancla de las opcionales | pendiente:F2.5 | Automática (no vacío) + revisión |
+| Ámbito: qué cubre el segmento (ruta, propósito en una frase) y su propietario | `<!-- harness:ambito -->` | HS-INS-011 | Automática (ancla) |
+| Al menos una regla, comando o límite **propio** del segmento | Cualquier ancla de las opcionales | HS-INS-011 | Automática (no vacío) + revisión |
 
 ## Contenido recomendado y opcional
 
@@ -87,10 +87,10 @@ Cálculo de facturas y notas de crédito. Propietario: @org/billing.
 | Validación | Capa | Estado |
 |---|---|---|
 | Enlaces resolubles y presupuesto de líneas | L4 (reglas vigentes; ya recorren todos los AGENTS.md) | Vigente |
-| Ancla `ambito` presente y archivo no vacío | L4 | Pendiente F2.5 |
-| Sin duplicación de líneas sustantivas con la raíz | L4 | Pendiente F2.5 (DEBERÍA) |
-| Presupuesto acumulado de la cadena de 32 KiB o menos | L4 | Pendiente F2.5 (DEBERÍA) |
-| Con `claude-code`: existe `<segmento>/CLAUDE.md` que importa `@AGENTS.md` | L4 | Pendiente F2.5 (DEBE) |
+| Ancla `ambito` presente y archivo no vacío | L4 | HS-INS-011, `core.instructions.segment-anchors` |
+| Sin duplicación de líneas sustantivas con la raíz | L4 | HS-INS-012 (NO DEBERÍA), `core.instructions.segment-no-duplication` |
+| Presupuesto acumulado de la cadena de 32 KiB o menos | L4 | HS-CTX-003 (DEBERÍA), `core.instructions.chain-bytes` |
+| Con `claude-code`: existe `<segmento>/CLAUDE.md` que importa `@AGENTS.md` | L4 | HS-INS-013 (DEBE), `adapter.claude.segment-adapter` |
 | Coherencia con `segments.yaml` (ruta y comandos) | L4 | Fase 4 (N2) |
 | Revisión del propietario del segmento | L5 (CODEOWNERS) | Vigente si CODEOWNERS asigna el subárbol |
 

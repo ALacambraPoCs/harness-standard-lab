@@ -17,7 +17,7 @@ def run_check(root: Path, *, standard: Standard | None = None, today: dt.date | 
     ctx = Context.build(root, std, today or dt.date.today(), run_commands=run_commands,
                         command_timeout=command_timeout)
     registry = load_all()
-    applicable = {r["id"]: r for r in std.applicable(ctx.level, ctx.adapters)}
+    applicable = {r["id"]: r for r in std.applicable(ctx.level, ctx.adapters, ctx.declared_version)}
 
     result = Result(root=str(ctx.root), standard_version=std.version, cli_version=__version__,
                     declared_level=(ctx.manifest or {}).get("standard", {}).get("level") if isinstance(ctx.manifest, dict) else None,
@@ -29,6 +29,9 @@ def run_check(root: Path, *, standard: Standard | None = None, today: dt.date | 
         reqs = [r for r in rule.requirements if r in applicable]
         if not reqs:
             result.rules_skipped[rule.id] = "requisitos no aplicables al nivel/adaptadores declarados"
+            continue
+        if rule.context != "check":
+            result.rules_skipped[rule.id] = "se verifica en el PR (harness tasks validate --base / harness pr check)"
             continue
         if rule.needs_valid_manifest and not ctx.manifest_valid:
             result.rules_skipped[rule.id] = "manifiesto ausente o inválido (ver core.manifest.valid)"
@@ -70,16 +73,16 @@ def _apply_waivers(ctx: Context, result: Result) -> None:
 def _effective_level(std: Standard, ctx: Context, result: Result) -> str | None:
     """Nivel más alto ≤ declarado en el que no hay errores DEBE/NO DEBE sin waiver.
 
-    En v0.1 solo N0 tiene requisitos; los niveles superiores aún no son evaluables.
+    Solo se evalúan los niveles definidos en la versión declarada del estándar.
     """
     if not ctx.manifest_valid:
         return None
     failing = {f.requirement for f in result.findings if f.status == "fail" and f.severity == "error"}
     effective = None
     for lvl in LEVELS[: LEVELS.index(ctx.level) + 1]:
-        if lvl not in std.defined_levels:
+        if not std.level_defined(lvl, ctx.declared_version):
             break
-        reqs = [r for r in std.applicable(lvl, ctx.adapters) if r["nivel"] in ("DEBE", "NO DEBE")]
+        reqs = [r for r in std.applicable(lvl, ctx.adapters, ctx.declared_version) if r["nivel"] in ("DEBE", "NO DEBE")]
         if not reqs or any(r["id"] in failing for r in reqs):
             break
         effective = lvl

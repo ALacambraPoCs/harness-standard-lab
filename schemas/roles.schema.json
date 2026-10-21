@@ -3,28 +3,123 @@
   "$id": "https://harness-standard.local/schemas/roles/0.1.0",
   "title": "Registro de roles de archivo",
   "type": "object",
-  "required": ["version_estandar", "roles", "rutas_sensibles"],
+  "required": [
+    "version_estandar",
+    "roles",
+    "rutas_sensibles"
+  ],
   "additionalProperties": false,
   "properties": {
-    "version_estandar": { "type": "string" },
+    "version_estandar": {
+      "type": "string"
+    },
     "roles": {
       "type": "object",
-      "propertyNames": { "pattern": "^[a-z][a-z0-9_.-]*$" },
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_.-]*$"
+      },
       "additionalProperties": {
         "type": "object",
-        "required": ["ruta", "tipo", "reubicable", "capa", "nivel_minimo", "descripcion"],
+        "required": [
+          "ruta",
+          "tipo",
+          "reubicable",
+          "obligatoriedad",
+          "capa",
+          "nivel_minimo",
+          "ficha",
+          "descripcion"
+        ],
         "additionalProperties": false,
         "properties": {
-          "ruta": { "type": "string" },
-          "alternativas": { "type": "array", "items": { "type": "string" } },
-          "tipo": { "enum": ["archivo", "directorio"] },
-          "reubicable": { "type": "boolean" },
-          "capa": { "type": "string", "pattern": "^(nucleo|adaptador:[a-z-]+)$" },
-          "nivel_minimo": { "enum": ["N0", "N1", "N2", "N3"] },
-          "descripcion": { "type": "string" }
-        }
+          "ruta": {
+            "type": "string"
+          },
+          "alternativas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tipo": {
+            "enum": [
+              "archivo",
+              "directorio"
+            ]
+          },
+          "reubicable": {
+            "type": "boolean"
+          },
+          "capa": {
+            "type": "string",
+            "pattern": "^(nucleo|adaptador:[a-z-]+)$"
+          },
+          "nivel_minimo": {
+            "enum": [
+              "N0",
+              "N1",
+              "N2",
+              "N3"
+            ]
+          },
+          "descripcion": {
+            "type": "string"
+          },
+          "patron": {
+            "type": "boolean",
+            "description": "La ruta contiene <segmento> y se aplica en cada raíz de segmento."
+          },
+          "obligatoriedad": {
+            "enum": [
+              "obligatorio",
+              "condicional",
+              "recomendado",
+              "opcional",
+              "generado",
+              "prohibido-versionar"
+            ]
+          },
+          "condicion": {
+            "type": "string",
+            "minLength": 5
+          },
+          "ficha": {
+            "type": "string",
+            "pattern": "^(pendiente:F[0-9](\\.[0-9])?|standard/04-archivos/[a-z0-9._-]+\\.md)$"
+          },
+          "relativa_a": {
+            "type": "string",
+            "description": "Rol directorio del que esta ruta es relativa (sigue su reubicación)."
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "obligatoriedad": {
+                  "enum": [
+                    "condicional",
+                    "generado",
+                    "prohibido-versionar"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "condicion"
+              ]
+            }
+          }
+        ]
       }
     },
-    "rutas_sensibles": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+    "rutas_sensibles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    }
   }
 }

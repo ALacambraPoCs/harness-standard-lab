@@ -34,9 +34,14 @@ jobs:
       - name: Autotests (pytest)
         run: python -m pytest -q
       - name: Matriz de trazabilidad estricta
-        # El CLI se instala en site-packages, que no incluye tests/fixtures: hay que apuntar al del repo.
-        run: harness matrix --strict --fixtures tests/fixtures --output MATRIZ.md
+        # El CLI instalado usa la copia del estándar empaquetada en site-packages, que no incluye
+        # tests/fixtures ni los .md de standard/: en este repo se apunta explícitamente a la raíz.
+        # (No se busca el estándar en el directorio actual por seguridad: una instancia podría
+        # aportar un standard/ propio para relajar las reglas.)
+        run: harness --standard-root . matrix --strict --output MATRIZ.md
       - name: La matriz versionada está al día
         run: diff -u docs/MATRIZ.md MATRIZ.md
+      - name: La tabla de roles de 03-estructura-canonica.md está al día
+        run: harness --standard-root . roles --write --check
       - name: El ejemplo greenfield es conforme
         run: harness check --path examples/greenfield --run-commands --strict

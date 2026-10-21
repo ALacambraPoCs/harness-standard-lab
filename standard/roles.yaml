@@ -1,87 +1,232 @@
 # Registro de roles de archivo (ADR-004). Validado por schemas/roles.schema.json.
-# Cada rol tiene una ruta por defecto. Solo los roles con `reubicable: true` pueden
-# declarar otra ruta en `roles` del manifiesto. `alternativas` son ubicaciones
-# que la herramienta destino reconoce por sí misma (se buscan en orden).
+# Fuente de verdad de la estructura canónica (standard/03-estructura-canonica.md la explica).
+#
+# Campos:
+#   ruta            Ruta por defecto (relativa a la raíz). Con `patron: true`, `<segmento>` es la raíz de un segmento.
+#   alternativas    Ubicaciones que la herramienta destino reconoce por sí misma, en orden de búsqueda.
+#   reubicable      Si `roles.<rol>` del manifiesto puede declarar otra ruta (brownfield).
+#   obligatoriedad  obligatorio | condicional | recomendado | opcional | generado | prohibido-versionar
+#   condicion       Cuándo aplica (obligatoriedad condicional) o por qué no se versiona.
+#   nivel_minimo    Primer nivel de conformidad en que el rol es exigible.
+#   ficha           Ficha normativa del rol (standard/04-archivos/), o "pendiente:<fase>".
 version_estandar: 0.1.0
 roles:
+
+  # ─────────────── Gobierno de la instancia ───────────────
   manifest:
     ruta: .harness/manifest.yaml
     tipo: archivo
     reubicable: false
+    obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
-    descripcion: Manifiesto de la instancia.
+    ficha: pendiente:F2.3
+    descripcion: Manifiesto de la instancia (versión, nivel, adaptadores, comandos, roles, waivers).
+
+  # ─────────────── Instrucciones ───────────────
   instructions.root:
     ruta: AGENTS.md
     tipo: archivo
     reubicable: false
+    obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
+    ficha: pendiente:F2.2
     descripcion: Índice de instrucciones para agentes (AGENTS.md raíz).
+  instructions.segment:
+    ruta: <segmento>/AGENTS.md
+    patron: true
+    tipo: archivo
+    reubicable: false
+    obligatoriedad: condicional
+    condicion: El segmento tiene reglas, comandos o límites propios que no aplican al resto del repositorio.
+    capa: nucleo
+    nivel_minimo: N0
+    ficha: pendiente:F2.2
+    descripcion: Instrucciones locales de un segmento (AGENTS.md anidado; gana el más cercano).
+  adapter.claude.instructions:
+    ruta: CLAUDE.md
+    tipo: archivo
+    reubicable: false
+    obligatoriedad: condicional
+    condicion: El manifiesto declara el adaptador claude-code.
+    capa: adaptador:claude-code
+    nivel_minimo: N0
+    ficha: pendiente:F2.2
+    descripcion: Adaptador fino de Claude Code; contiene `@AGENTS.md` (ADR-003).
+  adapter.claude.local:
+    ruta: CLAUDE.local.md
+    tipo: archivo
+    reubicable: false
+    obligatoriedad: prohibido-versionar
+    condicion: Preferencias personales de cada persona; DEBE estar en .gitignore (HS-SEC-003).
+    capa: adaptador:claude-code
+    nivel_minimo: N0
+    ficha: pendiente:F2.2
+    descripcion: Instrucciones personales de Claude Code, nunca versionadas.
+
+  # ─────────────── Conocimiento estable ───────────────
   architecture.map:
     ruta: docs/architecture/ARCHITECTURE.md
     tipo: archivo
     reubicable: true
+    obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
+    ficha: pendiente:F2.3
     descripcion: Mapa de dominios, capas, límites y dependencias.
   decisions.dir:
     ruta: docs/decisions
     tipo: directorio
     reubicable: true
+    obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
-    descripcion: Registro de decisiones (ADR) del proyecto.
+    ficha: pendiente:F2.3
+    descripcion: Registro de decisiones (ADR) del proyecto, con README.md como índice.
   security.policy:
     ruta: docs/security/SECURITY.md
     tipo: archivo
     reubicable: true
+    obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N0
+    ficha: pendiente:F2.3
     descripcion: Política de seguridad del repositorio y del uso de agentes.
+  quality.doc:
+    ruta: docs/quality/QUALITY.md
+    tipo: archivo
+    reubicable: true
+    obligatoriedad: recomendado
+    capa: nucleo
+    nivel_minimo: N1
+    ficha: pendiente:F6
+    descripcion: Estado de calidad por segmento (salud, deuda, cobertura de verificación).
+  runbooks.dir:
+    ruta: docs/runbooks
+    tipo: directorio
+    reubicable: true
+    obligatoriedad: condicional
+    condicion: El repositorio se despliega o se opera en un entorno compartido.
+    capa: nucleo
+    nivel_minimo: N1
+    ficha: pendiente:F5
+    descripcion: Procedimientos de despliegue, rollback e incidentes.
+  references.dir:
+    ruta: docs/references
+    tipo: directorio
+    reubicable: true
+    obligatoriedad: opcional
+    capa: nucleo
+    nivel_minimo: N0
+    ficha: pendiente:F2.3
+    descripcion: Documentación externa condensada para el modelo (p. ej. *-llms.txt), con fuente y fecha.
+
+  # ─────────────── Estado de tareas (N1) ───────────────
   plans.dir:
     ruta: docs/plans
     tipo: directorio
     reubicable: true
+    obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N1
-    descripcion: Tareas y planes de ejecución (ADR-005). Se especifica en la Fase 2.
+    ficha: pendiente:F2.4
+    descripcion: Raíz de tareas y planes de ejecución (ADR-005).
+  plans.active:
+    ruta: active
+    relativa_a: plans.dir
+    tipo: directorio
+    reubicable: false
+    obligatoriedad: obligatorio
+    capa: nucleo
+    nivel_minimo: N1
+    ficha: pendiente:F2.4
+    descripcion: Un archivo por tarea en curso o pendiente (T-NNNN-slug.md).
+  plans.completed:
+    ruta: completed
+    relativa_a: plans.dir
+    tipo: directorio
+    reubicable: false
+    obligatoriedad: obligatorio
+    capa: nucleo
+    nivel_minimo: N1
+    ficha: pendiente:F2.4
+    descripcion: Tareas en estado terminal (done, cancelled).
+  plans.index:
+    ruta: INDEX.md
+    relativa_a: plans.dir
+    tipo: archivo
+    reubicable: false
+    obligatoriedad: generado
+    condicion: Lo genera la CLI a partir de los archivos de tarea; no se edita a mano.
+    capa: nucleo
+    nivel_minimo: N1
+    ficha: pendiente:F2.4
+    descripcion: Índice de tareas generado (estado, propietario, segmento, issue).
+
+  # ─────────────── Reglas mecánicas del proyecto ───────────────
+  project.rules:
+    ruta: .harness/rules
+    tipo: directorio
+    reubicable: false
+    obligatoriedad: condicional
+    condicion: El proyecto declara límites de arquitectura que se verifican de forma mecánica.
+    capa: nucleo
+    nivel_minimo: N1
+    ficha: pendiente:F4
+    descripcion: Reglas de arquitectura del proyecto (qué / por qué / remedio / retirada).
   segments.map:
     ruta: .harness/segments.yaml
     tipo: archivo
     reubicable: false
+    obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N2
-    descripcion: Mapa de segmentos (ADR-014). Se especifica en la Fase 4.
+    ficha: pendiente:F4
+    descripcion: Mapa de segmentos (ADR-014).
+
+  # ─────────────── Adaptador de agente: Claude Code ───────────────
+  adapter.claude.settings:
+    ruta: .claude/settings.json
+    tipo: archivo
+    reubicable: false
+    obligatoriedad: condicional
+    condicion: El manifiesto declara claude-code y el nivel es N1 o superior.
+    capa: adaptador:claude-code
+    nivel_minimo: N1
+    ficha: pendiente:F3
+    descripcion: Permisos deny-first, hooks y sandbox de Claude Code a nivel de proyecto.
+
+  # ─────────────── Adaptador de plataforma: GitHub ───────────────
   codeowners:
     ruta: .github/CODEOWNERS
     alternativas: [.github/CODEOWNERS, CODEOWNERS, docs/CODEOWNERS]
     tipo: archivo
     reubicable: false
+    obligatoriedad: obligatorio
     capa: adaptador:github
     nivel_minimo: N0
+    ficha: pendiente:F2.3
     descripcion: Propietarios de código; GitHub usa el primero que encuentra en el orden de `alternativas`.
+  pr.template:
+    ruta: .github/pull_request_template.md
+    alternativas: [.github/pull_request_template.md, pull_request_template.md, docs/pull_request_template.md]
+    tipo: archivo
+    reubicable: false
+    obligatoriedad: obligatorio
+    capa: adaptador:github
+    nivel_minimo: N1
+    ficha: pendiente:F2.3
+    descripcion: Plantilla de PR que enlaza tarea, clase de riesgo y evidencia.
   ci.workflows:
     ruta: .github/workflows
     tipo: directorio
     reubicable: false
+    obligatoriedad: obligatorio
     capa: adaptador:github
     nivel_minimo: N0
-    descripcion: Workflows de GitHub Actions.
-  adapter.claude.instructions:
-    ruta: CLAUDE.md
-    tipo: archivo
-    reubicable: false
-    capa: adaptador:claude-code
-    nivel_minimo: N0
-    descripcion: Adaptador fino de Claude Code; contiene `@AGENTS.md` (ADR-003).
-  adapter.claude.settings:
-    ruta: .claude/settings.json
-    tipo: archivo
-    reubicable: false
-    capa: adaptador:claude-code
-    nivel_minimo: N1
-    descripcion: Permisos, hooks y sandbox de Claude Code a nivel de proyecto. Se especifica en la Fase 3.
+    ficha: pendiente:F5
+    descripcion: Workflows de GitHub Actions (conformidad en N0; ciclo de vida de tareas en N1).
 
 # Rutas de ejemplo que CODEOWNERS DEBE cubrir (HS-SEC-002, ADR-013).
 # Se evalúan como si existieran; representan cada patrón sensible.

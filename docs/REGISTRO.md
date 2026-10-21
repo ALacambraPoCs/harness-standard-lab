@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-20 (Fase 1 CERRADA; siguiente: Fase 2)
+actualizado: 2026-10-21 (Fase 2 en preparación)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -35,6 +35,10 @@ actualizado: 2026-10-20 (Fase 1 CERRADA; siguiente: Fase 2)
 | E-006 | **Evidencia L5 en instancia:** con el ruleset `main-protegida` activo en `harness-example-greenfield`, el PR #2 muestra `harness / conformance / harness check (pull_request)` fallido y marcado **Required**; el botón *Merge pull request* queda deshabilitado (captura del usuario, 2026-10-20). Verifica HS-GOV-004 completo (check ejecutado + requerido) en una instancia. | 2026-10-20 | Usuario (captura) |
 | E-007 | **Evidencia de corrección:** el PR #3 (revert de #1) pasa `harness / conformance / harness check` (**Required**, 12 s) y el merge queda habilitado (captura del usuario, 2026-10-20). Ciclo completo demostrado: incumplimiento detectado → merge bloqueado → corrección → merge permitido. | 2026-10-20 | Usuario (captura) |
 | D-019 | **Fase 1 cerrada** con los criterios de aceptación cumplidos (ver `fase-1/INFORME.md` §6). | 2026-10-20 | Usuario (validación de evidencias) |
+| D-020 | **Q-02 resuelta:** el idioma de los archivos de cada instancia es **libre**; se declara en `project.docs_language` del manifiesto. La validación no depende del idioma (esquemas y anclas, ADR-004). | 2026-10-21 | Usuario |
+| D-021 | **Q-04 resuelta como experimento:** el estado de las tareas se enlaza con **GitHub Issues** de forma provisional para evaluar si aporta y es eficiente. El diseño del experimento y su criterio de retirada se fijan en la Fase 2. | 2026-10-21 | Usuario |
+| D-022 | **Experimento X-01 aprobado** sin cambios: issue como espejo del archivo de tarea (dirección única archivo→issue), `Closes #n` para cerrar, job de CI con `issues: write` separado, métricas y criterio de adopción/retirada (`docs/experimentos/X-01-tareas-y-github-issues.md`). | 2026-10-21 | Usuario |
+| D-023 | **Q-11 resuelta:** requiere archivo de tarea si cambia comportamiento del código, toca > 1 segmento, riesgo medio/alto, > 1 sesión o la ejecuta un agente sin supervisión paso a paso. Exentas: documentación, formato/lint, parches de dependencias y reverts, con etiqueta `trivial` en el PR verificada por CI contra las rutas del diff. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
@@ -46,14 +50,15 @@ actualizado: 2026-10-20 (Fase 1 CERRADA; siguiente: Fase 2)
 | ID | Cuestión | Necesaria para | Propuesta provisional |
 |---|---|---|---|
 | Q-01 | ¿Quién forma el grupo de gobierno con autoridad para aprobar cambios del estándar? **Aplazada por el usuario (2026-10-20)**; mientras tanto aprueba el usuario. | F9 | Un responsable de DevEx/plataforma, uno de seguridad y dos tech leads de equipos piloto |
-| Q-02 | Idioma de los archivos de instancia (AGENTS.md, docs/): ¿inglés, español o libre? | F2 | Libre, porque la validación es por esquema y anclas. El idioma se declara en el manifiesto. |
+| Q-02 | ~~Idioma de los archivos de instancia~~ **Resuelta (D-020): libre, declarado en el manifiesto.** | — | — |
 | Q-03 | ~~Lenguaje de la CLI~~ | — | **Resuelta (D-014): Python** |
-| Q-04 | ¿Dónde vive el estado de las tareas: solo en el repositorio, o enlazado con GitHub Issues/Projects? | F2/F4 | En el repositorio como fuente, con enlace opcional a la issue |
+| Q-04 | ~~Estado de tareas y GitHub Issues~~ **Resuelta como experimento (D-021, X-01 aprobado D-022).** | — | — |
 | Q-05 | Plataforma de despliegue (Actions + environments, ArgoCD, otra). | F5 | Por confirmar |
 | Q-06 | Fuente de la telemetría de coste y tokens del agente (consola de la organización, OpenTelemetry, logs de CI). | F6 | Por verificar qué expone Claude Code |
 | Q-07 | En la v1, ¿skills en `.agents/skills` con sincronización o directamente en `.claude/skills`? | F3 | ADR-012 |
 | Q-08 | ¿Hay requisitos regulatorios o de cliente (datos, auditoría, EU AI Act) que afecten al uso de agentes? | F5 | Por confirmar con seguridad y legal |
 | Q-10 | ~~Organización y visibilidad~~ **Resuelta:** `ALacambraPoCs`, repos públicos, plan Free (D-018). Pendiente solo: equipos (se usa `@AlbertoLacambra`). | F2 | — |
+| Q-11 | ~~Umbral de tarea trivial~~ **Resuelta (D-023).** | — | — |
 | Q-09 | Repositorios candidatos para el piloto (1 greenfield + 1 brownfield grande). | F8 (identificar en F2) | Por designar |
 
 ## Riesgos

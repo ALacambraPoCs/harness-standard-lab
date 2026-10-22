@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harness-standard.local/schemas/catalog-entry/0.3.0",
+  "title": "Entrada de catálogo de un componente del harness",
+  "description": "catalog/<tipo>/<id>/componente.yaml (standard/05-componentes/00-modelo.md).",
+  "type": "object",
+  "required": ["id", "tipo", "version", "estado", "titulo", "proposito", "propietario", "compatibilidad",
+               "contrato", "permisos", "control", "archivos", "pruebas", "metricas", "coste", "riesgos", "retirada", "ficha"],
+  "additionalProperties": false,
+  "patternProperties": { "^x-": {} },
+  "properties": {
+    "id": { "type": "string", "pattern": "^(?!.*--)[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$" },
+    "tipo": { "enum": ["skill", "subagente", "hook", "mcp", "workflow", "plugin"] },
+    "version": { "type": "string", "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$" },
+    "estado": { "enum": ["experimental", "estable", "deprecado", "retirado"] },
+    "titulo": { "type": "string", "minLength": 3, "maxLength": 120 },
+    "proposito": { "type": "string", "minLength": 20, "maxLength": 1024 },
+    "propietario": { "type": "string", "pattern": "^@[A-Za-z0-9][A-Za-z0-9-]*(/[A-Za-z0-9._-]+)?$" },
+    "compatibilidad": {
+      "type": "object",
+      "required": ["adaptadores", "niveles"],
+      "additionalProperties": false,
+      "properties": {
+        "adaptadores": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["claude-code", "neutro"] } },
+        "perfil": { "enum": ["portable", "claude-code"], "description": "Solo skills (ADR-012)." },
+        "agente_min": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" } },
+        "niveles": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["N0", "N1", "N2", "N3"] } }
+      }
+    },
+    "contrato": {
+      "type": "object",
+      "required": ["entradas", "salidas", "efectos"],
+      "additionalProperties": false,
+      "properties": {
+        "entradas": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 3 } },
+        "salidas": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 3 } },
+        "efectos": { "type": "array", "items": { "type": "string", "minLength": 3 }, "description": "Qué modifica. Vacío = sin efectos." }
+      }
+    },
+    "permisos": {
+      "type": "object",
+      "required": ["herramientas", "escritura", "red", "secretos"],
+      "additionalProperties": false,
+      "properties": {
+        "herramientas": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "escritura": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Patrones de ruta que puede modificar. Vacío = solo lectura." },
+        "red": { "oneOf": [ { "const": "ninguna" }, { "type": "array", "minItems": 1, "items": { "type": "string" } } ] },
+        "secretos": { "type": "boolean" }
+      }
+    },
+    "control": {
+      "type": "object",
+      "required": ["es_control", "capa", "determinista"],
+      "additionalProperties": false,
+      "properties": {
+        "es_control": { "type": "boolean" },
+        "capa": { "enum": ["L1", "L2", "L3", "L4", "L5"] },
+        "determinista": { "type": "boolean" },
+        "hook_tipo": { "enum": ["command", "http", "mcp_tool", "prompt", "agent"] }
+      }
+    },
+    "archivos": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["origen", "destino"],
+        "additionalProperties": false,
+        "properties": {
+          "origen": { "type": "string", "pattern": "^src/[^\\0]+$" },
+          "destino": { "type": "string", "pattern": "^(?!/)(?!.*\\.\\.)[^\\0]+$" }
+        }
+      }
+    },
+    "dependencias": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "pruebas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["tipo", "descripcion"],
+        "additionalProperties": false,
+        "properties": {
+          "tipo": { "enum": ["unitaria", "integracion", "eval", "manual"] },
+          "descripcion": { "type": "string", "minLength": 5 },
+          "comando": { "type": "string" }
+        }
+      }
+    },
+    "metricas": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 5 } },
+    "coste": {
+      "type": "object",
+      "required": ["contexto", "latencia"],
+      "additionalProperties": false,
+      "properties": { "contexto": { "type": "string" }, "latencia": { "type": "string" }, "otros": { "type": "string" } }
+    },
+    "riesgos": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 5 } },
+    "retirada": {
+      "type": "object",
+      "required": ["condicion", "procedimiento"],
+      "additionalProperties": false,
+      "properties": { "condicion": { "type": "string", "minLength": 10 }, "procedimiento": { "type": "string", "minLength": 10 } }
+    },
+    "ficha": { "const": "FICHA.md" },
+    "evidencia": { "type": "array", "items": { "type": "string", "minLength": 5 } },
+    "revision_seguridad": { "type": "string", "description": "Quién y cuándo aprobó un componente con permisos elevados." },
+    "deprecacion": {
+      "type": "object",
+      "required": ["motivo", "fecha"],
+      "additionalProperties": false,
+      "properties": {
+        "motivo": { "type": "string", "minLength": 10 },
+        "fecha": { "type": "string", "format": "date" },
+        "reemplazo": { "type": "string" },
+        "retirada_prevista": { "type": "string", "format": "date" }
+      }
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "tipo": { "const": "skill" } } },
+      "then": { "properties": { "compatibilidad": { "required": ["perfil"] } } },
+      "else": { "properties": { "compatibilidad": { "not": { "required": ["perfil"] } } } } },
+    { "if": { "properties": { "control": { "properties": { "es_control": { "const": true } }, "required": ["es_control"] } } },
+      "then": { "properties": { "tipo": { "enum": ["hook", "workflow"] },
+                                "control": { "properties": { "determinista": { "const": true }, "capa": { "enum": ["L3", "L4", "L5"] } } } } } },
+    { "if": { "properties": { "tipo": { "const": "hook" } } },
+      "then": { "properties": { "control": { "required": ["hook_tipo"] } } } },
+    { "if": { "properties": { "control": { "properties": { "hook_tipo": { "enum": ["prompt", "agent", "mcp_tool"] } }, "required": ["hook_tipo"] } } },
+      "then": { "properties": { "control": { "properties": { "es_control": { "const": false }, "determinista": { "const": false } } } } } },
+    { "if": { "properties": { "estado": { "const": "estable" } } },
+      "then": { "required": ["evidencia"], "properties": { "evidencia": { "minItems": 1 } } } },
+    { "if": { "properties": { "estado": { "enum": ["deprecado", "retirado"] } } },
+      "then": { "required": ["deprecacion"] } },
+    { "if": { "anyOf": [
+        { "properties": { "permisos": { "properties": { "secretos": { "const": true } } } } },
+        { "properties": { "permisos": { "properties": { "red": { "type": "array" } } } } } ],
+        "properties": { "estado": { "enum": ["estable"] } } },
+      "then": { "required": ["revision_seguridad"] } }
+  ]
+}

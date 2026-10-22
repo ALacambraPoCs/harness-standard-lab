@@ -89,7 +89,7 @@ catalog/
 
 `<id>` sigue las reglas de nombre de Agent Skills (1–64 caracteres, `a-z0-9-`, sin `--`), para que una skill pueda conservar su `id` como `name`.
 
-## 7. Distribución a las instancias (ADR-017, propuesto)
+## 7. Distribución a las instancias (ADR-017)
 
 Los componentes llegan a una instancia **por copia versionada**. El catálogo viaja dentro del paquete de la CLI, así que fijar `cli-v…` fija también el catálogo.
 

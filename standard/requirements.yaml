@@ -1115,6 +1115,6 @@ requisitos:
     reglas: [core.components.drift]
     fuentes: [ADR-017, K-08]
     nota: Un componente modificado en local deja de ser el del catálogo. Se restaura o se convierte en un componente propio con otro id.
-    estado: propuesto
+    estado: aprobado
     desde: 0.4.0
     retirada: Si la distribución deja de hacerse por copia (ADR-017).

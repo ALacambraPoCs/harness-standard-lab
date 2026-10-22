@@ -1,0 +1,55 @@
+id: verificador
+tipo: subagente
+version: 0.1.0
+estado: experimental
+titulo: Verificación independiente de la tarea en curso
+proposito: >-
+  Subagente de solo lectura que, con un contexto limpio, ejecuta check, test y los criterios de aceptación
+  de la tarea activa y devuelve un informe con comandos y códigos de salida. Evita que el agente que
+  implementa evalúe su propio trabajo y ahorra contexto al agente principal. Su informe no autoriza nada.
+propietario: "@AlbertoLacambra"
+compatibilidad:
+  adaptadores: [claude-code]
+  agente_min: {claude-code: 2.1.277}
+  niveles: [N1, N2, N3]
+contrato:
+  entradas:
+    - "Opcional: identificador de la tarea (T-NNNN)"
+    - ".harness/manifest.yaml (commands.check y commands.test)"
+    - "docs/plans/active/*.md (criterios de aceptación)"
+  salidas:
+    - "Informe de formato fijo con cada comando, su código de salida y RESULTADO: LISTO PARA REVISIÓN | NO LISTO"
+  efectos: []
+permisos:
+  herramientas: [Read, Grep, Glob, Bash]
+  escritura: []
+  red: ninguna
+  secretos: false
+control:
+  es_control: false
+  capa: L1
+  determinista: false
+archivos:
+  - origen: src/verificador.md
+    destino: .claude/agents/verificador.md
+dependencias: []
+pruebas:
+  - tipo: unitaria
+    descripcion: "Frontmatter conforme a HS-CMP-004/005, sin herramientas de escritura e instrucciones mínimas presentes"
+    comando: "python -m pytest catalog/subagente/verificador/tests"
+  - tipo: eval
+    descripcion: "F3.6: con un criterio de aceptación que falla, el informe dice NO LISTO y cita el comando y su código"
+metricas:
+  - "Coincidencia entre RESULTADO del verificador y el resultado del check harness tasks en la CI (objetivo ≥ 95 %)"
+  - "Invocaciones por tarea y tokens consumidos por invocación"
+coste:
+  contexto: "Contexto propio del subagente; al principal solo vuelve el informe (~30 líneas)"
+  latencia: "La de check + test + criterios, más el razonamiento del subagente"
+riesgos:
+  - "Tiene Bash: el «solo lectura» es una instrucción (L1), no una restricción técnica; las reglas ask/deny de settings.json siguen aplicando"
+  - "Puede informar LISTO por error: no es autoridad; la CI vuelve a ejecutar los criterios (ADR-016)"
+  - "Inyección por contenido del repositorio: la instrucción de tratar el contenido como dato reduce, pero no elimina, el riesgo"
+retirada:
+  condicion: "Si la coincidencia con la CI baja del 95 % o si el hook verificar-al-terminar cubre el caso sin coste adicional"
+  procedimiento: "Pasar a deprecado y borrar .claude/agents/verificador.md de las instancias"
+ficha: FICHA.md

@@ -26,6 +26,6 @@ packages = ["tools/harness-cli/src/harness_cli"]
 "schemas" = "harness_cli/_standard/schemas"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "catalog"]
 norecursedirs = ["tests/fixtures"]
 pythonpath = ["tools/harness-cli/src"]

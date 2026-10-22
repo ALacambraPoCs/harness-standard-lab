@@ -103,7 +103,7 @@ Aplican solo a instancias que declaran `standard.version` ≥ 0.2.0 (regla 7). �
 | HS-STA-005 | DEBE | done solo con aceptación verificada por la CI | automática · en el PR | no |
 | HS-STA-006 | DEBERÍA | El índice de tareas está al día | automática | sí |
 
-## 3c. Requisitos añadidos en 0.3.0 (F3.3) — estado: propuestos
+## 3c. Requisitos añadidos en 0.3.0 (F3.3) — estado: aprobados (D-037)
 
 Aplican a instancias que declaran `standard.version` ≥ 0.3.0 (regla 7). Los de ámbito «repo central» los verifica `harness catalog validate` en la CI del repositorio del estándar.
 

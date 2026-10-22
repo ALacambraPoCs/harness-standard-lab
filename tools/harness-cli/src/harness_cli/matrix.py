@@ -15,12 +15,14 @@ def build(standard: Standard, fixtures_dir: Path) -> tuple[list[dict], list[str]
     for c in cases:
         for r in c.get("expect_fail", []):
             by_rule.setdefault(r, []).append(c["id"])
-    # Las reglas de contexto PR (base o cuerpo del PR) se prueban sobre repos git temporales en tests/test_tasks.py.
-    pr_tests = fixtures_dir.parent / "test_tasks.py"
-    pr_text = pr_tests.read_text(encoding="utf-8") if pr_tests.is_file() else ""
-    for rid, rule in registry.items():
-        if rule.context == "pr" and f'"{rid}"' in pr_text:
-            by_rule.setdefault(rid, []).append("test_tasks.py")
+    # Las reglas que no ejecuta `harness check` se prueban en su propio archivo de tests:
+    # contexto PR (base o cuerpo del PR) en test_tasks.py y catálogo central en test_catalog.py.
+    for context, fname in (("pr", "test_tasks.py"), ("catalog", "test_catalog.py")):
+        f = fixtures_dir.parent / fname
+        text = f.read_text(encoding="utf-8") if f.is_file() else ""
+        for rid, rule in registry.items():
+            if rule.context == context and f'"{rid}"' in text:
+                by_rule.setdefault(rid, []).append(fname)
     problems: list[str] = []
     rows = []
     for req in standard.requirements.values():

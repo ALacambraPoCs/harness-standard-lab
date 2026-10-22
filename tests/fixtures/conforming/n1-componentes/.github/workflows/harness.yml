@@ -1,0 +1,12 @@
+name: harness
+on:
+  pull_request:
+  merge_group:
+permissions:
+  contents: read
+jobs:
+  conformance:
+    uses: org/harness-standard/.github/workflows/harness-conformance.yml@cli-v0.1.0
+    with:
+      standard-repository: org/harness-standard
+      cli-ref: cli-v0.1.0

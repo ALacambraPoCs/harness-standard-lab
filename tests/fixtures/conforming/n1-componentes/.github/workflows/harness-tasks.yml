@@ -1,0 +1,18 @@
+name: harness-tasks
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  tasks:
+    uses: org/harness-standard/.github/workflows/harness-tasks-lifecycle.yml@cli-v0.2.0-rc.1
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+    with:
+      standard-repository: org/harness-standard
+      cli-ref: cli-v0.2.0-rc.1

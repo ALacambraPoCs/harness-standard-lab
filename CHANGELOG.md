@@ -4,6 +4,16 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 3 (en curso)
 
+### Añadido (F3.3, 2026-10-22) — estándar 0.3.0 (sin publicar)
+- 16 requisitos propuestos (`desde: 0.3.0`): 12 de instancia (HS-CMP-001…008, HS-SEC-007…009, HS-CI-004) y 4 del catálogo central (HS-CMP-010…013).
+- `harness_cli/skills.py`: validador propio de Agent Skills con perfiles (`metadata.harness-perfil`, ADR-012).
+- Reglas `rules/components.py`: skills, subagentes, hooks (scripts y no deterministas), versión mínima, `settings.json` (secretos, rutas sensibles por muestras, modos) y `claude -p` en CI.
+- `harness catalog validate [--base]` (`catalog.py`): entrada, ficha de 17 puntos, skill y, con base, transiciones de estado y subida de versión. Paso nuevo en la CI central (`fetch-depth: 0`).
+- Fixture conforme `n1-componentes` (0.3.0), 15 casos nuevos y `tests/test_catalog.py` (15 pruebas). La matriz cuenta como cobertura las pruebas de `test_catalog.py` para el contexto `catalog`.
+
+### Cambiado (F3.3)
+- Estándar 0.3.0 y CLI 0.3.0rc1 (soporta 0.1.x–0.3.x); los workflows reutilizables apuntan a `cli-v0.3.0-rc.1`. La plantilla declara 0.3.0.
+
 ### Añadido (F3.2, 2026-10-22)
 - `standard/adaptadores/claude-code.md`: versión mínima, mapeo del núcleo a archivos, política deny-first (qué aplica sin confianza y qué no), límites de las reglas deny, anclaje de rutas y ejecución del agente en CI (`--bare --setting-sources user`, R-14).
 - Ficha `standard/04-archivos/adapter.claude.settings.md` (aplazada de F2).

@@ -31,7 +31,8 @@ def run_check(root: Path, *, standard: Standard | None = None, today: dt.date | 
             result.rules_skipped[rule.id] = "requisitos no aplicables al nivel/adaptadores declarados"
             continue
         if rule.context != "check":
-            result.rules_skipped[rule.id] = "se verifica en el PR (harness tasks validate --base / harness pr check)"
+            result.rules_skipped[rule.id] = ("se verifica en el PR (harness tasks validate --base / harness pr check)"
+                                             if rule.context == "pr" else "se verifica en el repositorio central (harness catalog validate)")
             continue
         if rule.needs_valid_manifest and not ctx.manifest_valid:
             result.rules_skipped[rule.id] = "manifiesto ausente o inválido (ver core.manifest.valid)"

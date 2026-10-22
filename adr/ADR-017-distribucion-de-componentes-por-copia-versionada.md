@@ -1,7 +1,7 @@
 ---
 id: ADR-017
 titulo: "Distribución de componentes: copia versionada en la instancia con lockfile y control de deriva"
-estado: propuesto
+estado: aprobado
 fecha: 2026-10-22
 origen: F3.5 (docs/fase-3/PLAN.md)
 ---

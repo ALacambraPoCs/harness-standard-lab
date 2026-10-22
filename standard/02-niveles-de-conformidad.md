@@ -126,7 +126,7 @@ Aplican a instancias que declaran `standard.version` ≥ 0.3.0 (regla 7). Los de
 | HS-CMP-012 | DEBE | repo central | Las skills del catálogo cumplen su especificación y perfil | automática |
 | HS-CMP-013 | DEBE | repo central | El ciclo de vida y la versión de los componentes son coherentes | automática |
 
-## 3d. Requisitos añadidos en 0.4.0 (F3.5) — estado: propuestos
+## 3d. Requisitos añadidos en 0.4.0 (F3.5) — estado: aprobados (D-039)
 
 | ID | Nivel | Niveles | Requisito (resumen) | Verificación |
 |---|---|---|---|---|

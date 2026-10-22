@@ -42,4 +42,3 @@ sin coste de sincronización apreciable y sin crear una segunda fuente de verdad
 | Fecha | Tareas con `issue` | Sincronizaciones | Desincronizaciones sin resolver | Duración del job | Notas |
 |---|---|---|---|---|---|
 | 2026-10-22 | 1 (T-0002 → #4) | 3 (PR #5, #6 y #7) | 0 | Pendiente de leer en Actions | Inicio en `harness-example-greenfield` (E-013). Fricción observada: hay que predecir `issue` y `done_pr` |
-

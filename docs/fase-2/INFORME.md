@@ -1,7 +1,7 @@
 ---
 documento: F2-INFORME
 titulo: Informe de cierre de la Fase 2 — Estructura canónica, fichas de archivo y nivel N1
-estado: propuesto para cierre
+estado: aprobado (D-031, D-032)
 fecha: 2026-10-22
 ---
 

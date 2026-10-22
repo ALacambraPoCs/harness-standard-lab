@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-22 (F2.6 completada; cierre de la Fase 2 pendiente de aprobación)
+actualizado: 2026-10-22 (F3 en curso: F3.1)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -51,14 +51,17 @@ actualizado: 2026-10-22 (F2.6 completada; cierre de la Fase 2 pendiente de aprob
 | E-011 | **ADR-016 validado (rechazo):** PR #7, commit `d60fd2d`. T-0002 declarada `done` sin implementar; `harness tasks` en rojo (AC1/AC2 con código 1) y merge bloqueado, con la conformidad en verde. | 2026-10-22 | Usuario |
 | E-012 | **ADR-016 validado (aceptación):** PR #7, commit `2abc558`, con la implementación; ambos checks en verde y merge `e9946bd`. T-0001 pasó a `done` en el PR #6 tras volver a ejecutar `harness check --strict` como criterio. | 2026-10-22 | Usuario |
 | E-013 | **X-01 de extremo a extremo:** issue #4 `status:ready` → `status:in_progress` → cerrada por `Closes #4` → `status:done` y comentario con enlace a la ejecución 39779093407, siempre por `github-actions`. | 2026-10-22 | Usuario |
+| D-031 | **Fase 2 cerrada** con el criterio 1 parcial: 5 fichas aplazadas a la fase dueña de su subsistema (`adapter.claude.settings` → F3, `project.rules` → F4, `ci.workflows` y `runbooks.dir` → F5, `quality.doc` → F6). `fase-2/INFORME.md`. | 2026-10-22 | Usuario |
+| D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |
+| D-033 | **Plan de la F3 aprobado** (`fase-3/PLAN.md`): 6 incrementos, de F3.1 (modelo de componentes) a F3.6 (prueba en el laboratorio). | 2026-10-22 | Usuario |
+| D-034 | **ADR-012 rev. 2 aprobado:** fuente canónica de skills en `.claude/skills/`, perfiles `portable` (por defecto) y `claude-code`, `.agents/skills/` generado por `harness sync` solo cuando un adaptador lo necesite, y validación propia en la CLI. | 2026-10-22 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **Cierre de la Fase 2** con el criterio 1 parcial: 5 fichas aplazadas a F3–F6 (`fase-2/INFORME.md` §6).
-- **Siguiente fase:** F3 (componentes, catálogo y adaptador de Claude Code), recomendada.
-- ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-012 → F3. ADR-014 → F4. ADR-015 → F6.
+- **F3.1** — modelo de componentes, esquema `catalog-entry`, ciclo de vida y plantilla de ficha (`standard/05-componentes/`), pendiente de aprobación.
+- ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
 
@@ -92,6 +95,7 @@ actualizado: 2026-10-22 (F2.6 completada; cierre de la Fase 2 pendiente de aprob
 | R-11 | Copiar archivos de Windows a WSL añade metadatos ADS (`*:Zone.Identifier`, `*:sec.endpointdlp`) que se versionan y rompen el clonado en Windows. Ocurrió en la primera subida (171 archivos). | Media | Medio | Eliminados por el usuario; `.gitignore` los ignora y la CI central rechaza rutas no portables (cli 0.1.1). Propuesta para F2: requisito de rutas portables en instancias. |
 | R-12 | ~~Mitigado por D-018 (repos públicos: no hace falta token)~~. En privado, la instancia lee el repo del estándar con un **PAT fine-grained personal** (Contents: read, 1 repo, caducidad ≤ 90 días): credencial de larga duración ligada a una persona. | Media | Medio | Aceptado para el laboratorio. F5: sustituir por GitHub App de solo lectura o publicar la CLI como paquete interno. |
 | R-13 | **Hallazgo F2.2:** con el `CLAUDE.md` raíz que exige ADR-003, Claude Code (ajuste por defecto) **no carga** los `AGENTS.md` de subdirectorios (S-CC-MEM). Sin mitigación, las instrucciones de segmento serían invisibles para Claude. | Alta (si hay segmentos) | Alto | `<segmento>/CLAUDE.md` con `@AGENTS.md` obligatorio (fichas F2.2; requisito candidato C-07 en F2.5) |
+| R-14 | **Hallazgo F3 (H5):** con `claude -p` sin `--bare`, Claude Code ejecuta los hooks y los MCP de `.claude/settings.json` y `.mcp.json` del repositorio aunque la carpeta no sea de confianza. Un PR malicioso podría ejecutar código en el runner de CI si el agente se lanza sobre ese PR. | Media | Alto | En CI, el agente siempre con `--bare` y `--settings`/`--mcp-config` explícitos desde una ruta de confianza (no del PR). Se norma en F3.2 y F5 |
 | R-08 | Afirmaciones sobre la documentación oficial obtenidas por un subagente que no se han revisado a mano. | Media | Medio | Se revisaron a mano las críticas para ADR-003 y ADR-012 (memoria y skills de Claude Code). El resto se reverifica en la fase en que se norme. |
 
 ## Próximos pasos

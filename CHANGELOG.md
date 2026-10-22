@@ -2,7 +2,15 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Hay dos líneas de versión: **standard** (A) y **cli** (B).
 
-## [Sin publicar] — Fase 2 (en curso)
+## [Sin publicar] — Fase 3 (en curso)
+
+### Añadido (F3.1, 2026-10-22)
+- `standard/05-componentes/00-modelo.md`: qué es un componente, sus 6 tipos (skill, subagente, hook, mcp, workflow, plugin), contrato común, seguridad, ciclo de vida y estructura del catálogo.
+- `schemas/catalog-entry.schema.json` con reglas cruzadas: solo los hooks deterministas y los workflows pueden ser control; los hooks `prompt` y `agent` nunca; `estable` exige evidencia; los componentes con red o secretos exigen revisión de seguridad; perfil obligatorio en skills (ADR-012). `tests/test_catalog_schema.py` (28 casos).
+- Plantilla de ficha de 17 puntos (`standard/05-componentes/_PLANTILLA-FICHA.md`) y `catalog/README.md`.
+- ADR-012 rev. 2 (aprobado, D-034); verificación de fuentes de la F3; plan de la F3 (D-033); candidatos K-01…K-08; R-14.
+
+## Fase 2 (cerrada, D-031)
 
 ### Añadido (F2.1, 2026-10-21)
 - `standard/03-estructura-canonica.md`: árbol N0–N1, regla de ubicación del conocimiento, convenciones de nombres y rutas, archivos generados, instrucciones de segmento, brownfield.

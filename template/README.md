@@ -4,7 +4,7 @@ Scaffold para una instancia **N0** o **N1** del estándar 0.2.0. Los marcadores 
 `harness init` llegará en la Fase 7; hasta entonces se copia a mano:
 
 1. Copia `core/` en la raíz del repositorio.
-2. Copia el contenido de cada adaptador declarado (`adapters/claude-code/`, `adapters/github/`).
+2. Copia el contenido de cada adaptador declarado (`adapters/claude-code/`, que incluye `.claude/settings.json` deny-first, y `adapters/github/`). Inicia Claude Code siempre en la raíz del repositorio: las reglas `/…` se anclan ahí.
 3. Si ya existe un `.gitignore`, añade el contenido de `adapters/claude-code/gitignore.fragment`; si no, renómbralo a `.gitignore`.
 4. **Solo N1:** copia también `niveles/n1/` (estructura de tareas y workflow `harness-tasks.yml`), marca `harness tasks` como check requerido en el ruleset (HS-CI-003) y ejecuta `harness tasks index --write`.
 5. Sustituye los marcadores y ejecuta `harness check --run-commands`.

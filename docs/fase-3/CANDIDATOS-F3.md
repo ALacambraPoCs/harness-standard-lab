@@ -2,12 +2,26 @@
 documento: F3-CANDIDATOS
 titulo: Requisitos candidatos de la Fase 3 (componentes y adaptador de Claude Code)
 estado: lista viva
-actualizado: 2026-10-22 (F3.2)
+actualizado: 2026-10-22 (F3.3: formalizados)
 ---
 
 # Requisitos candidatos de la F3
 
-No son normativos. Se formalizan (ID, regla y fixtures) en F3.3 y se aprueban con ella.
+**Formalizados en F3.3** (`requirements.yaml`, estado `propuesto`, `desde: 0.3.0`):
+
+| Candidato | Requisito(s) | Cambio respecto al candidato |
+|---|---|---|
+| K-01, K-02 | HS-CMP-010, HS-CMP-011 | K-02 lo impone el propio esquema `catalog-entry` |
+| K-03 | HS-CMP-013 | Se añade la obligación de subir `version` si cambian los archivos |
+| K-04 | HS-CMP-001, HS-CMP-002, HS-CMP-012 | El perfil se declara en `metadata.harness-perfil` (campo de la especificación) |
+| K-05 | HS-CMP-003 | Sin `harness sync` todavía: avisa si existe `.agents/skills/` |
+| K-06 | HS-CMP-007 | Semiautomático |
+| K-07 | HS-CMP-004, HS-CMP-005 | «Revisor» no se puede detectar de forma fiable; se exige `tools` explícito en todo subagente |
+| — | HS-CMP-006 | Nuevo: scripts de hooks existentes |
+| K-08 | — | Se aplaza a F3.5 (distribución) |
+| K-09, K-10, K-11 | HS-SEC-007, HS-SEC-008, HS-SEC-009 | — |
+| K-12 | HS-CI-004 | Solo `run: claude -p`; `claude-code-action` en F5 |
+| K-13 | HS-CMP-008 | — |
 
 | # | Candidato | Nivel | Ámbito | Niveles | Verificación | Origen |
 |---|---|---|---|---|---|---|

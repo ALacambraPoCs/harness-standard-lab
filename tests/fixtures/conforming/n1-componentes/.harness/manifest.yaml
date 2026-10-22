@@ -1,0 +1,19 @@
+# Manifiesto de instancia — Estándar de Harness (ADR-004)
+standard:
+  version: 0.3.0
+  level: N1
+project:
+  name: ejemplo-componentes
+  owner: "@org/equipo-ejemplo"
+  kind: service
+  docs_language: es
+adapters:
+  agents:
+    - id: claude-code
+      min_version: 2.1.277
+  platform:
+    id: github
+commands:
+  setup: python3 scripts/setup.py
+  check: python3 -m py_compile src/app.py
+  test: python3 -m unittest discover -s tests

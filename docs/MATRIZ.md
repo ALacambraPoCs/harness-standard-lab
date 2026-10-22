@@ -54,6 +54,22 @@ Generada por `harness matrix`. No editar a mano.
 | HS-STA-004 | DEBE | N1,N2,N3 | enforcement | automatica | `tasks.transition` | test_tasks.py |
 | HS-STA-005 | DEBE | N1,N2,N3 | enforcement | automatica | `tasks.acceptance`<br>`tasks.done-pr` | nc-tarea-manual-sin-verificador<br>test_tasks.py |
 | HS-STA-006 | DEBERÍA | N1,N2,N3 | guidance | automatica | `tasks.index` | nc-indice-tareas-desactualizado<br>nc-tarea-invalida<br>nc-tarea-mal-ubicada<br>nc-tarea-manual-sin-verificador |
+| HS-CMP-001 | DEBE | N0,N1,N2,N3 | guidance | automatica | `adapter.claude.skills-spec` | nc-skill-invalida |
+| HS-CMP-002 | DEBERÍA | N0,N1,N2,N3 | guidance | automatica | `adapter.claude.skills-profile` | nc-skill-perfil |
+| HS-CMP-003 | NO DEBERÍA | N0,N1,N2,N3 | guidance | automatica | `core.skills.no-agents-dir` | nc-agents-skills-versionado |
+| HS-CMP-004 | DEBE | N0,N1,N2,N3 | guidance | automatica | `adapter.claude.agents-valid` | nc-subagente-invalido |
+| HS-CMP-005 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.agents-tools` | nc-subagente-sin-tools |
+| HS-CMP-006 | DEBE | N0,N1,N2,N3 | guidance | automatica | `adapter.claude.hooks-scripts` | nc-hook-script-ausente |
+| HS-CMP-007 | NO DEBE | N1,N2,N3 | guidance | semiautomatica | `adapter.claude.hooks-nondeterministic` | nc-hook-prompt-como-control |
+| HS-CMP-008 | DEBERÍA | N0,N1,N2,N3 | guidance | automatica | `adapter.claude.min-version` | nc-min-version-antigua |
+| HS-SEC-007 | DEBE | N1,N2,N3 | enforcement | automatica | `adapter.claude.settings-secrets` | nc-settings-ausente<br>nc-settings-sin-deny-env |
+| HS-SEC-008 | DEBE | N1,N2,N3 | enforcement | automatica | `adapter.claude.settings-sensitive` | nc-settings-ruta-sensible-sin-ask |
+| HS-SEC-009 | DEBE | N1,N2,N3 | enforcement | automatica | `adapter.claude.settings-modes` | nc-settings-modos |
+| HS-CI-004 | DEBE | N1,N2,N3 | enforcement | automatica | `core.ci.agent-bare` | nc-agente-ci-sin-bare |
+| HS-CMP-010 | DEBE | — | enforcement | automatica | `catalog.entry` | test_catalog.py |
+| HS-CMP-011 | DEBE | — | enforcement | automatica | `catalog.ficha` | test_catalog.py |
+| HS-CMP-012 | DEBE | — | enforcement | automatica | `catalog.skill` | test_catalog.py |
+| HS-CMP-013 | DEBE | — | enforcement | automatica | `catalog.transition`<br>`catalog.version` | test_catalog.py |
 
 ## Autotest de fixtures
 
@@ -118,6 +134,21 @@ Generada por `harness matrix`. No editar a mano.
 | nc-tarea-mal-ubicada | ✅ | ok |
 | nc-tarea-manual-sin-verificador | ✅ | ok |
 | nc-indice-tareas-desactualizado | ✅ | ok |
+| c-n1-componentes | ✅ | conforme |
+| c-n1-basico-sigue-en-0-2 | ✅ | conforme |
+| nc-skill-invalida | ✅ | ok |
+| nc-skill-perfil | ✅ | ok |
+| nc-agents-skills-versionado | ✅ | ok |
+| nc-subagente-invalido | ✅ | ok |
+| nc-subagente-sin-tools | ✅ | ok |
+| nc-hook-script-ausente | ✅ | ok |
+| nc-hook-prompt-como-control | ✅ | ok |
+| nc-min-version-antigua | ✅ | ok |
+| nc-settings-ausente | ✅ | ok |
+| nc-settings-sin-deny-env | ✅ | ok |
+| nc-settings-ruta-sensible-sin-ask | ✅ | ok |
+| nc-settings-modos | ✅ | ok |
+| nc-agente-ci-sin-bare | ✅ | ok |
 
 ## Incidencias
 

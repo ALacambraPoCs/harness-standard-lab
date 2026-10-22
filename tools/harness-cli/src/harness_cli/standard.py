@@ -94,7 +94,7 @@ def _load_yaml(path: Path) -> Any:
 def load_standard(root: Path | None = None) -> Standard:
     root = root or find_standard_root()
     schemas = {}
-    for name in ("manifest", "requirement", "roles", "task", "adr"):
+    for name in ("manifest", "requirement", "roles", "task", "adr", "catalog-entry"):
         with (root / "schemas" / f"{name}.schema.json").open(encoding="utf-8") as fh:
             schemas[name] = json.load(fh)
     reqs_doc = _load_yaml(root / "standard" / "requirements.yaml")

@@ -6,8 +6,8 @@ version: 0.1.0
 consumidores: [agentes, cli, plataforma]
 dependencias: [adapter.claude.instructions, adapter.claude.local, security.policy, codeowners, manifest]
 propietario: Propietario de plataforma/harness (CODEOWNERS, ADR-013), con revisión de seguridad para cambios en deny/ask
-requisitos: ["pendiente:F3.3"]
-reglas: []
+requisitos: [HS-SEC-007, HS-SEC-008, HS-SEC-009, HS-CMP-006, HS-CMP-007]
+reglas: [adapter.claude.settings-secrets, adapter.claude.settings-sensitive, adapter.claude.settings-modes, adapter.claude.hooks-scripts, adapter.claude.hooks-nondeterministic]
 ejemplo_canonico: template/adapters/claude-code/.claude/settings.json
 fuentes: [S-CC-SET, ADR-009, ADR-013, S-OWASP-LLM01]
 evolucion: >-
@@ -27,11 +27,12 @@ Fijar, para todo el equipo, **qué no puede hacer el agente sin preguntar y qué
 
 | Elemento | Requisito | Verificación |
 |---|---|---|
-| JSON estricto válido, con `$schema` `https://json.schemastore.org/claude-code-settings.json` | pendiente:F3.3 | Automática |
-| `permissions.deny` para leer y editar `.env` y `.env.*` | pendiente:F3.3 | Automática |
-| `permissions.ask` (o `deny`) de `Edit` que cubre **cada** patrón de `patrones_sensibles` de `roles.yaml` | pendiente:F3.3 | Automática (correspondencia entre patrones) |
-| `permissions.disableBypassPermissionsMode: "disable"` | pendiente:F3.3 | Automática |
-| Sin `enableAllProjectMcpServers: true` | pendiente:F3.3 | Automática |
+| JSON estricto válido (`$schema` `https://json.schemastore.org/claude-code-settings.json` recomendado) | HS-SEC-007 | Automática |
+| `permissions.deny` para leer y editar `.env` y `.env.*` | HS-SEC-007 | Automática |
+| `permissions.ask` (o `deny`) de `Edit` que cubre **cada** ruta de `rutas_sensibles` de `roles.yaml` | HS-SEC-008 | Automática (rutas de muestra contra las reglas) |
+| `permissions.disableBypassPermissionsMode: "disable"` | HS-SEC-009 | Automática |
+| Sin `enableAllProjectMcpServers: true` ni `defaultMode` `auto`/`bypassPermissions` | HS-SEC-009 | Automática |
+| Hooks `command` que apuntan a scripts versionados existentes | HS-CMP-006 | Automática |
 
 ## Contenido recomendado y opcional
 
@@ -67,7 +68,7 @@ Fijar, para todo el equipo, **qué no puede hacer el agente sin preguntar y qué
 
 | Validación | Capa | Estado |
 |---|---|---|
-| Contenido requerido (tabla anterior) | L4 (`harness check`) | Pendiente F3.3 |
+| Contenido requerido (tabla anterior) | L4 (`harness check`) | Vigente desde el estándar 0.3.0 |
 | `.claude/` bajo CODEOWNERS | L5 | Vigente (HS-SEC-002) |
 | `.claude/settings.local.json` ignorado por Git | L4 | Vigente (HS-SEC-003) |
 | Cobertura de `patrones_sensibles` por la plantilla | L4 (autotest del repositorio central) | Vigente (`tests/test_template.py`) |

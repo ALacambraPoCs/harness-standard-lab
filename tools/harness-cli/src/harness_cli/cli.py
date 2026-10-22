@@ -163,6 +163,13 @@ def _cmd_pr(args) -> int:
     return _print_findings(T.check_pr(ctx, body, args.base, title=title), "harness pr check", args.format)
 
 
+def _cmd_catalog(args) -> int:
+    from .catalog import validate
+    std = load_standard(Path(args.standard_root) if args.standard_root else None)
+    findings, n = validate(std, Path(args.path), args.catalog, base=args.base)
+    return _print_findings(findings, f"harness catalog validate · {n} componente(s)", args.format)
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="harness", description="CLI de conformidad del Estándar de Harness.")
     p.add_argument("--version", action="version",
@@ -226,6 +233,15 @@ def main(argv: list[str] | None = None) -> int:
     pc.add_argument("--title-env", help="Variable de entorno con el título del PR.")
     pc.add_argument("--format", choices=["text", "json"], default="text")
     pc.set_defaults(func=_cmd_pr)
+
+    cg = sub.add_parser("catalog", help="Catálogo de componentes del repositorio central (F3).")
+    cgsub = cg.add_subparsers(dest="catalog_cmd", required=True)
+    cv = cgsub.add_parser("validate", help="Valida entradas, fichas, skills y (con --base) transiciones y versiones.")
+    cv.add_argument("--path", default=".", help="Raíz del repositorio central (por defecto: .)")
+    cv.add_argument("--catalog", default="catalog", help="Directorio del catálogo (por defecto: catalog)")
+    cv.add_argument("--base", help="Referencia git base para validar transiciones de estado y subidas de versión.")
+    cv.add_argument("--format", choices=["text", "json"], default="text")
+    cv.set_defaults(func=_cmd_catalog)
 
     e = sub.add_parser("explain", help="Muestra un requisito o una regla.")
     e.add_argument("id")

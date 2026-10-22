@@ -39,5 +39,5 @@ def rule(rule_id: str, requirements: Iterable[str], *, needs_valid_manifest: boo
 
 
 def load_all() -> dict[str, Rule]:
-    from . import claude, core, github, lifecycle, n1  # noqa: F401  (registran sus reglas al importarse)
+    from . import catalog, claude, components, core, github, lifecycle, n1  # noqa: F401  (registran sus reglas al importarse)
     return REGISTRY

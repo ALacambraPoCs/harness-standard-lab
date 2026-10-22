@@ -1,7 +1,7 @@
 ---
 documento: HS-02
 titulo: Niveles de conformidad y waivers
-version_estandar: 0.2.0
+version_estandar: 0.3.0
 estado: borrador
 fecha: 2026-10-19
 adr: [ADR-004, ADR-007]
@@ -102,6 +102,29 @@ Aplican solo a instancias que declaran `standard.version` ≥ 0.2.0 (regla 7). �
 | HS-STA-004 | DEBE | Solo hay transiciones de estado permitidas | automática · en el PR | no |
 | HS-STA-005 | DEBE | done solo con aceptación verificada por la CI | automática · en el PR | no |
 | HS-STA-006 | DEBERÍA | El índice de tareas está al día | automática | sí |
+
+## 3c. Requisitos añadidos en 0.3.0 (F3.3) — estado: propuestos
+
+Aplican a instancias que declaran `standard.version` ≥ 0.3.0 (regla 7). Los de ámbito «repo central» los verifica `harness catalog validate` en la CI del repositorio del estándar.
+
+| ID | Nivel | Niveles | Requisito (resumen) | Verificación |
+|---|---|---|---|---|
+| HS-CMP-001 | DEBE | N0,N1,N2,N3 | (claude-code) Las skills cumplen la especificación de Agent Skills | automática |
+| HS-CMP-002 | DEBERÍA | N0,N1,N2,N3 | (claude-code) Las skills usan solo los campos de su perfil | automática |
+| HS-CMP-003 | NO DEBERÍA | N0,N1,N2,N3 | No se versiona .agents/skills en la v1 | automática |
+| HS-CMP-004 | DEBE | N0,N1,N2,N3 | (claude-code) Los subagentes tienen frontmatter válido | automática |
+| HS-CMP-005 | DEBERÍA | N1,N2,N3 | (claude-code) Los subagentes declaran sus herramientas | automática |
+| HS-CMP-006 | DEBE | N0,N1,N2,N3 | (claude-code) Los hooks de comando referencian scripts versionados | automática |
+| HS-CMP-007 | NO DEBE | N1,N2,N3 | (claude-code) Los hooks no deterministas no se presentan como control | semiautomática |
+| HS-CMP-008 | DEBERÍA | N0,N1,N2,N3 | (claude-code) La versión mínima de Claude Code es la del adaptador | automática |
+| HS-SEC-007 | DEBE | N1,N2,N3 | (claude-code) settings.json impide leer y editar .env | automática |
+| HS-SEC-008 | DEBE | N1,N2,N3 | (claude-code) settings.json pide confirmación para editar rutas sensibles | automática |
+| HS-SEC-009 | DEBE | N1,N2,N3 | (claude-code) settings.json no habilita modos ni MCP sin control | automática |
+| HS-CI-004 | DEBE | N1,N2,N3 | El agente en CI no carga la configuración del repositorio | automática |
+| HS-CMP-010 | DEBE | repo central | Las entradas del catálogo son válidas y coherentes | automática |
+| HS-CMP-011 | DEBE | repo central | Cada componente tiene ficha de 17 puntos | automática |
+| HS-CMP-012 | DEBE | repo central | Las skills del catálogo cumplen su especificación y perfil | automática |
+| HS-CMP-013 | DEBE | repo central | El ciclo de vida y la versión de los componentes son coherentes | automática |
 
 ## 4. Waivers
 

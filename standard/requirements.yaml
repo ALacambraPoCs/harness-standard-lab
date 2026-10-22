@@ -1,7 +1,7 @@
 # Registro de requisitos del Estándar de Harness.
 # Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
 # Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
-version_estandar: 0.2.0
+version_estandar: 0.3.0
 # Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
 niveles_definidos: [N0, N1]
 # Versión del estándar desde la que existe cada nivel (D-029). N1 exige declarar `standard.version` ≥ 0.2.0.
@@ -840,3 +840,263 @@ requisitos:
     estado: aprobado
     desde: 0.2.0
     retirada: Si el índice deja de versionarse.
+
+  # ───────────────────────── NUEVOS EN 0.3.0 (F3.3) ─────────────────────────
+
+  - id: HS-CMP-001
+    titulo: Las skills cumplen la especificación de Agent Skills
+    texto: 'Cada directorio de `.claude/skills/` DEBE contener un `SKILL.md` conforme a agentskills.io/specification: `name` válido e igual al directorio, `description` de 1–1024 caracteres, y `compatibility`, `metadata` y `allowed-tools` con su formato.'
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.skills-spec]
+    fuentes: [S-SKILLS, ADR-012, K-04]
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si la especificación de Agent Skills cambia de forma incompatible.
+
+  - id: HS-CMP-002
+    titulo: Las skills usan solo los campos de su perfil
+    texto: 'Una skill DEBERÍA usar solo los campos de Agent Skills (perfil `portable`, por defecto). Las extensiones de Claude Code solo se usan con `metadata.harness-perfil: claude-code`. Los campos desconocidos no se usan.'
+    nivel: DEBERÍA
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.skills-profile]
+    fuentes: [ADR-012, S-CC-SKILLS, K-04]
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si todos los adaptadores soportados aceptan las mismas extensiones.
+
+  - id: HS-CMP-003
+    titulo: No se versiona .agents/skills en la v1
+    texto: La instancia NO DEBERÍA contener `.agents/skills/`. La fuente canónica es `.claude/skills/`, y `.agents/skills/` solo lo genera `harness sync` cuando un adaptador lo necesita.
+    nivel: NO DEBERÍA
+    ambito: instancia
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.skills.no-agents-dir]
+    fuentes: [ADR-012, K-05]
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Cuando exista `harness sync` para un adaptador que lea `.agents/skills/`.
+
+  - id: HS-CMP-004
+    titulo: Los subagentes tienen frontmatter válido
+    texto: Cada archivo de `.claude/agents/*.md` DEBE tener frontmatter YAML con `name` y `description` no vacíos, y los nombres DEBEN ser únicos.
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.agents-valid]
+    fuentes: [S-CC-SET, K-07]
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si Claude Code cambia el formato de subagentes.
+
+  - id: HS-CMP-005
+    titulo: Los subagentes declaran sus herramientas
+    texto: Cada subagente DEBERÍA declarar `tools` de forma explícita (privilegio mínimo). Sin `tools`, hereda todas las herramientas.
+    nivel: DEBERÍA
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.agents-tools]
+    fuentes: [S-CC-SET, S-OWASP-LLM01, K-07]
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si Claude Code cambia el valor por defecto a ninguna herramienta.
+
+  - id: HS-CMP-006
+    titulo: Los hooks de comando referencian scripts versionados
+    texto: Cada hook `command` de `.claude/settings.json` que referencie `${CLAUDE_PROJECT_DIR}/<ruta>` DEBE apuntar a un archivo existente dentro del repositorio.
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.hooks-scripts]
+    fuentes: [S-CC-SET, ADR-013]
+    nota: 'Un hook cuyo script falta no se ejecuta y no avisa: la protección desaparece sin que nadie lo note.'
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si los hooks pasan a distribuirse solo como plugin.
+
+  - id: HS-CMP-007
+    titulo: Los hooks no deterministas no se presentan como control
+    texto: Si la instancia usa hooks `prompt` o `agent`, la tabla `harness:controles` de la política de seguridad NO DEBE presentarlos como control.
+    nivel: NO DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: semiautomatica
+    verificacion_manual: La regla avisa si hay hooks prompt o agent y la tabla de controles menciona hooks. El revisor de seguridad confirma que ningún control depende de ellos.
+    exentable: true
+    reglas: [adapter.claude.hooks-nondeterministic]
+    fuentes: [ADR-009, C9, K-06]
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Nunca mientras existan hooks no deterministas.
+
+  - id: HS-CMP-008
+    titulo: La versión mínima de Claude Code es la del adaptador
+    texto: '`adapters.agents[claude-code].min_version` del manifiesto DEBERÍA ser igual o posterior a la versión mínima del adaptador (2.1.277).'
+    nivel: DEBERÍA
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N0, N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.min-version]
+    fuentes: [standard/adaptadores/claude-code.md, K-13]
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Se actualiza con cada revisión del adaptador.
+
+  - id: HS-SEC-007
+    titulo: settings.json impide leer y editar .env
+    texto: Con el adaptador `claude-code` y N1, DEBE existir `.claude/settings.json` como JSON válido, con `permissions.deny` que impida `Read` y `Edit` de `.env` y `.env.*` a cualquier profundidad.
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [adapter.claude.settings-secrets]
+    fuentes: [S-CC-SET, ADR-013, K-09]
+    nota: Reduce la exposición accidental. No es un control frente a scripts arbitrarios (H6); los secretos no deben estar en el árbol de trabajo (HS-SEC-004).
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si la organización lo impone en managed settings para todos los repositorios.
+
+  - id: HS-SEC-008
+    titulo: settings.json pide confirmación para editar rutas sensibles
+    texto: '`.claude/settings.json` DEBE tener reglas `Edit` en `ask` o `deny` que cubran cada ruta de `rutas_sensibles` de `roles.yaml`.'
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [adapter.claude.settings-sensitive]
+    fuentes: [ADR-013, S-CC-SET, K-10]
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si la organización lo impone en managed settings.
+
+  - id: HS-SEC-009
+    titulo: settings.json no habilita modos ni MCP sin control
+    texto: '`.claude/settings.json` DEBE fijar `permissions.disableBypassPermissionsMode: "disable"` y NO DEBE contener `enableAllProjectMcpServers: true` ni `defaultMode` `auto` o `bypassPermissions`.'
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [adapter.claude.settings-modes]
+    fuentes: [S-CC-SET, S-MCP, K-11]
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si la organización lo impone en managed settings.
+
+  - id: HS-CI-004
+    titulo: El agente en CI no carga la configuración del repositorio
+    texto: Un paso de workflow que ejecute `claude -p` DEBE usar `--bare` y `--setting-sources user`, con su configuración tomada de fuera del PR.
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [core.ci.agent-bare]
+    fuentes: [R-14, S-CC-SET, K-12]
+    nota: 'No cubre `anthropics/claude-code-action`: sus opciones se verificarán en F5.'
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si Claude Code deja de cargar en `-p` la configuración de proyectos no confiables.
+
+  - id: HS-CMP-010
+    titulo: Las entradas del catálogo son válidas y coherentes
+    texto: Cada componente del catálogo central DEBE tener `componente.yaml` válido contra `schemas/catalog-entry.schema.json`, con `id` y `tipo` iguales a su ruta `catalog/<tipo>/<id>/` y con archivos de origen existentes.
+    nivel: DEBE
+    ambito: estandar
+    conformidad: []
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [catalog.entry]
+    fuentes: [05-componentes, K-01, K-02]
+    nota: Lo verifica `harness catalog validate` en la CI del repositorio central.
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si el catálogo deja de existir como repositorio versionado.
+
+  - id: HS-CMP-011
+    titulo: Cada componente tiene ficha de 17 puntos
+    texto: Cada componente del catálogo DEBE tener `FICHA.md` con los 17 apartados de la plantilla.
+    nivel: DEBE
+    ambito: estandar
+    conformidad: []
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [catalog.ficha]
+    fuentes: [Encargo (plantilla obligatoria), K-01]
+    nota: Lo verifica `harness catalog validate` en la CI del repositorio central.
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si el catálogo deja de existir como repositorio versionado.
+
+  - id: HS-CMP-012
+    titulo: Las skills del catálogo cumplen su especificación y perfil
+    texto: Cada skill del catálogo DEBE instalar un `SKILL.md` conforme a Agent Skills, con `name` igual al `id`, perfil igual al de la entrada y destino `.claude/skills/<id>/SKILL.md`.
+    nivel: DEBE
+    ambito: estandar
+    conformidad: []
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [catalog.skill]
+    fuentes: [ADR-012, S-SKILLS]
+    nota: Lo verifica `harness catalog validate` en la CI del repositorio central.
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si el catálogo deja de existir como repositorio versionado.
+
+  - id: HS-CMP-013
+    titulo: El ciclo de vida y la versión de los componentes son coherentes
+    texto: En un PR, el estado de un componente DEBE cambiar solo según `experimental → estable → deprecado → retirado` (o `experimental → retirado`), y un componente cuyos archivos cambian DEBE subir su `version`.
+    nivel: DEBE
+    ambito: estandar
+    conformidad: []
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [catalog.transition, catalog.version]
+    fuentes: [05-componentes §5, K-03]
+    nota: Lo verifica `harness catalog validate` en la CI del repositorio central.
+    estado: propuesto
+    desde: 0.3.0
+    retirada: Si el catálogo deja de existir como repositorio versionado.

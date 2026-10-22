@@ -17,6 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0          # catalog validate --base compara con la base del PR
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
@@ -45,3 +46,12 @@ jobs:
         run: harness --standard-root . roles --write --check
       - name: El ejemplo greenfield es conforme
         run: harness check --path examples/greenfield --run-commands --strict
+      - name: Catálogo de componentes (HS-CMP-010…013)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+        run: |
+          if [ -n "$BASE_SHA" ]; then
+            harness --standard-root . catalog validate --base "$BASE_SHA"
+          else
+            harness --standard-root . catalog validate
+          fi

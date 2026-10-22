@@ -425,3 +425,103 @@ casos:
     mutations:
       - replace: {path: docs/plans/active/T-0001-redondeo.md, old: "title: Redondear totales a céntimos", new: "title: Redondear totales"}
     expect_fail: [tasks.index]
+
+  # ─────────────── Estándar 0.3.0 · componentes y adaptador (F3.3) ───────────────
+  - id: c-n1-componentes
+    base: conforming/n1-componentes
+    conforming: true
+    run_commands: true
+    today: 2026-10-22
+    expect_effective_level: N1
+
+  - id: c-n1-basico-sigue-en-0-2
+    base: conforming/n1-basico
+    conforming: true
+    mutations:
+      - write: {path: .agents/skills/x/SKILL.md, content: "sin frontmatter\n"}
+    expect_effective_level: N1
+
+  - id: nc-skill-invalida
+    base: conforming/n1-componentes
+    mutations:
+      - replace: {path: .claude/skills/cerrar-tarea/SKILL.md, old: "name: cerrar-tarea", new: "name: Cerrar--Tarea"}
+      - write: {path: .claude/skills/vacia/notas.md, content: "sin SKILL.md\n"}
+    expect_fail: [adapter.claude.skills-spec]
+
+  - id: nc-skill-perfil
+    base: conforming/n1-componentes
+    mutations:
+      - replace: {path: .claude/skills/cerrar-tarea/SKILL.md, old: "license: Propietaria", new: "license: Propietaria\ndisable-model-invocation: true"}
+    expect_fail: [adapter.claude.skills-profile]
+
+  - id: nc-agents-skills-versionado
+    base: conforming/n1-componentes
+    mutations:
+      - write: {path: .agents/skills/cerrar-tarea/SKILL.md, content: "---\nname: cerrar-tarea\ndescription: copia\n---\n"}
+    expect_fail: [core.skills.no-agents-dir]
+
+  - id: nc-subagente-invalido
+    base: conforming/n1-componentes
+    mutations:
+      - write: {path: .claude/agents/sin-nombre.md, content: "---\ndescription: falta el nombre\ntools: Read\n---\n"}
+      - write: {path: .claude/agents/copia.md, content: "---\nname: verificador\ndescription: duplicado\ntools: Read\n---\n"}
+    expect_fail: [adapter.claude.agents-valid]
+
+  - id: nc-subagente-sin-tools
+    base: conforming/n1-componentes
+    mutations:
+      - replace: {path: .claude/agents/verificador.md, old: "tools: Read, Grep, Glob, Bash\n", new: ""}
+    expect_fail: [adapter.claude.agents-tools]
+
+  - id: nc-hook-script-ausente
+    base: conforming/n1-componentes
+    mutations: [{delete: .claude/hooks/verificar_al_terminar.py}]
+    expect_fail: [adapter.claude.hooks-scripts]
+
+  - id: nc-hook-prompt-como-control
+    base: conforming/n1-componentes
+    mutations:
+      - replace:
+          path: .claude/settings.json
+          old: "\"Stop\": ["
+          new: "\"PreToolUse\": [{\"matcher\": \"Bash\", \"hooks\": [{\"type\": \"prompt\", \"prompt\": \"¿Es seguro?\"}]}],\n    \"Stop\": ["
+      - append: {path: docs/security/SECURITY.md, content: "| Comandos peligrosos | Hook de revisión antes de Bash |\n"}
+    expect_fail: [adapter.claude.hooks-nondeterministic]
+
+  - id: nc-min-version-antigua
+    base: conforming/n1-componentes
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "min_version: 2.1.277", new: "min_version: 2.0.0"}
+    expect_fail: [adapter.claude.min-version]
+
+  - id: nc-settings-ausente
+    base: conforming/n1-componentes
+    mutations: [{delete: .claude/settings.json}]
+    expect_fail: [adapter.claude.settings-secrets]
+
+  - id: nc-settings-sin-deny-env
+    base: conforming/n1-componentes
+    mutations:
+      - replace: {path: .claude/settings.json, old: "      \"Read(.env.*)\",\n", new: ""}
+    expect_fail: [adapter.claude.settings-secrets]
+
+  - id: nc-settings-ruta-sensible-sin-ask
+    base: conforming/n1-componentes
+    mutations:
+      - replace: {path: .claude/settings.json, old: "      \"Edit(/.github/workflows/**)\",\n", new: ""}
+    expect_fail: [adapter.claude.settings-sensitive]
+
+  - id: nc-settings-modos
+    base: conforming/n1-componentes
+    mutations:
+      - replace: {path: .claude/settings.json, old: "\"enableAllProjectMcpServers\": false", new: "\"enableAllProjectMcpServers\": true"}
+      - replace: {path: .claude/settings.json, old: "    \"disableBypassPermissionsMode\": \"disable\"\n", new: "    \"defaultMode\": \"bypassPermissions\"\n"}
+    expect_fail: [adapter.claude.settings-modes]
+
+  - id: nc-agente-ci-sin-bare
+    base: conforming/n1-componentes
+    mutations:
+      - write:
+          path: .github/workflows/revision.yml
+          content: "name: revision\non: pull_request\njobs:\n  r:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: claude -p \"revisa el PR\" --output-format json\n"
+    expect_fail: [core.ci.agent-bare]

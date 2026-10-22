@@ -434,7 +434,7 @@ requisitos:
     exentable: true
     reglas: [core.manifest.docs-language]
     fuentes: [D-020, C-11]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si el idioma pasa a ser fijo para toda la organización.
 
@@ -450,7 +450,7 @@ requisitos:
     reglas: [core.paths.portable]
     fuentes: [R-11, E-008, C-10]
     nota: 'Incidente del 2026-10-20: 171 archivos `*:Zone.Identifier` versionados al copiar desde Windows.'
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Nunca mientras haya personas o agentes trabajando en Windows.
 
@@ -465,7 +465,7 @@ requisitos:
     exentable: true
     reglas: [core.instructions.root-anchors]
     fuentes: [S-AGENTSMD, S-OAI-HE#p5, C-01]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si la evaluación por ablación (F6) muestra que una sección no aporta.
 
@@ -480,7 +480,7 @@ requisitos:
     exentable: true
     reglas: [core.instructions.flow-anchor]
     fuentes: [ADR-005, ADR-016, C-03]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si el flujo se carga desde una skill o un hook de inicio de sesión equivalente.
 
@@ -495,7 +495,7 @@ requisitos:
     exentable: true
     reglas: [core.instructions.segment-anchors]
     fuentes: [S-AGENTSMD, C-05]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si se sustituyen por `segments.yaml` (N2).
 
@@ -510,7 +510,7 @@ requisitos:
     exentable: true
     reglas: [core.instructions.segment-no-duplication]
     fuentes: [S-CC-MEM, C-06]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si los agentes dejan de cargar la raíz junto al segmento.
 
@@ -527,7 +527,7 @@ requisitos:
     reglas: [adapter.claude.segment-adapter]
     fuentes: [S-CC-MEM, R-13, C-07]
     nota: Sin él, Claude Code no carga las instrucciones del segmento cuando existe un CLAUDE.md raíz (R-13).
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si Claude Code carga AGENTS.md de subdirectorios de forma nativa.
 
@@ -543,7 +543,7 @@ requisitos:
     exentable: true
     reglas: [adapter.claude.import-first]
     fuentes: [ADR-003, C-08]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si el adaptador deja de basarse en imports.
 
@@ -559,7 +559,7 @@ requisitos:
     exentable: true
     reglas: [adapter.claude.single-location]
     fuentes: [S-CC-MEM, C-09]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si el estándar adopta `.claude/CLAUDE.md` como ubicación canónica.
 
@@ -575,7 +575,7 @@ requisitos:
     reglas: [core.instructions.constraints-budget]
     fuentes: [S-OAI-HE#p5, C-02]
     nota: Valor por defecto ajustable; la evidencia sobre el óptimo es débil.
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si la ablación (F6) muestra que el número no influye en la adherencia.
 
@@ -590,7 +590,7 @@ requisitos:
     exentable: true
     reglas: [core.instructions.chain-bytes]
     fuentes: [S-CODEX-AGENTSMD, C-04]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si Codex cambia `project_doc_max_bytes` o deja de ser un agente soportado.
 
@@ -605,7 +605,7 @@ requisitos:
     exentable: true
     reglas: [core.references.provenance]
     fuentes: [S-OAI-HE#p5, C-17]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si las referencias se sirven por un MCP con procedencia propia.
 
@@ -620,7 +620,7 @@ requisitos:
     exentable: true
     reglas: [core.architecture.anchors]
     fuentes: [S-MATKLAD-ARCH, C-12]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si la ablación (F6) muestra que una sección no aporta.
 
@@ -635,7 +635,7 @@ requisitos:
     exentable: true
     reglas: [core.decisions.index]
     fuentes: [S-NYGARD-ADR, C-13]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si el índice pasa a generarse.
 
@@ -650,7 +650,7 @@ requisitos:
     exentable: true
     reglas: [core.decisions.frontmatter]
     fuentes: [S-NYGARD-ADR, C-14]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Nunca mientras los ADR sean la fuente de decisiones.
 
@@ -666,7 +666,7 @@ requisitos:
     reglas: [pr.adr-immutable]
     fuentes: [S-NYGARD-ADR, C-15]
     nota: 'Se verifica en el PR (`harness pr check`). No distingue correcciones editoriales: aviso, no error.'
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si se adopta otro modelo de versionado de decisiones.
 
@@ -681,7 +681,7 @@ requisitos:
     exentable: true
     reglas: [core.security.anchors]
     fuentes: [ADR-013, C-16]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Nunca.
 
@@ -697,7 +697,7 @@ requisitos:
     reglas: [pr.sensitive, pr.risk-sensitive]
     fuentes: [ADR-013, C-20]
     nota: Se verifica en el PR (`harness pr check`), check requerido por HS-CI-003.
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Nunca mientras exista configuración de agentes versionada.
 
@@ -712,7 +712,7 @@ requisitos:
     exentable: true
     reglas: [core.pr.template]
     fuentes: [S-GH-PRTEMPLATE, C-18]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si el cuerpo del PR se genera por herramienta.
 
@@ -728,7 +728,7 @@ requisitos:
     reglas: [pr.anchors, pr.task, pr.trivial, pr.risk]
     fuentes: [D-023, C-19]
     nota: Se verifica en el PR (`harness pr check`).
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si la tarea se vincula al PR por otro mecanismo verificable.
 
@@ -744,7 +744,7 @@ requisitos:
     exentable: false
     reglas: [core.ci.tasks-workflow]
     fuentes: [ADR-016, E-006, C-26]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si `done` deja de escribirse en el repositorio.
 
@@ -759,7 +759,7 @@ requisitos:
     exentable: true
     reglas: [core.plans.structure]
     fuentes: [ADR-005]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si la fuente de verdad de las tareas pasa a un sistema externo (X-01).
 
@@ -774,7 +774,7 @@ requisitos:
     exentable: false
     reglas: [tasks.schema, tasks.naming, tasks.unique, tasks.body, tasks.depends]
     fuentes: [ADR-005, C-21]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si la fuente de verdad de las tareas pasa a un sistema externo (X-01).
 
@@ -790,7 +790,7 @@ requisitos:
     reglas: [tasks.location, tasks.deleted]
     fuentes: [ADR-005, C-22]
     nota: '`tasks.deleted` se verifica en el PR (`harness tasks validate --base`).'
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si se adopta una política de archivo aprobada por ADR.
 
@@ -806,7 +806,7 @@ requisitos:
     reglas: [tasks.transition]
     fuentes: [ADR-005, C-23]
     nota: Se verifica en el PR (`harness tasks validate --base`).
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Nunca mientras exista el ciclo de vida.
 
@@ -822,7 +822,7 @@ requisitos:
     reglas: [tasks.acceptance, tasks.done-pr]
     fuentes: [ADR-016, C-24]
     nota: La re-ejecución y los aprobadores se verifican en el PR (`harness tasks validate --base --run-acceptance`).
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: 'Nunca: es la definición verificable de terminado.'
 
@@ -837,6 +837,6 @@ requisitos:
     exentable: true
     reglas: [tasks.index]
     fuentes: [ADR-005, C-25]
-    estado: propuesto
+    estado: aprobado
     desde: 0.2.0
     retirada: Si el índice deja de versionarse.

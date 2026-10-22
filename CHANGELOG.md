@@ -25,8 +25,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 - Ejemplo greenfield con anclas en arquitectura, seguridad y decisiones; fragmento `examples/fragmentos/references-README.md`.
 - Candidatos C-11…C-20; fuentes S-MATKLAD-ARCH, S-NYGARD-ADR y S-GH-PRTEMPLATE.
 
+### Cambiado (F2.6, 2026-10-21)
+- Los 27 requisitos de 0.2.0 pasan a `aprobado` (D-030) y se aprueba la aplicabilidad por versión (D-029).
+- `examples/greenfield` sube a N1 del estándar 0.2.0 (copia de referencia de `harness-example-greenfield` tras el PR de adopción). Sin el secreto `HARNESS_STANDARD_TOKEN` (repos públicos, D-018).
+- Ficha `plans.dir`: `.gitkeep` explícito en `active/` y `completed/` (E-009).
+
 ### Añadido (F2.5, 2026-10-21) — estándar 0.2.0 (sin publicar)
-- 26 requisitos nuevos en `standard/requirements.yaml` (estado `propuesto`, `desde: 0.2.0`): 7 que se añaden a N0 y 19 de N1. `niveles_definidos: [N0, N1]` y `niveles_desde: {N0: 0.1.0, N1: 0.2.0}`.
+- 27 requisitos nuevos en `standard/requirements.yaml` (estado `propuesto`, `desde: 0.2.0`): 8 que se añaden a N0 y 19 de N1. `niveles_definidos: [N0, N1]` y `niveles_desde: {N0: 0.1.0, N1: 0.2.0}`.
 - Aplicabilidad por versión (D-029, propuesta): la CLI solo aplica los requisitos con `desde` ≤ versión declarada; N1 exige declarar 0.2.0.
 - `schemas/adr.schema.json`; `budgets.instructions_max_constraints` en el manifiesto; `niveles_desde` en el esquema de requisitos.
 - Reglas nuevas (`rules/n1.py`, `rules/lifecycle.py`): anclas de AGENTS.md, arquitectura y seguridad; flujo; presupuesto de restricciones; cadena de 32 KiB; segmentos (ámbito, duplicación, CLAUDE.md); `@AGENTS.md` primero; `.claude/CLAUDE.md`; rutas portables; idioma; índice y frontmatter de ADR; procedencia de referencias; plantilla de PR; workflow de tareas; estructura de tareas; la parte estática de `harness tasks validate` y el índice dentro de `harness check`.

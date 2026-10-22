@@ -82,6 +82,7 @@ Una tarea no se borra (`tasks.deleted`): se cancela y se conserva su historia.
 ## Formato y convenciones
 
 - Markdown con frontmatter YAML. Nombre `T-NNNN-<slug>.md`, slug en minúsculas con guiones.
+- `active/` y `completed/` llevan un `.gitkeep`: Git no versiona directorios vacíos y, sin él, la estructura desaparece cuando la última tarea cambia de carpeta (E-009).
 - El PR que completa la tarea **incluye la transición** a `done`: mueve el archivo a `completed/`, pone `status: done` y `done_pr`, y rellena `resultado` (ADR-016).
 - Los criterios ejecutables se ejecutan en CI desde la raíz del repositorio, sin secretos y con el límite `tasks.acceptance_timeout` del manifiesto.
 - **Tarea trivial** (D-023): un PR puede declarar `trivial — <motivo>` en lugar de una tarea si **todas** sus rutas coinciden con `patrones_triviales` (o `tasks.trivial_paths` del manifiesto) y ninguna con `patrones_sensibles`. Los reverts están exentos.

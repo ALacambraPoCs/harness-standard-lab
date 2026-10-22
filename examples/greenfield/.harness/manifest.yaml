@@ -1,7 +1,7 @@
 # Manifiesto de instancia — Estándar de Harness (ADR-004)
 standard:
-  version: 0.1.0
-  level: N0
+  version: 0.2.0
+  level: N1
 project:
   name: harness-example-greenfield
   owner: "@AlbertoLacambra"

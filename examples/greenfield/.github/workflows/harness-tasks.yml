@@ -1,0 +1,21 @@
+# Ciclo de vida de tareas (N1): valida tareas y PR, verifica la aceptación de las tareas que pasan a done
+# (ADR-016) y refleja el estado en las issues enlazadas (X-01). Márcalo como check requerido.
+name: harness-tasks
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+  merge_group:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  tasks:
+    uses: ALacambraPoCs/harness-standard-lab/.github/workflows/harness-tasks-lifecycle.yml@cli-v0.2.0-rc.2
+    with:
+      standard-repository: ALacambraPoCs/harness-standard-lab
+      cli-ref: cli-v0.2.0-rc.2
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write

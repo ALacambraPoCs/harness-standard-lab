@@ -4,6 +4,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 3 (en curso)
 
+### Añadido (F3.2, 2026-10-22)
+- `standard/adaptadores/claude-code.md`: versión mínima, mapeo del núcleo a archivos, política deny-first (qué aplica sin confianza y qué no), límites de las reglas deny, anclaje de rutas y ejecución del agente en CI (`--bare --setting-sources user`, R-14).
+- Ficha `standard/04-archivos/adapter.claude.settings.md` (aplazada de F2).
+- Plantilla `template/adapters/claude-code/.claude/settings.json` con deny de secretos, `ask` para cada patrón sensible, `disableBypassPermissionsMode` y sin aprobación automática de MCP. El autotest comprueba la cobertura de `patrones_sensibles`.
+- Candidatos K-09…K-13. F3.4 sustituye el hook `rutas-sensibles` por `verificar-al-terminar`.
+
 ### Añadido (F3.1, 2026-10-22)
 - `standard/05-componentes/00-modelo.md`: qué es un componente, sus 6 tipos (skill, subagente, hook, mcp, workflow, plugin), contrato común, seguridad, ciclo de vida y estructura del catálogo.
 - `schemas/catalog-entry.schema.json` con reglas cruzadas: solo los hooks deterministas y los workflows pueden ser control; los hooks `prompt` y `agent` nunca; `estable` exige evidencia; los componentes con red o secretos exigen revisión de seguridad; perfil obligatorio en skills (ADR-012). `tests/test_catalog_schema.py` (28 casos).

@@ -194,7 +194,7 @@ roles:
     condicion: El manifiesto declara claude-code y el nivel es N1 o superior.
     capa: adaptador:claude-code
     nivel_minimo: N1
-    ficha: pendiente:F3
+    ficha: standard/04-archivos/adapter.claude.settings.md
     descripcion: Permisos deny-first, hooks y sandbox de Claude Code a nivel de proyecto.
 
   # ─────────────── Adaptador de plataforma: GitHub ───────────────

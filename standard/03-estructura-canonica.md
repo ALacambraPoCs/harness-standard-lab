@@ -81,7 +81,7 @@ Leyenda: **O** obligatorio · **C** condicional · **R** recomendado · **P** op
 | `plans.index` | `{plans.dir}/INDEX.md` | archivo | G | N1 | nucleo | no | Lo genera la CLI a partir de los archivos de tarea; no se edita a mano. | [ficha](04-archivos/plans.dir.md) |
 | `project.rules` | `.harness/rules` | directorio | C | N1 | nucleo | no | El proyecto declara límites de arquitectura que se verifican de forma mecánica. | pendiente:F4 |
 | `segments.map` | `.harness/segments.yaml` | archivo | O | N2 | nucleo | no | — | pendiente:F4 |
-| `adapter.claude.settings` | `.claude/settings.json` | archivo | C | N1 | adaptador:claude-code | no | El manifiesto declara claude-code y el nivel es N1 o superior. | pendiente:F3 |
+| `adapter.claude.settings` | `.claude/settings.json` | archivo | C | N1 | adaptador:claude-code | no | El manifiesto declara claude-code y el nivel es N1 o superior. | [ficha](04-archivos/adapter.claude.settings.md) |
 | `codeowners` | `.github/CODEOWNERS` (alt.: CODEOWNERS, docs/CODEOWNERS) | archivo | O | N0 | adaptador:github | no | — | [ficha](04-archivos/codeowners.md) |
 | `pr.template` | `.github/pull_request_template.md` (alt.: pull_request_template.md, docs/pull_request_template.md) | archivo | O | N1 | adaptador:github | no | — | [ficha](04-archivos/pr.template.md) |
 | `ci.workflows` | `.github/workflows` | directorio | O | N0 | adaptador:github | no | — | pendiente:F5 |

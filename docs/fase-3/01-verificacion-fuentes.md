@@ -68,3 +68,15 @@ metodo: Lectura de la documentación oficial vigente por dos subagentes, con cit
 - Si `skills-ref` en PyPI (0.1.1) es un canal oficial.
 - El comportamiento exacto de `defer` y `ask` en PreToolUse (la página se cortó antes de esa sección).
 - S-CODEX-AGENTSMD (32 KiB), que sigue pendiente de leerse a mano (R-08).
+
+## 4. Verificaciones adicionales (F3.2, 2026-10-22)
+
+Lectura directa de code.claude.com/docs/en/settings, /permissions y /hooks:
+
+- **Workspace trust:** «`deny` and `ask` rules apply right away»; `permissions.allow` y `additionalDirectories` esperan a la confianza (y nunca se aplican en `-p`).
+- **Anclaje:** `/path` es relativo a la fuente de configuración, que en un proyecto es el «primary working directory». Un nombre sin barra (`Read(.env)`) sigue la semántica de gitignore y coincide a cualquier profundidad.
+- **Bash compuesto:** «a rule like `Bash(safe-cmd *)` won't give it permission to run the command `safe-cmd && other-cmd`». Las reglas deny y ask se aplican si coincide cualquier subcomando.
+- **`$schema`:** `https://json.schemastore.org/claude-code-settings.json` (documentado y recomendado).
+- **`-p` en una carpeta no confiable:** se ejecutan los hooks y el `env` del proyecto y se conectan los MCP de `.mcp.json` sin preguntar. Con `--bare`, el `env` del proyecto y los helpers siguen aplicándose. `--setting-sources user` evita leer la configuración y `.mcp.json` del proyecto.
+- **Hooks:** en `Stop`, el exit 2 «Prevents Claude from stopping, continues the conversation»; JSON `{"decision": "block", "reason": …}`; `${CLAUDE_PROJECT_DIR}` disponible. La documentación recomienda: «use the permission system rather than a hook to enforce a hard allow or deny».
+- **No verificado:** el campo `stop_hook_active` (la sección no se pudo leer completa).

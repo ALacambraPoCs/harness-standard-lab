@@ -47,3 +47,28 @@ def test_template_passes_own_validator(tmp_path, level):
     failing = [(f.rule, f.message) for f in res.findings if f.status == "fail"]
     assert not failing, failing
     assert res.effective_level == level
+
+
+# Reglas de settings.json que cubren cada patrón sensible (ficha adapter.claude.settings, F3.2).
+SENSITIVE_TO_RULE = {
+    "AGENTS.md": "Edit(AGENTS.md)", "**/AGENTS.md": "Edit(AGENTS.md)",
+    "CLAUDE.md": "Edit(CLAUDE.md)", "**/CLAUDE.md": "Edit(CLAUDE.md)",
+    "/.claude/": "Edit(/.claude/**)", "/.agents/": "Edit(/.agents/**)", "/.mcp.json": "Edit(/.mcp.json)",
+    "/.harness/": "Edit(/.harness/**)", "/.github/workflows/": "Edit(/.github/workflows/**)",
+    "/.github/CODEOWNERS": "Edit(/.github/CODEOWNERS)",
+}
+
+
+def test_settings_base_cubre_rutas_sensibles():
+    import json
+    s = json.loads((TEMPLATE / "adapters/claude-code/.claude/settings.json").read_text(encoding="utf-8"))
+    perms = s["permissions"]
+    guarded = set(perms.get("ask", [])) | set(perms.get("deny", []))
+    std = load_standard()
+    missing = [p for p in std.sensitive_patterns if SENSITIVE_TO_RULE.get(p) not in guarded]
+    assert not missing, f"patrones_sensibles sin regla ask/deny en settings.json: {missing}"
+    assert {"Read(.env)", "Read(.env.*)", "Edit(.env)", "Edit(.env.*)"} <= set(perms["deny"])
+    assert perms["disableBypassPermissionsMode"] == "disable"
+    assert s.get("enableAllProjectMcpServers") is not True
+    assert s["$schema"] == "https://json.schemastore.org/claude-code-settings.json"
+    assert "defaultMode" not in perms

@@ -55,12 +55,13 @@ actualizado: 2026-10-22 (F3 en curso: F3.1)
 | D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |
 | D-033 | **Plan de la F3 aprobado** (`fase-3/PLAN.md`): 6 incrementos, de F3.1 (modelo de componentes) a F3.6 (prueba en el laboratorio). | 2026-10-22 | Usuario |
 | D-034 | **ADR-012 rev. 2 aprobado:** fuente canónica de skills en `.claude/skills/`, perfiles `portable` (por defecto) y `claude-code`, `.agents/skills/` generado por `harness sync` solo cuando un adaptador lo necesite, y validación propia en la CLI. | 2026-10-22 | Usuario |
+| D-035 | **F3.1 aprobada** (modelo de componentes, `catalog-entry`, ciclo de vida, plantilla de ficha). Fusionada en `harness-standard-lab` (PR #9). | 2026-10-22 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F3.1** — modelo de componentes, esquema `catalog-entry`, ciclo de vida y plantilla de ficha (`standard/05-componentes/`), pendiente de aprobación.
+- **F3.2** — adaptador de Claude Code, ficha `adapter.claude.settings` y `settings.json` base. Cambio propuesto en F3.4: hook `verificar-al-terminar` en lugar de `rutas-sensibles`. Pendiente de aprobación.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas

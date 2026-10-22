@@ -12,7 +12,7 @@ decisores: ["{{OWNER}}"]
 El equipo trabaja con agentes de programación y necesita normas comunes y verificables.
 
 ## Decisión
-El repositorio adopta el Estándar de Harness 0.3.0, nivel {{LEVEL}}.
+El repositorio adopta el Estándar de Harness 0.4.0, nivel {{LEVEL}}.
 
 ## Consecuencias
 `harness check` es un check requerido en los PR; la configuración de agentes queda bajo CODEOWNERS.

@@ -29,7 +29,7 @@ Traduce el núcleo neutro (`05-componentes`, `03-estructura-canonica`) a los arc
 | `subagente` | `.claude/agents/<name>.md` | — (F3.3) | `name` y `description` obligatorios. `tools` es una lista de herramientas permitidas: un revisor usa `Read, Grep, Glob` |
 | `hook` | Bloque `hooks` de `.claude/settings.json` y script en `.claude/hooks/` | — (F3.3) | Solo `type: command` (o `http`) cuenta como control. **Exit 2** bloquea. Se usa `${CLAUDE_PROJECT_DIR}` en la ruta del script |
 | `mcp` | `.mcp.json` | — | Requiere aprobación en sesión interactiva; un repositorio no puede aprobar sus propios servidores |
-| `plugin` | `.claude-plugin/plugin.json` y `enabledPlugins` en settings | — (F3.5) | Un plugin habilitado solo en el proyecto no se descarga salvo que su fuente sea una ruta relativa |
+| `plugin` | `.claude-plugin/plugin.json` y `enabledPlugins` en settings | — | No se usa para distribuir componentes del estándar (ADR-017): `--bare` no carga plugins y un plugin habilitado solo en el proyecto no se descarga salvo que su fuente sea una ruta relativa |
 
 ## 3. Política de permisos (deny-first)
 

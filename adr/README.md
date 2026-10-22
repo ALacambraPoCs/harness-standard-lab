@@ -22,3 +22,4 @@ Un ADR aprobado no se edita: se reemplaza por otro nuevo que lo cite en `reempla
 | [ADR-014](ADR-014-mapa-de-segmentos-como-artefacto-pivote.md) | Mapa de segmentos como artefacto pivote | propuesto |
 | [ADR-015](ADR-015-cada-mecanismo-tiene-condicion-de-retirada-y-se.md) | Cada mecanismo tiene condición de retirada y se evalúa por ablación | propuesto |
 | [ADR-016](ADR-016-transicion-a-done-en-el-pr-verificada-por-check.md) | La transición a `done` ocurre en el propio PR y la verifica un check requerido | aprobado |
+| [ADR-017](ADR-017-distribucion-de-componentes-por-copia-versionada.md) | Distribución de componentes por copia versionada con lockfile y control de deriva | propuesto |

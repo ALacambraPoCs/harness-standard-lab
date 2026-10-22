@@ -88,3 +88,18 @@ catalog/
 ```
 
 `<id>` sigue las reglas de nombre de Agent Skills (1–64 caracteres, `a-z0-9-`, sin `--`), para que una skill pueda conservar su `id` como `name`.
+
+## 7. Distribución a las instancias (ADR-017, propuesto)
+
+Los componentes llegan a una instancia **por copia versionada**. El catálogo viaja dentro del paquete de la CLI, así que fijar `cli-v…` fija también el catálogo.
+
+```bash
+harness components list                 # catálogo y estado de lo instalado
+harness components add cerrar-tarea     # instala (y añade dependencias: verificador)
+harness components sync                 # actualiza a la versión del catálogo de la CLI, si no hay cambios locales
+harness components remove cerrar-tarea  # retira archivos y configuración (si no se han modificado)
+```
+
+- `.harness/components.lock` registra la versión, el origen, el SHA-256 de cada archivo (con los finales de línea normalizados) y el fragmento de `settings.json` aportado.
+- `harness check` avisa de la deriva (HS-CMP-009).
+- Cada operación se sube en un PR, porque toca rutas sensibles (ADR-013).

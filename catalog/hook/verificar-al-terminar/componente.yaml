@@ -1,6 +1,6 @@
 id: verificar-al-terminar
 tipo: hook
-version: 0.1.0
+version: 0.2.0
 estado: experimental
 titulo: No dar el trabajo por terminado si check o las tareas fallan
 proposito: >-
@@ -36,6 +36,14 @@ archivos:
   - origen: src/verificar_al_terminar.py
     destino: .claude/hooks/verificar_al_terminar.py
 dependencias: []
+configuracion:
+  claude_settings:
+    hooks:
+      Stop:
+        - hooks:
+            - type: command
+              command: python3 "${CLAUDE_PROJECT_DIR}/.claude/hooks/verificar_al_terminar.py"
+              timeout: 300
 pruebas:
   - tipo: unitaria
     descripcion: "check en verde y en rojo, límite de reintentos, reinicio del contador, manifiesto ausente, check entre comillas, tareas inválidas"

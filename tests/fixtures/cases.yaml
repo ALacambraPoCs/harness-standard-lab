@@ -525,3 +525,41 @@ casos:
           path: .github/workflows/revision.yml
           content: "name: revision\non: pull_request\njobs:\n  r:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: claude -p \"revisa el PR\" --output-format json\n"
     expect_fail: [core.ci.agent-bare]
+
+  # ─────────────── Estándar 0.4.0 · distribución de componentes (F3.5, ADR-017) ───────────────
+  - id: c-n1-distribucion
+    base: conforming/n1-distribucion
+    conforming: true
+    run_commands: true
+    today: 2026-10-22
+    expect_effective_level: N1
+
+  - id: c-componentes-con-crlf
+    base: conforming/n1-distribucion
+    conforming: true
+    mutations:
+      - replace: {path: .claude/agents/verificador.md, old: "\n", new: "\r\n"}
+    expect_effective_level: N1
+
+  - id: nc-componente-modificado
+    base: conforming/n1-distribucion
+    mutations:
+      - append: {path: .claude/skills/cerrar-tarea/SKILL.md, content: "\n9. Paso añadido en local.\n"}
+    expect_fail: [core.components.drift]
+
+  - id: nc-componente-borrado
+    base: conforming/n1-distribucion
+    mutations: [{delete: .claude/agents/verificador.md}]
+    expect_fail: [core.components.drift]
+
+  - id: nc-componente-config-quitada
+    base: conforming/n1-distribucion
+    mutations:
+      - replace: {path: .claude/settings.json, old: "\"timeout\": 300", new: "\"timeout\": 30"}
+    expect_fail: [core.components.drift]
+
+  - id: nc-lock-invalido
+    base: conforming/n1-distribucion
+    mutations:
+      - write: {path: .harness/components.lock, content: "{\"formato\": 99}\n"}
+    expect_fail: [core.components.drift]

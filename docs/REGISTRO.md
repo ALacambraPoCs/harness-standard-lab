@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-22 (F3.4 en curso)
+actualizado: 2026-10-22 (F3.5 en curso)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -58,12 +58,13 @@ actualizado: 2026-10-22 (F3.4 en curso)
 | D-035 | **F3.1 aprobada** (modelo de componentes, `catalog-entry`, ciclo de vida, plantilla de ficha). Fusionada en `harness-standard-lab` (PR #9). | 2026-10-22 | Usuario |
 | D-036 | **F3.2 aprobada** (adaptador de Claude Code, ficha `adapter.claude.settings`, `settings.json` deny-first), con el cambio de hook semilla: `verificar-al-terminar` (Stop) en lugar de `rutas-sensibles`, cuya función cubren las reglas `ask`. Fusionada (PR #10). | 2026-10-22 | Usuario |
 | D-037 | **F3.3 aprobada:** los 16 requisitos de 0.3.0 (HS-CMP-001…008 y 010…013, HS-SEC-007…009, HS-CI-004) pasan a `aprobado`; `harness catalog validate` en la CI central. Fusionada (`03a1473`). | 2026-10-22 | Usuario |
+| D-038 | **F3.4 aprobada:** componentes semilla `verificar-al-terminar` (hook, `es_control: false`), `verificador` (subagente) y `cerrar-tarea` (skill), en estado `experimental`; `harness catalog index`. | 2026-10-22 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F3.4** — 3 componentes semilla (`catalog/`): hook `verificar-al-terminar`, subagente `verificador` y skill `cerrar-tarea`. Pendiente de aprobación.
+- **F3.5 / ADR-017** — distribución de componentes del catálogo a las instancias. Pendiente de aprobación.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas

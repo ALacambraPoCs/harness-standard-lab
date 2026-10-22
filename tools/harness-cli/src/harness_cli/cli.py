@@ -186,6 +186,28 @@ def _cmd_catalog(args) -> int:
     return _print_findings(findings, f"harness catalog validate · {n} componente(s)", args.format)
 
 
+def _cmd_components(args) -> int:
+    from . import distribucion as D
+    std = load_standard(Path(args.standard_root) if args.standard_root else None)
+    root = Path(args.path)
+    try:
+        if args.components_cmd == "add":
+            log = D.add(root, std, args.ids)
+        elif args.components_cmd == "sync":
+            log = D.sync(root, std)
+        elif args.components_cmd == "remove":
+            log = D.remove(root, std, args.ids)
+        else:
+            log = D.listado(root, std)
+    except D.DistribucionError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
+    print("\n".join(log) or "Nada que hacer.")
+    if args.components_cmd in ("add", "sync", "remove"):
+        print(f"Revisa el diff ({D.LOCK}, archivos y {D.SETTINGS}) y súbelo en un PR: son rutas sensibles (ADR-013).")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="harness", description="CLI de conformidad del Estándar de Harness.")
     p.add_argument("--version", action="version",
@@ -264,6 +286,18 @@ def main(argv: list[str] | None = None) -> int:
     ci.add_argument("--write", action="store_true")
     ci.add_argument("--check", action="store_true")
     ci.set_defaults(func=_cmd_catalog)
+
+    co = sub.add_parser("components", help="Instala y actualiza componentes del catálogo en una instancia (ADR-017).")
+    cosub = co.add_subparsers(dest="components_cmd", required=True)
+    for name, hlp, ids in (("add", "Instala componentes (y sus dependencias) desde el catálogo de esta CLI.", True),
+                           ("remove", "Retira componentes instalados sin cambios locales.", True),
+                           ("sync", "Actualiza los componentes instalados a la versión del catálogo de esta CLI.", False),
+                           ("list", "Lista el catálogo y el estado de lo instalado.", False)):
+        sp = cosub.add_parser(name, help=hlp)
+        if ids:
+            sp.add_argument("ids", nargs="+")
+        sp.add_argument("--path", default=".")
+        sp.set_defaults(func=_cmd_components)
 
     e = sub.add_parser("explain", help="Muestra un requisito o una regla.")
     e.add_argument("id")

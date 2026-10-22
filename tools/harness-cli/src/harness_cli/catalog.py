@@ -134,3 +134,26 @@ def _transition(std, root, cdir, rel, data, base) -> list[Finding]:
         out.append(_f(std, "catalog.version", f"{rel}: el componente cambia ({len(changed)} archivo/s) pero `version` no sube ({old.get('version')} → {data.get('version')}).",
                       "Sube la versión con SemVer (PATCH, MINOR o MAJOR según el cambio).", rel))
     return out
+
+
+INDEX_START = "<!-- generado:catalogo:inicio (harness catalog index --write) -->"
+INDEX_END = "<!-- generado:catalogo:fin -->"
+
+
+def render_index(root: Path, catalog: str = "catalog") -> str:
+    rows = ["| Id | Tipo | Estado | Versión | Control | Título |", "|---|---|---|---|---|---|"]
+    for entry in entries(root, catalog):
+        d = _load(entry.read_text(encoding="utf-8")) or {}
+        rel = entry.parent.relative_to(root / catalog).as_posix()
+        ctrl = d.get("control") or {}
+        control = f"sí ({ctrl.get('capa')})" if ctrl.get("es_control") else "no"
+        rows.append(f"| [{d.get('id')}]({rel}/FICHA.md) | {d.get('tipo')} | {d.get('estado')} | {d.get('version')} | {control} | {d.get('titulo')} |")
+    return "\n".join(rows)
+
+
+def update_readme(text: str, table: str) -> str:
+    if INDEX_START not in text or INDEX_END not in text:
+        raise ValueError(f"catalog/README.md no contiene los marcadores {INDEX_START} … {INDEX_END}")
+    head, rest = text.split(INDEX_START, 1)
+    _, tail = rest.split(INDEX_END, 1)
+    return f"{head}{INDEX_START}\n{table}\n{INDEX_END}{tail}"

@@ -133,3 +133,10 @@ def test_catalogo_real_del_repositorio():
     root = Path(__file__).resolve().parents[1]
     f, _ = validate(STD, root)
     assert rules(f) == [], [x.message for x in f]
+
+
+def test_indice_del_catalogo_al_dia():
+    from harness_cli.catalog import render_index, update_readme
+    root = Path(__file__).resolve().parents[1]
+    readme = (root / "catalog/README.md").read_text(encoding="utf-8")
+    assert update_readme(readme, render_index(root)) == readme, "ejecuta: harness --standard-root . catalog index --write"

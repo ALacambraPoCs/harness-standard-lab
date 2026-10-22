@@ -4,6 +4,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 3 (en curso)
 
+### Añadido (F3.4, 2026-10-22)
+- Primeros componentes del catálogo (`experimental`, versión 0.1.0), con entrada, ficha de 17 puntos y pruebas:
+  - `hook/verificar-al-terminar`: hook Stop que ejecuta `check` y `harness tasks validate` y devuelve exit 2 si fallan. Límite de 3 bloqueos por sesión, falla en abierto, solo biblioteca estándar. 7 pruebas.
+  - `subagente/verificador`: verificación independiente de solo lectura con informe de formato fijo. 3 pruebas.
+  - `skill/cerrar-tarea`: procedimiento de ADR-016, perfil portable. 7 pruebas, entre ellas una que comprueba que cada comando `harness` citado (opciones incluidas) lo acepta la CLI real.
+- `harness catalog index [--write|--check]` y paso de CI que comprueba el índice de `catalog/README.md`.
+- pytest recoge también `catalog/` (`testpaths`). Candidato K-14.
+
 ### Añadido (F3.3, 2026-10-22) — estándar 0.3.0 (sin publicar)
 - 16 requisitos propuestos (`desde: 0.3.0`): 12 de instancia (HS-CMP-001…008, HS-SEC-007…009, HS-CI-004) y 4 del catálogo central (HS-CMP-010…013).
 - `harness_cli/skills.py`: validador propio de Agent Skills con perfiles (`metadata.harness-perfil`, ADR-012).

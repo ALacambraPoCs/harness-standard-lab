@@ -164,8 +164,24 @@ def _cmd_pr(args) -> int:
 
 
 def _cmd_catalog(args) -> int:
-    from .catalog import validate
+    from .catalog import render_index, update_readme, validate
     std = load_standard(Path(args.standard_root) if args.standard_root else None)
+    if args.catalog_cmd == "index":
+        readme = Path(args.path) / args.catalog / "README.md"
+        old = readme.read_text(encoding="utf-8")
+        new = update_readme(old, render_index(Path(args.path), args.catalog))
+        if args.check:
+            if new != old:
+                print(f"{readme} está desactualizado: ejecuta `harness catalog index --write`.", file=sys.stderr)
+                return 1
+            print("Índice del catálogo al día.")
+            return 0
+        if args.write:
+            readme.write_text(new, encoding="utf-8")
+            print(f"Índice escrito en {readme}.")
+            return 0
+        print(render_index(Path(args.path), args.catalog))
+        return 0
     findings, n = validate(std, Path(args.path), args.catalog, base=args.base)
     return _print_findings(findings, f"harness catalog validate · {n} componente(s)", args.format)
 
@@ -242,6 +258,12 @@ def main(argv: list[str] | None = None) -> int:
     cv.add_argument("--base", help="Referencia git base para validar transiciones de estado y subidas de versión.")
     cv.add_argument("--format", choices=["text", "json"], default="text")
     cv.set_defaults(func=_cmd_catalog)
+    ci = cgsub.add_parser("index", help="Genera o comprueba el índice de catalog/README.md.")
+    ci.add_argument("--path", default=".")
+    ci.add_argument("--catalog", default="catalog")
+    ci.add_argument("--write", action="store_true")
+    ci.add_argument("--check", action="store_true")
+    ci.set_defaults(func=_cmd_catalog)
 
     e = sub.add_parser("explain", help="Muestra un requisito o una regla.")
     e.add_argument("id")

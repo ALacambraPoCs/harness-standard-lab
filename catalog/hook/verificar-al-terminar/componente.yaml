@@ -1,0 +1,60 @@
+id: verificar-al-terminar
+tipo: hook
+version: 0.1.0
+estado: experimental
+titulo: No dar el trabajo por terminado si check o las tareas fallan
+proposito: >-
+  Hook Stop de Claude Code que ejecuta el comando `check` del manifiesto y `harness tasks validate` y,
+  si alguno falla, impide que el agente se detenga y le muestra el error, para que corrija antes de
+  pedir revisión. Adelanta en local la señal que después dará la CI (ADR-016).
+propietario: "@AlbertoLacambra"
+compatibilidad:
+  adaptadores: [claude-code]
+  agente_min: {claude-code: 2.1.277}
+  niveles: [N1, N2, N3]
+contrato:
+  entradas:
+    - "Evento Stop de Claude Code (JSON por stdin: session_id, cwd)"
+    - "commands.check de .harness/manifest.yaml"
+    - "docs/plans/ y la CLI harness en el PATH (opcional)"
+  salidas:
+    - "Exit 0: el agente puede parar"
+    - "Exit 2 con el resumen de errores en stderr: el agente continúa"
+  efectos:
+    - "Escribe un contador por sesión en el directorio temporal del sistema (no en el repositorio)"
+permisos:
+  herramientas: []
+  escritura: []
+  red: ninguna
+  secretos: false
+control:
+  es_control: false   # retroalimentación determinista: tiene salida tras 3 intentos y falla en abierto (FICHA §11)
+  capa: L3
+  determinista: true
+  hook_tipo: command
+archivos:
+  - origen: src/verificar_al_terminar.py
+    destino: .claude/hooks/verificar_al_terminar.py
+dependencias: []
+pruebas:
+  - tipo: unitaria
+    descripcion: "check en verde y en rojo, límite de reintentos, reinicio del contador, manifiesto ausente, check entre comillas, tareas inválidas"
+    comando: "python -m pytest catalog/hook/verificar-al-terminar/tests"
+  - tipo: integracion
+    descripcion: "Sesión real de Claude Code en harness-example-greenfield (F3.6): el agente no puede terminar con check en rojo"
+metricas:
+  - "Bloqueos por sesión (contador) y porcentaje de sesiones que terminan tras corregir"
+  - "PR que llegan a la CI con check en rojo (debería bajar frente a la línea base)"
+  - "Latencia añadida al terminar (duración de check)"
+coste:
+  contexto: "Nulo si pasa; el resumen de errores (≤ 25 líneas por verificación) si bloquea"
+  latencia: "La duración de commands.check en cada parada (límite 240 s por comando)"
+riesgos:
+  - "Bucle de bloqueos si el agente no sabe corregir: mitigado con un máximo de 3 bloqueos por sesión"
+  - "Latencia alta si check es lento: usar un check rápido o subir HARNESS_STOP_TIMEOUT con criterio"
+  - "Falsa sensación de control: es retroalimentación L3; la autoridad sigue siendo la CI (ADR-016)"
+  - "Ejecuta commands.check del repositorio: el mismo código que ya ejecuta la persona; no usar en carpetas no confiables"
+retirada:
+  condicion: "Si la métrica de PR con check en rojo no mejora tras 4 semanas de piloto, o si Claude Code ofrece una verificación equivalente nativa"
+  procedimiento: "Pasar a deprecado, quitar el bloque Stop de .claude/settings.json y el script de .claude/hooks/"
+ficha: FICHA.md

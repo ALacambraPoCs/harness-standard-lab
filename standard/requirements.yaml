@@ -855,7 +855,7 @@ requisitos:
     exentable: true
     reglas: [adapter.claude.skills-spec]
     fuentes: [S-SKILLS, ADR-012, K-04]
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si la especificación de Agent Skills cambia de forma incompatible.
 
@@ -871,7 +871,7 @@ requisitos:
     exentable: true
     reglas: [adapter.claude.skills-profile]
     fuentes: [ADR-012, S-CC-SKILLS, K-04]
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si todos los adaptadores soportados aceptan las mismas extensiones.
 
@@ -886,7 +886,7 @@ requisitos:
     exentable: true
     reglas: [core.skills.no-agents-dir]
     fuentes: [ADR-012, K-05]
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Cuando exista `harness sync` para un adaptador que lea `.agents/skills/`.
 
@@ -902,7 +902,7 @@ requisitos:
     exentable: true
     reglas: [adapter.claude.agents-valid]
     fuentes: [S-CC-SET, K-07]
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si Claude Code cambia el formato de subagentes.
 
@@ -918,7 +918,7 @@ requisitos:
     exentable: true
     reglas: [adapter.claude.agents-tools]
     fuentes: [S-CC-SET, S-OWASP-LLM01, K-07]
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si Claude Code cambia el valor por defecto a ninguna herramienta.
 
@@ -935,7 +935,7 @@ requisitos:
     reglas: [adapter.claude.hooks-scripts]
     fuentes: [S-CC-SET, ADR-013]
     nota: 'Un hook cuyo script falta no se ejecuta y no avisa: la protección desaparece sin que nadie lo note.'
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si los hooks pasan a distribuirse solo como plugin.
 
@@ -952,7 +952,7 @@ requisitos:
     exentable: true
     reglas: [adapter.claude.hooks-nondeterministic]
     fuentes: [ADR-009, C9, K-06]
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Nunca mientras existan hooks no deterministas.
 
@@ -968,7 +968,7 @@ requisitos:
     exentable: true
     reglas: [adapter.claude.min-version]
     fuentes: [standard/adaptadores/claude-code.md, K-13]
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Se actualiza con cada revisión del adaptador.
 
@@ -985,7 +985,7 @@ requisitos:
     reglas: [adapter.claude.settings-secrets]
     fuentes: [S-CC-SET, ADR-013, K-09]
     nota: Reduce la exposición accidental. No es un control frente a scripts arbitrarios (H6); los secretos no deben estar en el árbol de trabajo (HS-SEC-004).
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si la organización lo impone en managed settings para todos los repositorios.
 
@@ -1001,7 +1001,7 @@ requisitos:
     exentable: false
     reglas: [adapter.claude.settings-sensitive]
     fuentes: [ADR-013, S-CC-SET, K-10]
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si la organización lo impone en managed settings.
 
@@ -1017,7 +1017,7 @@ requisitos:
     exentable: false
     reglas: [adapter.claude.settings-modes]
     fuentes: [S-CC-SET, S-MCP, K-11]
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si la organización lo impone en managed settings.
 
@@ -1033,7 +1033,7 @@ requisitos:
     reglas: [core.ci.agent-bare]
     fuentes: [R-14, S-CC-SET, K-12]
     nota: 'No cubre `anthropics/claude-code-action`: sus opciones se verificarán en F5.'
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si Claude Code deja de cargar en `-p` la configuración de proyectos no confiables.
 
@@ -1049,7 +1049,7 @@ requisitos:
     reglas: [catalog.entry]
     fuentes: [05-componentes, K-01, K-02]
     nota: Lo verifica `harness catalog validate` en la CI del repositorio central.
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si el catálogo deja de existir como repositorio versionado.
 
@@ -1065,7 +1065,7 @@ requisitos:
     reglas: [catalog.ficha]
     fuentes: [Encargo (plantilla obligatoria), K-01]
     nota: Lo verifica `harness catalog validate` en la CI del repositorio central.
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si el catálogo deja de existir como repositorio versionado.
 
@@ -1081,7 +1081,7 @@ requisitos:
     reglas: [catalog.skill]
     fuentes: [ADR-012, S-SKILLS]
     nota: Lo verifica `harness catalog validate` en la CI del repositorio central.
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si el catálogo deja de existir como repositorio versionado.
 
@@ -1097,6 +1097,6 @@ requisitos:
     reglas: [catalog.transition, catalog.version]
     fuentes: [05-componentes §5, K-03]
     nota: Lo verifica `harness catalog validate` en la CI del repositorio central.
-    estado: propuesto
+    estado: aprobado
     desde: 0.3.0
     retirada: Si el catálogo deja de existir como repositorio versionado.

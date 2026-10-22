@@ -1,0 +1,58 @@
+id: cerrar-tarea
+tipo: skill
+version: 0.1.0
+estado: experimental
+titulo: Cerrar una tarea en el PR que la completa (ADR-016)
+proposito: >-
+  Procedimiento para que el agente cierre una tarea sin errores de forma: conocer el número del PR antes
+  de escribir done_pr, mover el archivo, rellenar el resultado, regenerar el índice, enlazar la issue y
+  verificar en local con los mismos comandos que la CI. Reduce los ciclos de CI fallidos por forma.
+propietario: "@AlbertoLacambra"
+compatibilidad:
+  adaptadores: [claude-code]
+  perfil: portable
+  agente_min: {claude-code: 2.1.277}
+  niveles: [N1, N2, N3]
+contrato:
+  entradas:
+    - "Tarea T-NNNN en docs/plans/active/ con status in_progress o in_review"
+    - "Criterios de aceptación que pasan en local"
+    - "Rama de la tarea con PR abierto o por abrir"
+  salidas:
+    - "Archivo de tarea en docs/plans/completed/ con status done, done_pr y resultado"
+    - "Índice regenerado y cuerpo del PR con T-NNNN, evidencia y Closes #n si aplica"
+  efectos:
+    - "Edita docs/plans/ y el índice; hace commit y push (con confirmación); abre o marca listo el PR"
+permisos:
+  herramientas: [Read, Edit, Bash]
+  escritura: ["docs/plans/**"]
+  red: [api.github.com]
+  secretos: false
+control:
+  es_control: false
+  capa: L1
+  determinista: false
+archivos:
+  - origen: src/SKILL.md
+    destino: .claude/skills/cerrar-tarea/SKILL.md
+dependencias: [verificador]
+pruebas:
+  - tipo: unitaria
+    descripcion: "Especificación de Agent Skills y perfil portable; cada comando harness citado lo acepta la CLI real (opciones incluidas); cubre los errores de la CI"
+    comando: "python -m pytest catalog/skill/cerrar-tarea/tests"
+  - tipo: eval
+    descripcion: "F3.6: el agente cierra T-0003 con la skill y el primer push del PR de cierre pasa harness tasks"
+metricas:
+  - "Fallos de la CI por tasks.done-pr, tasks.index o pr.issue en PR de cierre (objetivo: 0)"
+  - "Pushes necesarios hasta tener harness tasks en verde en el PR de cierre"
+coste:
+  contexto: "~100 tokens en el arranque (descripción); ~1500 tokens al activarse"
+  latencia: "La de los comandos de verificación local"
+riesgos:
+  - "Que el agente ajuste los criterios de aceptación para que pasen: la skill lo prohíbe y la revisión del PR lo vigila (candidato de regla para F5)"
+  - "Que invente verified_by: la skill lo prohíbe y la CI lo comprueba contra los aprobadores reales"
+  - "Depende de gh y de red hacia GitHub para conocer el número del PR"
+retirada:
+  condicion: "Si la CLI rellena done_pr y el índice por sí misma, o si los fallos de forma no bajan en el piloto"
+  procedimiento: "Pasar a deprecado y borrar .claude/skills/cerrar-tarea/ de las instancias"
+ficha: FICHA.md

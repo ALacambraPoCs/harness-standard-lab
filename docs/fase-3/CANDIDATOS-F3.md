@@ -38,3 +38,4 @@ actualizado: 2026-10-22 (F3.3: formalizados)
 | K-11 | `disableBypassPermissionsMode: "disable"`; sin `enableAllProjectMcpServers: true` ni `defaultMode` `auto`/`bypassPermissions` en el proyecto | DEBE | instancia | N1+ | automática | adaptador §3.1 |
 | K-12 | Un workflow que ejecuta el agente sobre código de un PR usa `--bare --setting-sources user` y `--settings`/`--mcp-config` de fuera del PR | DEBE | instancia | N1+ | automática (lint de workflows) | adaptador §5, R-14 |
 | K-13 | `manifest.adapters.agents[claude-code].min_version` ≥ versión mínima del adaptador (2.1.277) | DEBERÍA | instancia | N0+ | automática | adaptador §1 |
+| K-14 | Un PR que pasa una tarea a `done` y a la vez modifica su `acceptance` se marca para revisión (aviso) | DEBERÍA | instancia | N1+ | automática (diff de PR) | skill cerrar-tarea §11 (F3.4) |

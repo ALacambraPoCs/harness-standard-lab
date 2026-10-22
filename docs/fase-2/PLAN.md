@@ -1,7 +1,7 @@
 ---
 documento: F2-PLAN
 titulo: Plan de la Fase 2 — Estructura canónica, fichas de archivo y nivel N1
-estado: propuesto
+estado: ejecutado (cierre pendiente de aprobación; ver INFORME.md)
 fecha: 2026-10-21
 depende_de: [D-015, D-020, D-021, D-022, D-023, ADR-003, ADR-004, ADR-005, ADR-006]
 ---

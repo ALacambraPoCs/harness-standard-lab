@@ -2,9 +2,10 @@
 id: T-0001
 title: Adoptar el nivel N1 del estándar 0.2.0
 owner: "@AlbertoLacambra"
-status: in_progress
+status: done
 risk: medio
 created: 2026-10-21
+done_pr: 6
 acceptance:
   - id: AC1
     description: La instancia cumple N1 sin errores ni avisos
@@ -35,6 +36,7 @@ El repositorio pasa de N0 a N1: el trabajo se gestiona con archivos de tarea y `
 <!-- harness:progreso -->
 ## Progreso
 - [x] 2026-10-21 — estructura N1 preparada (quien: Claude a nombre de @AlbertoLacambra)
+- [x] 2026-10-21 — PR #5 fusionado; `tasks / harness tasks` añadido como check requerido al ruleset (quien: @AlbertoLacambra)
 
 <!-- harness:decisiones -->
 ## Decisiones
@@ -42,4 +44,4 @@ El repositorio pasa de N0 a N1: el trabajo se gestiona con archivos de tarea y `
 
 <!-- harness:resultado -->
 ## Resultado
-(Se rellena al pasar a done.)
+La instancia declara N1 del estándar 0.2.0 y cumple sin avisos. El ciclo de vida de tareas es check requerido. Pendiente: ninguno.

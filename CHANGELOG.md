@@ -25,6 +25,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 - Ejemplo greenfield con anclas en arquitectura, seguridad y decisiones; fragmento `examples/fragmentos/references-README.md`.
 - Candidatos C-11…C-20; fuentes S-MATKLAD-ARCH, S-NYGARD-ADR y S-GH-PRTEMPLATE.
 
+### Añadido (cierre F2, 2026-10-22)
+- `docs/fase-2/INFORME.md` (cierre de la Fase 2), `docs/fase-2/GUIA-F2.6.md` y evidencias E-010…E-013.
+- `examples/greenfield` sincronizado con `harness-example-greenfield` tras el PR #7 (T-0001 y T-0002 en `done`).
+- Registro de medición de X-01.
+
 ### Cambiado (F2.6, 2026-10-21)
 - Los 27 requisitos de 0.2.0 pasan a `aprobado` (D-030) y se aprueba la aplicabilidad por versión (D-029).
 - `examples/greenfield` sube a N1 del estándar 0.2.0 (copia de referencia de `harness-example-greenfield` tras el PR de adopción). Sin el secreto `HARNESS_STANDARD_TOKEN` (repos públicos, D-018).

@@ -270,3 +270,23 @@ def agent_bare(ctx: Context):
                         yield Finding("core.ci.agent-bare", "HS-CI-004",
                                       f"{rel}: `{line.strip()[:80]}` sin `--bare --setting-sources user`.",
                                       "En CI el agente no debe cargar hooks, MCP ni env del repositorio (adaptador §5, R-14).", rel)
+
+
+# ─────────────── distribución (ADR-017) ───────────────
+@rule("core.components.drift", ["HS-CMP-009"])
+def components_drift(ctx: Context):
+    """Los componentes de .harness/components.lock están instalados sin cambios locales."""
+    from ..distribucion import LOCK, DistribucionError, deriva, leer_lock
+    if not (ctx.root / LOCK).is_file():
+        return
+    try:
+        lock = leer_lock(ctx.root)
+    except (DistribucionError, ValueError) as exc:
+        yield Finding("core.components.drift", "HS-CMP-009", f"{LOCK} no es válido: {exc}",
+                      "Regenera el lock con `harness components add/sync` en lugar de editarlo a mano.", LOCK)
+        return
+    for cid, entrada in lock["componentes"].items():
+        for problema in deriva(ctx.root, entrada):
+            yield Finding("core.components.drift", "HS-CMP-009", f"Componente `{cid}` {entrada.get('version')}: {problema}.",
+                          "Restaura con `harness components remove` + `add`, o conviértelo en un componente propio (otro id y su ficha). ADR-017.",
+                          LOCK)

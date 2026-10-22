@@ -4,6 +4,17 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 3 (en curso)
 
+### Añadido (F3.5, 2026-10-22) — estándar 0.4.0 (sin publicar)
+- ADR-017 (propuesto): distribución de componentes por copia versionada con lockfile, frente a plugins de Claude Code.
+- `harness components add|sync|remove|list` (`distribucion.py`): dependencias, fusión aditiva de `settings.json`, no sobrescribe archivos no gestionados ni modificados, y hash con los finales de línea normalizados.
+- `.harness/components.lock` y requisito HS-CMP-009 (deriva, propuesto) con la regla `core.components.drift`.
+- El catálogo viaja en el paquete de la CLI (`force-include`). El esquema `catalog-entry` admite `configuracion.claude_settings`.
+- `verificar-al-terminar` 0.2.0 declara su bloque `Stop` como fragmento de configuración.
+- Fixture `n1-distribucion`, generado con la propia CLI; 6 casos, entre ellos CRLF no es deriva; `tests/test_distribucion.py` (13 pruebas).
+
+### Cambiado (F3.5)
+- Estándar 0.4.0 y CLI 0.4.0rc1 (soporta 0.1.x–0.4.x); los workflows reutilizables apuntan a `cli-v0.4.0-rc.1`.
+
 ### Añadido (F3.4, 2026-10-22)
 - Primeros componentes del catálogo (`experimental`, versión 0.1.0), con entrada, ficha de 17 puntos y pruebas:
   - `hook/verificar-al-terminar`: hook Stop que ejecuta `check` y `harness tasks validate` y devuelve exit 2 si fallan. Límite de 3 bloqueos por sesión, falla en abierto, solo biblioteca estándar. 7 pruebas.

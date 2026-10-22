@@ -38,10 +38,9 @@ Agente decide terminar ──► Stop ──► verificar_al_terminar.py
 ```
 
 ## 7. Implementación paso a paso
-1. Copiar `src/verificar_al_terminar.py` a `.claude/hooks/verificar_al_terminar.py` (`archivos`).
-2. Añadir a `.claude/settings.json` el bloque del §8 (merge con el existente).
-3. `harness check` debe pasar (HS-CMP-006 comprueba que el script existe).
-4. Opcional: instalar la CLI `harness` en local para que también se validen las tareas.
+1. `harness components add verificar-al-terminar` (ADR-017). Copia el script a `.claude/hooks/`, fusiona en `.claude/settings.json` el bloque del §8 (`configuracion.claude_settings`) y lo registra en `.harness/components.lock`.
+2. `harness check`: HS-CMP-006 comprueba que el script existe y HS-CMP-009 que no hay deriva.
+3. Opcional: instalar la CLI `harness` en local para que también se validen las tareas.
 
 ## 8. Ejemplo concreto
 ```json

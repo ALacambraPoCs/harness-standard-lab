@@ -23,5 +23,5 @@ que supere `harness check` (criterio de aceptación del producto B), en N0 y en 
 | `{{KIND}}` | service, library, application, infrastructure, monorepo u other |
 | `{{SETUP}}`, `{{CHECK}}`, `{{TEST}}` | Invocaciones del contrato de comandos (ADR-006) |
 | `{{HARNESS_OWNERS}}`, `{{SECURITY_OWNERS}}`, `{{PLATFORM_OWNERS}}` | Equipos de GitHub para rutas sensibles (ADR-013) |
-| `{{CLI_REF}}` | Tag de la CLI, p. ej. `cli-v0.3.0-rc.1` |
+| `{{CLI_REF}}` | Tag de la CLI, p. ej. `cli-v0.4.0-rc.1` |
 | `{{STANDARD_REPO}}` | `owner/harness-standard` |

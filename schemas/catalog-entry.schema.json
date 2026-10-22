@@ -73,6 +73,14 @@
       }
     },
     "dependencias": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "configuracion": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Fragmentos que `harness components add` fusiona en la instancia (ADR-017). Solo añaden entradas.",
+      "properties": {
+        "claude_settings": { "type": "object", "description": "Fragmento JSON de .claude/settings.json (p. ej. el bloque hooks)." }
+      }
+    },
     "pruebas": {
       "type": "array",
       "minItems": 1,

@@ -18,7 +18,7 @@ actualizado: 2026-10-22 (F3.3: formalizados)
 | K-06 | HS-CMP-007 | Semiautomático |
 | K-07 | HS-CMP-004, HS-CMP-005 | «Revisor» no se puede detectar de forma fiable; se exige `tools` explícito en todo subagente |
 | — | HS-CMP-006 | Nuevo: scripts de hooks existentes |
-| K-08 | — | Se aplaza a F3.5 (distribución) |
+| K-08 | HS-CMP-009 (0.4.0, F3.5) | Con lock y SHA-256; ADR-017 |
 | K-09, K-10, K-11 | HS-SEC-007, HS-SEC-008, HS-SEC-009 | — |
 | K-12 | HS-CI-004 | Solo `run: claude -p`; `claude-code-action` en F5 |
 | K-13 | HS-CMP-008 | — |

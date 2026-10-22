@@ -70,6 +70,7 @@ Generada por `harness matrix`. No editar a mano.
 | HS-CMP-011 | DEBE | — | enforcement | automatica | `catalog.ficha` | test_catalog.py |
 | HS-CMP-012 | DEBE | — | enforcement | automatica | `catalog.skill` | test_catalog.py |
 | HS-CMP-013 | DEBE | — | enforcement | automatica | `catalog.transition`<br>`catalog.version` | test_catalog.py |
+| HS-CMP-009 | DEBERÍA | N0,N1,N2,N3 | guidance | automatica | `core.components.drift` | nc-componente-borrado<br>nc-componente-config-quitada<br>nc-componente-modificado<br>nc-lock-invalido |
 
 ## Autotest de fixtures
 
@@ -149,6 +150,12 @@ Generada por `harness matrix`. No editar a mano.
 | nc-settings-ruta-sensible-sin-ask | ✅ | ok |
 | nc-settings-modos | ✅ | ok |
 | nc-agente-ci-sin-bare | ✅ | ok |
+| c-n1-distribucion | ✅ | conforme |
+| c-componentes-con-crlf | ✅ | conforme |
+| nc-componente-modificado | ✅ | ok |
+| nc-componente-borrado | ✅ | ok |
+| nc-componente-config-quitada | ✅ | ok |
+| nc-lock-invalido | ✅ | ok |
 
 ## Incidencias
 

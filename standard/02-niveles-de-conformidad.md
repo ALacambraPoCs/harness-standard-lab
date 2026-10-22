@@ -1,7 +1,7 @@
 ---
 documento: HS-02
 titulo: Niveles de conformidad y waivers
-version_estandar: 0.3.0
+version_estandar: 0.4.0
 estado: borrador
 fecha: 2026-10-19
 adr: [ADR-004, ADR-007]
@@ -125,6 +125,12 @@ Aplican a instancias que declaran `standard.version` ≥ 0.3.0 (regla 7). Los de
 | HS-CMP-011 | DEBE | repo central | Cada componente tiene ficha de 17 puntos | automática |
 | HS-CMP-012 | DEBE | repo central | Las skills del catálogo cumplen su especificación y perfil | automática |
 | HS-CMP-013 | DEBE | repo central | El ciclo de vida y la versión de los componentes son coherentes | automática |
+
+## 3d. Requisitos añadidos en 0.4.0 (F3.5) — estado: propuestos
+
+| ID | Nivel | Niveles | Requisito (resumen) | Verificación |
+|---|---|---|---|---|
+| HS-CMP-009 | DEBERÍA | N0,N1,N2,N3 | Los componentes de `.harness/components.lock` están instalados sin deriva (ADR-017) | automática |
 
 ## 4. Waivers
 

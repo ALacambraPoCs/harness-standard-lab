@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "harness-standard-cli"
-version = "0.3.0rc1"
+version = "0.4.0rc1"
 description = "CLI de conformidad del Estándar de Harness (producto B)"
 readme = "tools/harness-cli/README.md"
 requires-python = ">=3.11"
@@ -24,6 +24,7 @@ packages = ["tools/harness-cli/src/harness_cli"]
 "standard/roles.yaml" = "harness_cli/_standard/standard/roles.yaml"
 "standard/VERSION" = "harness_cli/_standard/standard/VERSION"
 "schemas" = "harness_cli/_standard/schemas"
+"catalog" = "harness_cli/_standard/catalog"
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "catalog"]

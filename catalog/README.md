@@ -10,7 +10,7 @@ Estructura: `catalog/<tipo>/<id>/{componente.yaml, FICHA.md, src/, tests/}`.
 <!-- generado:catalogo:inicio (harness catalog index --write) -->
 | Id | Tipo | Estado | Versión | Control | Título |
 |---|---|---|---|---|---|
-| [verificar-al-terminar](hook/verificar-al-terminar/FICHA.md) | hook | experimental | 0.1.0 | no | No dar el trabajo por terminado si check o las tareas fallan |
+| [verificar-al-terminar](hook/verificar-al-terminar/FICHA.md) | hook | experimental | 0.2.0 | no | No dar el trabajo por terminado si check o las tareas fallan |
 | [cerrar-tarea](skill/cerrar-tarea/FICHA.md) | skill | experimental | 0.1.0 | no | Cerrar una tarea en el PR que la completa (ADR-016) |
 | [verificador](subagente/verificador/FICHA.md) | subagente | experimental | 0.1.0 | no | Verificación independiente de la tarea en curso |
 <!-- generado:catalogo:fin -->

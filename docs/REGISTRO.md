@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-21 (F2.5 aprobada; F2.6 en curso)
+actualizado: 2026-10-22 (F2.6 completada; cierre de la Fase 2 pendiente de aprobación)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -47,12 +47,17 @@ actualizado: 2026-10-21 (F2.5 aprobada; F2.6 en curso)
 | D-029 | **Aplicabilidad por versión aprobada:** un requisito aplica solo si `desde` ≤ `standard.version` declarada; cada nivel existe desde una versión (`niveles_desde`; N1 desde 0.2.0). Concreta parte de ADR-008. | 2026-10-21 | Usuario |
 | D-030 | **F2.5 aprobada:** los 27 requisitos de 0.2.0 (HS-GOV-007/008, HS-INS-009…015, HS-CTX-002…004, HS-ARC-003…006, HS-SEC-005/006, HS-CI-001…003, HS-STA-001…006) pasan a `aprobado`. Fusionada en `harness-standard-lab` (PR #6). | 2026-10-21 | Usuario |
 | E-009 | **Hallazgo F2.6 (simulación antes del laboratorio):** al pasar a `completed/` la última tarea activa, `active/` queda vacío y Git no lo versiona; fallan HS-STA-001 y el enlace de AGENTS.md. Lo detectó `harness check` en la simulación del PR #7 del ejemplo. Mitigación: `.gitkeep` en `active/` y `completed/` (ya en la plantilla; ahora explícito en la ficha). | 2026-10-21 | Claude |
+| E-010 | **Adopción de N1 bajo control L5:** PR #5 de `harness-example-greenfield`, con `harness check` y `tasks / harness tasks` en verde y requeridos en el ruleset antes del merge. | 2026-10-22 | Usuario |
+| E-011 | **ADR-016 validado (rechazo):** PR #7, commit `d60fd2d`. T-0002 declarada `done` sin implementar; `harness tasks` en rojo (AC1/AC2 con código 1) y merge bloqueado, con la conformidad en verde. | 2026-10-22 | Usuario |
+| E-012 | **ADR-016 validado (aceptación):** PR #7, commit `2abc558`, con la implementación; ambos checks en verde y merge `e9946bd`. T-0001 pasó a `done` en el PR #6 tras volver a ejecutar `harness check --strict` como criterio. | 2026-10-22 | Usuario |
+| E-013 | **X-01 de extremo a extremo:** issue #4 `status:ready` → `status:in_progress` → cerrada por `Closes #4` → `status:done` y comentario con enlace a la ejecución 39779093407, siempre por `github-actions`. | 2026-10-22 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F2.6** (prueba de extremo a extremo en el laboratorio) — en curso; se aprueba con las evidencias E-010…
+- **Cierre de la Fase 2** con el criterio 1 parcial: 5 fichas aplazadas a F3–F6 (`fase-2/INFORME.md` §6).
+- **Siguiente fase:** F3 (componentes, catálogo y adaptador de Claude Code), recomendada.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-012 → F3. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -91,6 +96,11 @@ actualizado: 2026-10-21 (F2.5 aprobada; F2.6 en curso)
 
 ## Próximos pasos
 
-1. **Usuario:** fusionar el PR #3 del ejemplo y subir al repo central, mediante PR, la actualización documental (`fase1-cierre.patch`).
-2. **Fase 2** — estructura canónica y fichas de archivo del núcleo + requisitos N1 (alcance propuesto en `fase-1/INFORME.md` §7).
-3. Pendientes heredados: Secret Protection/push protection en repos públicos (verificar UI), requisito de rutas portables en instancias (R-11), escáner de secretos en CI (F5), sustituir PAT si vuelve a haber repos privados (R-12).
+1. **Usuario:** aprobar el cierre de la Fase 2 y la siguiente fase (`fase-2/INFORME.md` §6); subir `f2-cierre.patch` al central.
+2. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas).
+3. **Pendientes heredados:**
+   - Secret Protection y push protection en repos públicos;
+   - borrar el secreto `HARNESS_STANDARD_TOKEN` del ejemplo y revocar el PAT;
+   - escáner de secretos (F5);
+   - verificar a mano S-CODEX-AGENTSMD (R-08);
+   - segundo mantenedor (R-10).

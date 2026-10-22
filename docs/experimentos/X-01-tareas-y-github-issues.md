@@ -36,3 +36,10 @@ sin coste de sincronización apreciable y sin crear una segunda fuente de verdad
 ## Criterio de decisión
 - **Adoptar** (requisito N1 DEBERÍA) si: 0 desincronizaciones no resueltas, < 1 min añadido por merge y > 50 % del equipo las consulta.
 - **Retirar** el campo `issue:` y el job en caso contrario, sin migración.
+
+## Registro de medición
+
+| Fecha | Tareas con `issue` | Sincronizaciones | Desincronizaciones sin resolver | Duración del job | Notas |
+|---|---|---|---|---|---|
+| 2026-10-22 | 1 (T-0002 → #4) | 3 (PR #5, #6 y #7) | 0 | Pendiente de leer en Actions | Inicio en `harness-example-greenfield` (E-013). Fricción observada: hay que predecir `issue` y `done_pr` |
+

@@ -80,3 +80,19 @@ Lectura directa de code.claude.com/docs/en/settings, /permissions y /hooks:
 - **`-p` en una carpeta no confiable:** se ejecutan los hooks y el `env` del proyecto y se conectan los MCP de `.mcp.json` sin preguntar. Con `--bare`, el `env` del proyecto y los helpers siguen aplicándose. `--setting-sources user` evita leer la configuración y `.mcp.json` del proyecto.
 - **Hooks:** en `Stop`, el exit 2 «Prevents Claude from stopping, continues the conversation»; JSON `{"decision": "block", "reason": …}`; `${CLAUDE_PROJECT_DIR}` disponible. La documentación recomienda: «use the permission system rather than a hook to enforce a hard allow or deny».
 - **No verificado:** el campo `stop_hook_active` (la sección no se pudo leer completa).
+
+## 5. Verificaciones adicionales (cierre de F3 y F3.7, 2026-10-23)
+
+Fuente: code.claude.com/docs/en/permissions y /permission-modes, leídas el 2026-10-23.
+
+| Hecho | Sección | Uso |
+|---|---|---|
+| `permissions.disableAutoMode` y `disableBypassPermissionsMode` a `"disable"` funcionan «in any settings file»; son más útiles en *managed settings*, donde no se pueden anular | permissions, «Permission modes» | HS-SEC-010 (D-041) |
+| Con `disableAutoMode`, `auto` sale del ciclo de Shift+Tab y `--permission-mode auto` arranca en manual | permission-modes | Validación en el laboratorio |
+| En modo automático, un clasificador (por defecto Sonnet 5) revisa las acciones en lugar de la persona; las reglas `ask` siguen forzando el diálogo | permission-modes | H-9 |
+| Lista interna, no configurable, de comandos Bash de solo lectura que no piden confirmación (`ls`, `cat`, `grep`, formas de solo lectura de `git`…) | permissions, «Read-only commands» | P-3: no hace falta permitirlos |
+| Comandos compuestos: `allow` debe coincidir con cada parte; `deny`/`ask` aplican si coincide cualquiera, también en subshells y bucles | permissions, «Compound commands» | §3.2 del adaptador |
+| Una regla Bash no detiene el mismo programa invocado de otra forma (ruta absoluta, `sh -c`, opciones antes del subcomando, p. ej. `git -C . push`) | permissions, «What a Bash rule doesn't match» | HS-SEC-011 es reducción de riesgo, no frontera |
+| `*` final precedido de espacio también coincide con el comando sin argumentos; `:*` equivale a ` *` | permissions, «Wildcard patterns» | `bash_rule_matches` de la CLI |
+
+**No verificado:** si `gh -R o/r api …` coincide con `Bash(gh api *)` (por analogía con `git -C`, probablemente no); si la versión de `gh` permite modificar rulesets; si un `export` del agente llega al entorno de los hooks.

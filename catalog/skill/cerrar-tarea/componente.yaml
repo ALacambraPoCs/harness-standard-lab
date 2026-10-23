@@ -1,12 +1,12 @@
 id: cerrar-tarea
 tipo: skill
-version: 0.1.0
+version: 0.2.0
 estado: experimental
 titulo: Cerrar una tarea en el PR que la completa (ADR-016)
 proposito: >-
-  Procedimiento para que el agente cierre una tarea sin errores de forma: conocer el número del PR antes
-  de escribir done_pr, mover el archivo, rellenar el resultado, regenerar el índice, enlazar la issue y
-  verificar en local con los mismos comandos que la CI. Reduce los ciclos de CI fallidos por forma.
+  Procedimiento para que el agente cierre una tarea sin errores de forma: abrir el PR para conocer su
+  número, cerrar la tarea con `harness tasks close` (determinista), pegar literal la evidencia del
+  verificador, enlazar la issue y verificar en local con los mismos comandos que la CI.
 propietario: "@AlbertoLacambra"
 compatibilidad:
   adaptadores: [claude-code]
@@ -22,7 +22,7 @@ contrato:
     - "Archivo de tarea en docs/plans/completed/ con status done, done_pr y resultado"
     - "Índice regenerado y cuerpo del PR con T-NNNN, evidencia y Closes #n si aplica"
   efectos:
-    - "Edita docs/plans/ y el índice; hace commit y push (con confirmación); abre o marca listo el PR"
+    - "Edita docs/plans/ y el índice mediante harness tasks close; hace commit y push (con confirmación); abre o marca listo el PR si hay gh"
 permisos:
   herramientas: [Read, Edit, Bash]
   escritura: ["docs/plans/**"]
@@ -38,10 +38,10 @@ archivos:
 dependencias: [verificador]
 pruebas:
   - tipo: unitaria
-    descripcion: "Especificación de Agent Skills y perfil portable; cada comando harness citado lo acepta la CLI real (opciones incluidas); cubre los errores de la CI"
+    descripcion: "Especificación de Agent Skills y perfil portable; cada comando harness citado lo acepta la CLI real (opciones incluidas); cubre los errores de la CI; usa tasks close tras abrir el PR; evidencia literal"
     comando: "python -m pytest catalog/skill/cerrar-tarea/tests"
   - tipo: eval
-    descripcion: "F3.6: el agente cierra T-0003 con la skill y el primer push del PR de cierre pasa harness tasks"
+    descripcion: "F3.6 (0.1.0): PR #10 en verde al primer push (E-017) y T-0003 en el segundo (H-8). Pendiente con la 0.2.0"
 metricas:
   - "Fallos de la CI por tasks.done-pr, tasks.index o pr.issue en PR de cierre (objetivo: 0)"
   - "Pushes necesarios hasta tener harness tasks en verde en el PR de cierre"
@@ -51,8 +51,9 @@ coste:
 riesgos:
   - "Que el agente ajuste los criterios de aceptación para que pasen: la skill lo prohíbe y la revisión del PR lo vigila (candidato de regla para F5)"
   - "Que invente verified_by: la skill lo prohíbe y la CI lo comprueba contra los aprobadores reales"
-  - "Depende de gh y de red hacia GitHub para conocer el número del PR"
+  - "Sin gh, depende de que la persona dé el número del PR"
+  - "El orden de los pasos es guía (L1); tasks close exige --pr, pero no impide editar a mano: la CI lo detecta"
 retirada:
-  condicion: "Si la CLI rellena done_pr y el índice por sí misma, o si los fallos de forma no bajan en el piloto"
+  condicion: "Si la CLI o un workflow abre el PR y cierra la tarea sin intervención del agente, o si los fallos de forma no bajan en el piloto"
   procedimiento: "Pasar a deprecado y borrar .claude/skills/cerrar-tarea/ de las instancias"
 ficha: FICHA.md

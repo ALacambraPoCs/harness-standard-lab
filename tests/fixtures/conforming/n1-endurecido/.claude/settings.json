@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(secrets/**)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Bash(gh repo delete *)",
+      "Bash(gh secret *)",
+      "Bash(gh ruleset *)",
+      "Bash(gh auth *)"
+    ],
+    "ask": [
+      "Edit(AGENTS.md)",
+      "Edit(CLAUDE.md)",
+      "Edit(/.claude/**)",
+      "Edit(/.agents/**)",
+      "Edit(/.mcp.json)",
+      "Edit(/.harness/**)",
+      "Edit(/.github/workflows/**)",
+      "Edit(/.github/CODEOWNERS)",
+      "Bash(git push *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh api *)",
+      "Bash(harness * --run-commands*)",
+      "Bash(harness * --run-acceptance*)",
+      "Bash(harness * --json-out*)"
+    ],
+    "allow": [
+      "Bash(harness check *)",
+      "Bash(harness tasks validate *)",
+      "Bash(harness tasks index --check)",
+      "Bash(harness tasks close *)",
+      "Bash(harness pr check *)",
+      "Bash(harness components list)"
+    ],
+    "disableBypassPermissionsMode": "disable",
+    "disableAutoMode": "disable"
+  },
+  "enableAllProjectMcpServers": false,
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/verificar_al_terminar.py\"",
+            "timeout": 300
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [agentes, cli, plataforma]
 dependencias: [adapter.claude.instructions, adapter.claude.local, security.policy, codeowners, manifest]
 propietario: Propietario de plataforma/harness (CODEOWNERS, ADR-013), con revisión de seguridad para cambios en deny/ask
-requisitos: [HS-SEC-007, HS-SEC-008, HS-SEC-009, HS-CMP-006, HS-CMP-007]
+requisitos: [HS-SEC-007, HS-SEC-008, HS-SEC-009, HS-SEC-010, HS-SEC-011, HS-SEC-012, HS-CMP-006, HS-CMP-007]
 reglas: [adapter.claude.settings-secrets, adapter.claude.settings-sensitive, adapter.claude.settings-modes, adapter.claude.hooks-scripts, adapter.claude.hooks-nondeterministic]
 ejemplo_canonico: template/adapters/claude-code/.claude/settings.json
 fuentes: [S-CC-SET, ADR-009, ADR-013, S-OWASP-LLM01]
@@ -32,12 +32,14 @@ Fijar, para todo el equipo, **qué no puede hacer el agente sin preguntar y qué
 | `permissions.ask` (o `deny`) de `Edit` que cubre **cada** ruta de `rutas_sensibles` de `roles.yaml` | HS-SEC-008 | Automática (rutas de muestra contra las reglas) |
 | `permissions.disableBypassPermissionsMode: "disable"` | HS-SEC-009 | Automática |
 | Sin `enableAllProjectMcpServers: true` ni `defaultMode` `auto`/`bypassPermissions` | HS-SEC-009 | Automática |
+| `permissions.disableAutoMode: "disable"` (desde 0.5.0) | HS-SEC-010 | Automática |
 | Hooks `command` que apuntan a scripts versionados existentes | HS-CMP-006 | Automática |
 
 ## Contenido recomendado y opcional
 
 - `deny` de lectura de claves (`**/*.pem`, `**/*.key`) y del directorio `secrets/`.
 - `ask` para `Bash(git push *)` y `Bash(gh pr merge *)`.
+- Desde 0.5.0 (DEBERÍA): `ask` para `Bash(gh api *)` y `deny` para `gh repo delete`, `gh secret`, `gh ruleset` y `gh auth` (HS-SEC-011); `allow` solo para comandos del contrato sin efectos, con `ask` para las opciones que ejecutan o escriben (HS-SEC-012). Detalle en el adaptador §3.4.
 - Hooks `command` del catálogo, por ejemplo `verificar-al-terminar` (F3.4). Solo componentes del catálogo con su ficha.
 - `sandbox.enabled: true` en equipos con macOS o Linux/WSL2. En Windows nativo no está disponible, así que no se exige.
 
@@ -45,7 +47,7 @@ Fijar, para todo el equipo, **qué no puede hacer el agente sin preguntar y qué
 
 | No incluir | Por qué / dónde va |
 |---|---|
-| `permissions.allow` como mecanismo de seguridad | No aplica sin confianza ni en `-p`. Solo se permite para comodidad (comandos del contrato) |
+| `permissions.allow` como mecanismo de seguridad, o `allow` amplios (`Bash`, intérpretes, red, `git`/`gh` en general) | No aplica sin confianza ni en `-p`. Solo se permite para comodidad, con comandos del contrato sin efectos (HS-SEC-012) |
 | `defaultMode: "auto"` o `"bypassPermissions"` | No tiene efecto desde el proyecto y confunde. Va en la configuración de usuario o gestionada |
 | Hooks `prompt` o `agent` presentados como control | No son deterministas (ADR-009, C9) |
 | Secretos, tokens o `apiKeyHelper` con credenciales | `env` y los helpers se aplican incluso con `--bare` (§5 del adaptador). Ningún secreto en archivos versionados |
@@ -68,7 +70,8 @@ Fijar, para todo el equipo, **qué no puede hacer el agente sin preguntar y qué
 
 | Validación | Capa | Estado |
 |---|---|---|
-| Contenido requerido (tabla anterior) | L4 (`harness check`) | Vigente desde el estándar 0.3.0 |
+| Contenido requerido (tabla anterior) | L4 (`harness check`) | Vigente desde el estándar 0.3.0 (HS-SEC-010…012 desde 0.5.0) |
+| Opciones de los comandos permitidos revisadas | L4 (autotest del repositorio central) | Vigente (`tests/test_template.py`) |
 | `.claude/` bajo CODEOWNERS | L5 | Vigente (HS-SEC-002) |
 | `.claude/settings.local.json` ignorado por Git | L4 | Vigente (HS-SEC-003) |
 | Cobertura de `patrones_sensibles` por la plantilla | L4 (autotest del repositorio central) | Vigente (`tests/test_template.py`) |

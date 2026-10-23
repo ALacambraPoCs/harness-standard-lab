@@ -16,7 +16,7 @@ VALUES = {
     "{{OWNER}}": "@org/demo", "{{KIND}}": "service", "{{DOCS_LANGUAGE}}": "es", "{{DATE}}": "2026-10-21",
     "{{SETUP}}": "python3 -c pass", "{{CHECK}}": "python3 -c pass", "{{TEST}}": "python3 -c pass",
     "{{HARNESS_OWNERS}}": "@org/harness-owners", "{{SECURITY_OWNERS}}": "@org/security",
-    "{{PLATFORM_OWNERS}}": "@org/platform", "{{CLI_REF}}": "cli-v0.4.0-rc.1", "{{STANDARD_REPO}}": "org/harness-standard",
+    "{{PLATFORM_OWNERS}}": "@org/platform", "{{CLI_REF}}": "cli-v0.5.0-rc.1", "{{STANDARD_REPO}}": "org/harness-standard",
 }
 
 
@@ -72,3 +72,66 @@ def test_settings_base_cubre_rutas_sensibles():
     assert s.get("enableAllProjectMcpServers") is not True
     assert s["$schema"] == "https://json.schemastore.org/claude-code-settings.json"
     assert "defaultMode" not in perms
+
+
+# ─────────────── P-1…P-3 (D-041…D-043): modos, gh y allow de la base ───────────────
+def _settings_base():
+    import json
+    return json.loads((TEMPLATE / "adapters/claude-code/.claude/settings.json").read_text(encoding="utf-8"))
+
+
+def test_settings_base_modo_automatico_y_gh():
+    from harness_cli.rules.components import GH_ASK, GH_DENY, bash_decision
+    s = _settings_base()
+    assert s["permissions"]["disableAutoMode"] == "disable"
+    assert all(bash_decision(s, c) == "ask" for c in GH_ASK)
+    assert all(bash_decision(s, c) == "deny" for c in GH_DENY)
+
+
+# Opciones revisadas de los subcomandos que la base permite sin confirmación (P-3).
+# Si se añade una opción nueva a estos subcomandos, este test falla: hay que revisar si tiene
+# efectos y, en ese caso, cubrirla con una regla ask en la base y en EFECTOS.
+REVISADAS = {
+    ("check",): {"--path", "--format", "--json-out", "--strict", "--run-commands", "--timeout", "--today", "--rule", "--verbose"},
+    ("tasks", "validate"): {"--path", "--base", "--pr-number", "--run-acceptance", "--approvers", "--format"},
+    ("tasks", "close"): {"--pr", "--resultado", "--verified-by", "--autor", "--path"},
+    ("tasks", "index"): {"--path", "--write", "--check"},
+    ("pr", "check"): {"--path", "--base", "--body-file", "--body-env", "--title-env", "--format"},
+    ("components", "list"): None,  # se compara abajo con lo que exista
+}
+EFECTOS = {
+    "harness check --run-commands": "ask",                      # ejecuta setup/check del manifiesto
+    "harness check --json-out .claude/settings.json": "ask",    # escribe un archivo arbitrario
+    "harness tasks validate --base origin/main --run-acceptance": "ask",  # ejecuta criterios de las tareas
+    "harness tasks index --write": None,                        # escribe: no está en allow
+    "harness components add verificador": None,                 # instala: no está en allow
+    "harness check --strict": "allow",
+    "harness tasks close T-0001 --pr 7": "allow",
+    "harness components list": "allow",
+}
+
+
+def _sub(parser, path):
+    import argparse
+    for name in path:
+        action = next(a for a in parser._actions if isinstance(a, argparse._SubParsersAction))
+        parser = action.choices[name]
+    return parser
+
+
+def test_opciones_de_comandos_permitidos_revisadas():
+    from harness_cli.cli import build_parser
+    p = build_parser()
+    for path, esperado in REVISADAS.items():
+        opts = {o for a in _sub(p, path)._actions for o in a.option_strings if o.startswith("--") and o != "--help"}
+        if esperado is not None:
+            assert opts == esperado, f"harness {' '.join(path)}: opciones sin revisar {sorted(opts ^ esperado)}"
+        else:
+            assert opts <= {"--path"}, f"harness {' '.join(path)}: opciones nuevas {sorted(opts)}"
+
+
+def test_efectos_de_la_base():
+    from harness_cli.rules.components import bash_decision
+    s = _settings_base()
+    for cmd, want in EFECTOS.items():
+        assert bash_decision(s, cmd) == want, cmd

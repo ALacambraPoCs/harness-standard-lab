@@ -305,3 +305,75 @@ def test_adr_aceptado_solo_cambia_estado(repo):
     commit(repo)
     f = T.check_pr(ctx(repo), pr(tarea="trivial — doc"), base)
     assert "pr.adr-immutable" not in rules(f, "warning")
+
+
+# ─────────────── harness tasks close (P-4, D-044) ───────────────
+ACTIVE = "docs/plans/active/T-0001-x.md"
+DONE = "docs/plans/completed/T-0001-x.md"
+
+
+def test_close_lleva_a_done_y_pasa_la_validacion_del_pr(repo):
+    write(repo, ACTIVE, task_text(status="in_progress"))
+    commit(repo)
+    c = ctx(repo)
+    changed = T.close(c, "T-0001", 7, resultado="Logrado: x.", autor="@ana", today=dt.date(2026, 10, 23))
+    assert changed == [ACTIVE, DONE, "docs/plans/INDEX.md"]
+    assert not (repo / ACTIVE).exists()
+    text = (repo / DONE).read_text(encoding="utf-8")
+    assert "status: done\ndone_pr: 7\n" in text
+    assert "- 2026-10-23 — cerrada en el PR #7 — @ana" in text
+    assert T.section(T.parse_task(text, DONE).body, "resultado") == "## Resultado\nLogrado: x."
+    findings, _ = T.validate(ctx(repo), base="HEAD", pr_number=7, run_acceptance=True)
+    assert rules(findings) == []
+    assert "| T-0001 |" in (repo / "docs/plans/INDEX.md").read_text(encoding="utf-8")
+
+
+def test_close_es_idempotente_con_el_mismo_pr_y_rechaza_otro(repo):
+    write(repo, ACTIVE, task_text(status="in_progress", resultado="Hecho."))
+    c = ctx(repo)
+    T.close(c, "T-0001", 7)
+    antes = (repo / DONE).read_text(encoding="utf-8")
+    assert T.close(ctx(repo), "T-0001", 7) == []
+    assert (repo / DONE).read_text(encoding="utf-8") == antes
+    with pytest.raises(T.CloseError, match="done_pr=7"):
+        T.close(ctx(repo), "T-0001", 8)
+
+
+@pytest.mark.parametrize("status,kwargs,match", [
+    ("ready", {"resultado": "x"}, "solo se cierra desde"),
+    ("in_progress", {}, "Resultado está vacía"),
+    ("in_progress", {"resultado": "x", "pr": 0}, "entero positivo"),
+])
+def test_close_precondiciones_sin_efectos(repo, status, kwargs, match):
+    write(repo, ACTIVE, task_text(status=status))
+    antes = (repo / ACTIVE).read_text(encoding="utf-8")
+    pr = kwargs.pop("pr", 7)
+    with pytest.raises(T.CloseError, match=match):
+        T.close(ctx(repo), "T-0001", pr, **kwargs)
+    assert (repo / ACTIVE).read_text(encoding="utf-8") == antes
+    assert not (repo / DONE).exists() and not (repo / "docs/plans/INDEX.md").exists()
+
+
+def test_close_tarea_inexistente(repo):
+    with pytest.raises(T.CloseError, match="no existe"):
+        T.close(ctx(repo), "T-0009", 7)
+
+
+def test_close_criterio_manual_exige_verified_by(repo):
+    write(repo, ACTIVE, task_text(status="in_review", check="manual", resultado="Hecho."))
+    with pytest.raises(T.CloseError, match="verified-by"):
+        T.close(ctx(repo), "T-0001", 7)
+    T.close(ctx(repo), "T-0001", 7, verified_by="luis")
+    meta = T.parse_task((repo / DONE).read_text(encoding="utf-8"), DONE).meta
+    assert meta["acceptance"][0]["verified_by"] == "@luis"
+    findings, _ = T.validate(ctx(repo))
+    assert rules(findings) == []
+
+
+def test_close_cli(repo, capsys):
+    from harness_cli.cli import main
+    write(repo, ACTIVE, task_text(status="in_progress"))
+    assert main(["tasks", "close", "T-0001", "--pr", "7", "--path", str(repo)]) == 2
+    assert "No se ha modificado nada" in capsys.readouterr().err
+    assert main(["tasks", "close", "T-0001", "--pr", "7", "--resultado", "Hecho.", "--path", str(repo)]) == 0
+    assert DONE in capsys.readouterr().out

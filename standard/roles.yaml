@@ -9,7 +9,7 @@
 #   condicion       Cuándo aplica (obligatoriedad condicional) o por qué no se versiona.
 #   nivel_minimo    Primer nivel de conformidad en que el rol es exigible.
 #   ficha           Ficha normativa del rol (standard/04-archivos/), o "pendiente:<fase>".
-version_estandar: 0.4.0
+version_estandar: 0.5.0
 roles:
 
   # ─────────────── Gobierno de la instancia ───────────────

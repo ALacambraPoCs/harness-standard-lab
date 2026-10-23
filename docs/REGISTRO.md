@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-23 (F3.6 ejecutada; cierre de la F3 propuesto)
+actualizado: 2026-10-23 (F3 cerrada, D-040; F3.7 con D-041…D-046)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -66,13 +66,19 @@ actualizado: 2026-10-23 (F3.6 ejecutada; cierre de la F3 propuesto)
 | D-037 | **F3.3 aprobada:** los 16 requisitos de 0.3.0 (HS-CMP-001…008 y 010…013, HS-SEC-007…009, HS-CI-004) pasan a `aprobado`; `harness catalog validate` en la CI central. Fusionada (`03a1473`). | 2026-10-22 | Usuario |
 | D-038 | **F3.4 aprobada:** componentes semilla `verificar-al-terminar` (hook, `es_control: false`), `verificador` (subagente) y `cerrar-tarea` (skill), en estado `experimental`; `harness catalog index`. | 2026-10-22 | Usuario |
 | D-039 | **ADR-017 y F3.5 aprobados:** distribución de componentes por copia versionada (`harness components`, `.harness/components.lock`), HS-CMP-009 (deriva) aprobado, estándar 0.4.0. | 2026-10-22 | Usuario |
+| D-040 | **Fase 3 cerrada** con los criterios 1–5 cumplidos (`fase-3/INFORME.md`). Fusionado en `harness-standard-lab` (PR #15). Las propuestas P-1…P-6 se deciden una a una para un incremento F3.7. | 2026-10-23 | Usuario |
+| D-041 | **P-1 aprobada:** `disableAutoMode: "disable"` en la plantilla y requisito nuevo HS-SEC-010 (DEBE, N1, desde 0.5.0) en lugar de modificar HS-SEC-009 (D-029). Se reevalúa en F5. | 2026-10-23 | Usuario |
+| D-042 | **P-2 aprobada:** `ask` para `Bash(gh api *)`; `deny` para `gh repo delete`, `gh secret`, `gh ruleset` y `gh auth`; HS-SEC-011 (DEBERÍA). Reducción de riesgo, no frontera. | 2026-10-23 | Usuario |
+| D-043 | **P-3 aprobada:** `allow` solo para comandos del contrato sin efectos, `ask` para las opciones que ejecutan o escriben, test que congela las opciones y HS-SEC-012 (DEBERÍA) contra `allow` amplios. `check`/`test` de la instancia: decisión de cada instancia. | 2026-10-23 | Usuario |
+| D-044 | **P-4 aprobada:** `harness tasks close T-NNNN --pr N` (transición determinista) y skill `cerrar-tarea` 0.2.0 que lo usa; `gh` opcional. | 2026-10-23 | Usuario |
+| D-045 | **P-5 aprobada:** hook `verificar-al-terminar` 0.3.0 con límite 2 y suspensión con `HARNESS_STOP_MAX=0`. | 2026-10-23 | Usuario |
+| D-046 | **P-6 aprobada:** verificador 0.2.0 con informe literal entre marcas; la skill lo copia en `harness:evidencia` y no pide confirmación propia antes del push. | 2026-10-23 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **Cierre de la F3** (`fase-3/INFORME.md`): criterios 1–5 cumplidos.
-- **Propuestas P-1…P-6** derivadas de los hallazgos de la F3.6 (`fase-3/INFORME.md` §4), para un incremento F3.7. Se deciden una a una.
+- **F3.7** (implementa D-041…D-046; estándar 0.5.0, CLI 0.5.0rc1): pendiente de revisión y fusión.
 - **Siguiente fase:** F4 (segmentación y concurrencia; requiere un repositorio brownfield, Q-09) o F5 (CI/CD y seguridad; incluye el modo automático y `claude-code-action`).
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
@@ -90,6 +96,7 @@ actualizado: 2026-10-23 (F3.6 ejecutada; cierre de la F3 propuesto)
 | Q-08 | ¿Hay requisitos regulatorios o de cliente (datos, auditoría, EU AI Act) que afecten al uso de agentes? | F5 | Por confirmar con seguridad y legal |
 | Q-10 | ~~Organización y visibilidad~~ **Resuelta:** `ALacambraPoCs`, repos públicos, plan Free (D-018). Pendiente solo: equipos (se usa `@AlbertoLacambra`). | F2 | — |
 | Q-11 | ~~Umbral de tarea trivial~~ **Resuelta (D-023).** | — | — |
+| Q-12 | ¿Se pueden restringir los comandos Bash de un subagente (p. ej. el `verificador`) por configuración, o solo con sandbox? Hoy su «solo lectura» es L1. | F5 | Verificar en la documentación de subagentes y sandbox |
 | Q-09 | Repositorios candidatos para el piloto (1 greenfield + 1 brownfield grande). | F8 (identificar en F2) | Por designar |
 
 ## Riesgos
@@ -115,7 +122,7 @@ actualizado: 2026-10-23 (F3.6 ejecutada; cierre de la F3 propuesto)
 
 ## Próximos pasos
 
-1. **Usuario:** aprobar el cierre de la F3, decidir P-1…P-6 una a una y elegir la siguiente fase; subir `f3-cierre.patch` al central.
+1. **Usuario:** revisar y fusionar la F3.7 (`f3.7.patch`), publicar `cli-v0.5.0-rc.1` y elegir la siguiente fase (F4 o F5). Opcional: repetir un cierre de tarea en el laboratorio con los componentes nuevos para medir confirmaciones.
 2. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 3. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

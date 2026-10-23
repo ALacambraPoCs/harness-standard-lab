@@ -2,7 +2,25 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Hay dos líneas de versión: **standard** (A) y **cli** (B).
 
-## [Sin publicar] — Fase 3 (en curso)
+## [Sin publicar] — Fase 3 (cerrada, D-040) y F3.7
+
+### Añadido (F3.7, 2026-10-23) — estándar 0.5.0 (sin publicar)
+- Requisitos aprobados `desde: 0.5.0` (D-041…D-043), con sus reglas:
+  - HS-SEC-010 (DEBE) `adapter.claude.settings-automode`: `disableAutoMode: "disable"`;
+  - HS-SEC-011 (DEBERÍA) `adapter.claude.settings-gh`: `ask` para `gh api` y `deny` para `gh repo delete|secret|ruleset|auth`;
+  - HS-SEC-012 (DEBERÍA) `adapter.claude.settings-allow-broad`: `allow` sin intérpretes, red, borrado ni ejecución del contrato.
+- `harness tasks close T-NNNN --pr N [--resultado] [--verified-by] [--autor]` (D-044): transición determinista a `done`, idempotente, sin efectos si falla una precondición (código 2). 7 pruebas.
+- `cli.build_parser()` y un test que congela las opciones de los subcomandos permitidos en la base.
+- Fixture `n1-endurecido` (0.5.0, generado con `harness components add`) y 6 casos, entre ellos uno que confirma que 0.4.0 no exige lo de 0.5.0 (D-029).
+
+### Cambiado (F3.7)
+- Plantilla `settings.json`: `disableAutoMode`, reglas `gh`, `ask` para `--run-commands`, `--run-acceptance` y `--json-out`, y `allow` para comandos del contrato sin efectos (adaptador §3.4).
+- `verificar-al-terminar` 0.3.0 (D-045): límite por defecto 2, suspensión con `HARNESS_STOP_MAX=0` (no bloquea, informa) y valor inválido → defecto. 10 pruebas.
+- `verificador` 0.2.0 (D-046): informe entre `<!-- verificador:inicio -->` y `<!-- verificador:fin -->`, y solo ese bloque como respuesta.
+- `cerrar-tarea` 0.2.0 (D-044, D-046): usa `harness tasks close`, evidencia literal, sin confirmación propia antes del push, `gh` opcional y sin recurrir a `gh api`.
+- Estándar 0.5.0 y CLI 0.5.0rc1 (soporta 0.1.x–0.5.x); los workflows reutilizables apuntan a `cli-v0.5.0-rc.1`.
+- `tests/test_distribucion.py` ya no depende de las versiones concretas del catálogo.
+
 
 ### Añadido (F3.5, 2026-10-22) — estándar 0.4.0 (sin publicar)
 - ADR-017 (propuesto): distribución de componentes por copia versionada con lockfile, frente a plugins de Claude Code.

@@ -131,6 +131,20 @@ def _cmd_tasks(args) -> int:
         for line in T.apply_issue_ops(ops, repo, token) or ["Sin cambios que reflejar."]:
             print(line)
         return 0
+    if args.tasks_cmd == "close":
+        try:
+            changed = T.close(ctx, args.task_id, args.pr, resultado=args.resultado,
+                              verified_by=args.verified_by, autor=args.autor)
+        except T.CloseError as exc:
+            print(f"harness tasks close: {exc}. No se ha modificado nada.", file=sys.stderr)
+            return 2
+        if not changed:
+            print(f"{args.task_id} ya estaba cerrada con el PR #{args.pr}. Sin cambios.")
+            return 0
+        print(f"{args.task_id} → done (PR #{args.pr}). Archivos modificados (inclúyelos en el commit):")
+        for c in changed:
+            print(f"  {c}")
+        return 0
     # index
     findings, found = T.validate(ctx)
     path = ctx.root / ctx.role_path("plans.index")
@@ -208,7 +222,7 @@ def _cmd_components(args) -> int:
     return 0
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="harness", description="CLI de conformidad del Estándar de Harness.")
     p.add_argument("--version", action="version",
                    version=f"harness {__version__} (estándar soportado: {', '.join(s + '.x' for s in SUPPORTED_STANDARD)})")
@@ -254,6 +268,14 @@ def main(argv: list[str] | None = None) -> int:
     ts.add_argument("--run-url", help="URL de la ejecución de CI para el comentario de evidencia.")
     ts.add_argument("--dry-run", action="store_true", help="Solo muestra las operaciones.")
     ts.set_defaults(func=_cmd_tasks)
+    tc = tsub.add_parser("close", help="Lleva una tarea a done tras abrir su PR (ADR-016): mueve, done_pr, progreso e índice.")
+    tc.add_argument("task_id", metavar="T-NNNN")
+    tc.add_argument("--pr", type=int, required=True, help="Número del PR que cierra la tarea.")
+    tc.add_argument("--resultado", help="Texto de la sección Resultado (obligatorio si está vacía).")
+    tc.add_argument("--verified-by", help="Persona que verificó los criterios manuales (debe aprobar el PR).")
+    tc.add_argument("--autor", help="Autor de la línea de progreso (por defecto, el owner de la tarea).")
+    tc.add_argument("--path", default=".")
+    tc.set_defaults(func=_cmd_tasks)
     ti = tsub.add_parser("index", help="Genera o comprueba el índice de tareas (plans.index).")
     ti.add_argument("--path", default=".")
     ti.add_argument("--write", action="store_true")
@@ -303,6 +325,11 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("id")
     e.set_defaults(func=_cmd_explain)
 
+    return p
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = build_parser()
     args = p.parse_args(argv)
     return args.func(args)
 

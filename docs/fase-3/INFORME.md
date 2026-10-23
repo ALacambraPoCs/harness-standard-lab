@@ -1,7 +1,7 @@
 ---
 documento: F3-INFORME
 titulo: Informe de cierre de la Fase 3 — Componentes, catálogo y adaptador de Claude Code
-estado: propuesto para cierre
+estado: aprobado (D-040)
 fecha: 2026-10-23
 ---
 
@@ -59,6 +59,8 @@ Estado final del ejemplo (`main` `6bbe505`): N1, estándar 0.4.0, 60 reglas sin 
 | P-5 | H-1 | El hook 0.3 documenta `HARNESS_STOP_MAX=0` para suspenderlo en una sesión TDD y baja el límite por defecto a 2 | F3.7 |
 | P-6 | H-3, H-6, H-10 | Verificador 0.2: devolver solo el bloque literal. Skill 0.2: pegar ese bloque en `harness:evidencia`, no pedir confirmación extra antes del push y aceptar el número del PR si no hay `gh` | F3.7 |
 | P-7 | H-2, H-5 | Solo se registran; se reevalúan con datos del piloto (F6/F8) | — |
+
+**Resultado:** P-1…P-6 aprobadas como D-041…D-046 e implementadas en F3.7 (estándar 0.5.0). H-2 queda resuelto en parte: `harness tasks close` escribe la línea de progreso con fecha y autor.
 
 ## 5. Criterios de aceptación de la fase (`PLAN.md`)
 

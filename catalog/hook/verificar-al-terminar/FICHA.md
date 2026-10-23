@@ -15,7 +15,7 @@ Que el agente reciba la misma señal **antes** de entregar. Beneficio esperado: 
 
 ## 4. Principios y conceptos fundamentales
 - P-verificación: no se acepta como evidencia la afirmación del agente.
-- ADR-009: un hook `command` determinista *puede* ser control L3. Este se declara `es_control: false` porque tiene salida (3 intentos) y falla en abierto: es **retroalimentación** determinista, no un control ni una autoridad.
+- ADR-009: un hook `command` determinista *puede* ser control L3. Este se declara `es_control: false` porque tiene salida (2 intentos por defecto) y falla en abierto: es **retroalimentación** determinista, no un control ni una autoridad.
 - ADR-016: la autoridad de `done` es la CI.
 - ADR-015: tiene condición de retirada.
 
@@ -24,7 +24,8 @@ Que el agente reciba la misma señal **antes** de entregar. Beneficio esperado: 
 - **No usar:**
   - si `check` tarda mucho: la alternativa más simple es un `check` rápido en el hook y el completo en CI;
   - en sesiones sobre código no confiable;
-  - en CI (allí el agente va con `--bare`, que no carga hooks, y la verificación la hace el propio workflow).
+  - en CI (allí el agente va con `--bare`, que no carga hooks, y la verificación la hace el propio workflow);
+  - en una sesión de TDD con rojo intencionado: se suspende con `HARNESS_STOP_MAX=0` (§8).
 
 ## 6. Arquitectura y funcionamiento
 ```
@@ -54,7 +55,9 @@ Agente decide terminar ──► Stop ──► verificar_al_terminar.py
   }
 }
 ```
-Variables opcionales: `HARNESS_STOP_MAX` (3) y `HARNESS_STOP_TIMEOUT` (240 s por comando).
+Variables opcionales: `HARNESS_STOP_MAX` (2) y `HARNESS_STOP_TIMEOUT` (240 s por comando).
+
+**Suspensión en TDD (P-5, D-045).** Si la persona quiere terminar con pruebas en rojo a propósito, arranca la sesión con `HARNESS_STOP_MAX=0 claude`. El hook no bloquea, pero sigue escribiendo en stderr lo que falla (visible en el detalle de la sesión). La variable tiene que estar en el entorno de Claude Code: el agente no la controla, y la vía indirecta (`env` en `.claude/settings*.json`) está bajo la regla `ask` de `/.claude/**`.
 
 ## 9. Integración con el resto del harness
 - Usa el contrato de comandos (manifiesto, HS-VER-001).
@@ -74,13 +77,15 @@ Variables opcionales: `HARNESS_STOP_MAX` (3) y `HARNESS_STOP_TIMEOUT` (240 s por
 - **Entradas:** ejecuta `commands.check` del repositorio, el mismo código que ejecutaría la persona. Por eso no debe usarse en carpetas no confiables (en `-p` sin `--bare` los hooks del proyecto se ejecutan igualmente, R-14).
 - **Modos de fallo:**
   - sin manifiesto o sin `check`: falla en abierto (exit 0 con aviso), porque la CI cubre el caso;
-  - error persistente: tras 3 bloqueos deja parar y pide escalar a la persona;
+  - error persistente: tras 2 bloqueos (configurable) deja parar y pide escalar a la persona;
+  - `HARNESS_STOP_MAX` no numérico: se usa el valor por defecto;
+  - suspendido (`HARNESS_STOP_MAX=0`): no bloquea; si alguien lo deja fijo en su perfil, el hook deja de ayudar a esa persona, pero la CI sigue siendo la autoridad.
   - timeout: se trata como fallo.
-- **No verificado:** el campo `stop_hook_active` del evento; el límite de reintentos no depende de él.
+- **No verificado:** el campo `stop_hook_active` del evento; el límite de reintentos no depende de él. Tampoco que un `export` en un comando Bash del agente llegue al entorno del hook (por arquitectura no debería: los hooks los lanza el proceso de Claude Code).
 
 ## 12. Estrategia de pruebas y verificación
-- 7 pruebas unitarias (`pruebas`): verde y rojo, límite, reinicio, sin manifiesto, comillas, tareas inválidas.
-- Integración en F3.6 con una sesión real.
+- 10 pruebas unitarias (`pruebas`): verde y rojo, límite por defecto y configurable, suspensión, valor inválido, reinicio, sin manifiesto, comillas, tareas inválidas.
+- Integración en F3.6 con una sesión real (E-015, con la versión 0.2.0: 3 bloqueos y después deja parar). Hallazgo H-1 (rojo intencionado en TDD) → versión 0.3.0.
 
 ## 13. Métricas de eficacia, calidad, coste y latencia
 Ver `metricas` y `coste`. La línea base es el porcentaje de PR del piloto con `check` en rojo en el primer push. Umbral de retirada: sin mejora en 4 semanas.

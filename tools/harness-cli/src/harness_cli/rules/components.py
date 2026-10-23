@@ -1,4 +1,4 @@
-"""Reglas de componentes y del adaptador de Claude Code (estándar 0.3.0, F3.3)."""
+"""Reglas de componentes y del adaptador de Claude Code (estándar 0.3.0, F3.3; 0.5.0, F3.7)."""
 from __future__ import annotations
 
 import json
@@ -246,6 +246,91 @@ def settings_modes(ctx: Context):
     if perms.get("defaultMode") in ("auto", "bypassPermissions"):
         yield Finding("adapter.claude.settings-modes", "HS-SEC-009", f"`defaultMode: {perms['defaultMode']}` en el proyecto.",
                       "No tiene efecto desde el proyecto y confunde; quítalo.", SETTINGS)
+
+
+# ─────────────── reglas Bash (estándar 0.5.0, F3.7) ───────────────
+def bash_rule_matches(rule: str, cmd: str) -> bool:
+    """Aproxima la coincidencia de una regla `Bash(...)` de Claude Code con un comando simple.
+
+    Documentado (permissions, «Wildcard patterns»): `*` equivale a cualquier secuencia; `:*` final
+    equivale a ` *`; un ` *` final como único comodín también coincide con el comando sin argumentos.
+    `Bash` sin paréntesis coincide con todo.
+    """
+    rule = str(rule).strip()
+    if rule in ("Bash", "Bash(*)"):
+        return True
+    m = re.fullmatch(r"Bash\((.+)\)", rule)
+    if not m:
+        return False
+    pat = m.group(1)
+    if pat.endswith(":*"):
+        pat = pat[:-2] + " *"
+    rx = ".*".join(re.escape(part) for part in pat.split("*"))
+    if re.fullmatch(rx, cmd, re.S):
+        return True
+    return pat.endswith(" *") and pat.count("*") == 1 and cmd == pat[:-2]
+
+
+def bash_decision(data, cmd: str) -> str | None:
+    """Decisión efectiva de la configuración para un comando: deny → ask → allow (o None)."""
+    perms = data.get("permissions") if isinstance(data, dict) else None
+    for kind in ("deny", "ask", "allow"):
+        if any(bash_rule_matches(r, cmd) for r in (perms or {}).get(kind) or []):
+            return kind
+    return None
+
+
+@rule("adapter.claude.settings-automode", ["HS-SEC-010"])
+def settings_automode(ctx: Context):
+    """settings.json fija permissions.disableAutoMode: "disable" (D-041)."""
+    data, _ = _settings(ctx)
+    if not isinstance(data, dict):
+        return
+    if (data.get("permissions") or {}).get("disableAutoMode") != "disable":
+        yield Finding("adapter.claude.settings-automode", "HS-SEC-010", "Falta `permissions.disableAutoMode: \"disable\"`.",
+                      "Añádelo: en modo automático las confirmaciones las decide un modelo, no una regla (ADR-009).", SETTINGS)
+
+
+GH_ASK = ["gh api repos/o/r", "gh api -X DELETE repos/o/r/git/refs/heads/main"]
+GH_DENY = ["gh repo delete o/r --yes", "gh secret set TOKEN", "gh secret list", "gh ruleset list", "gh auth token", "gh auth login"]
+
+
+@rule("adapter.claude.settings-gh", ["HS-SEC-011"])
+def settings_gh(ctx: Context):
+    """settings.json pide confirmación para `gh api` y rechaza las operaciones de gh sobre repo, secretos, rulesets y sesión (D-042)."""
+    data, _ = _settings(ctx)
+    if not isinstance(data, dict):
+        return
+    sin_ask = [c for c in GH_ASK if bash_decision(data, c) not in ("ask", "deny")]
+    sin_deny = [c for c in GH_DENY if bash_decision(data, c) != "deny"]
+    if sin_ask:
+        yield Finding("adapter.claude.settings-gh", "HS-SEC-011", f"`{sin_ask[0]}` se ejecutaría sin confirmación.",
+                      "Añade `Bash(gh api *)` a permissions.ask (adaptador §3).", SETTINGS)
+    if sin_deny:
+        yield Finding("adapter.claude.settings-gh", "HS-SEC-011", f"No se rechazan: {', '.join(f'`{c}`' for c in sin_deny)}.",
+                      "Añade a permissions.deny `Bash(gh repo delete *)`, `Bash(gh secret *)`, `Bash(gh ruleset *)` y `Bash(gh auth *)`.", SETTINGS)
+
+
+# Comandos que nunca deberían quedar permitidos sin confirmación en la base (P-3, D-043).
+BROAD_SAMPLES = [
+    "python3 -c x", "python -c x", "bash -c x", "sh -c x", "node -e x", "npx paquete", "uv run x",
+    "curl https://ejemplo.invalid", "wget https://ejemplo.invalid", "rm -rf build",
+    "git reset --hard HEAD~1", "git push origin main", "gh pr merge 1", "gh api repos/o/r",
+    "harness check --run-commands", "harness tasks validate --base origin/main --run-acceptance",
+]
+
+
+@rule("adapter.claude.settings-allow-broad", ["HS-SEC-012"])
+def settings_allow_broad(ctx: Context):
+    """Ninguna regla allow deja ejecutar sin confirmación intérpretes, red, borrado ni comandos que ejecutan el contrato (D-043)."""
+    data, _ = _settings(ctx)
+    if not isinstance(data, dict):
+        return
+    abiertos = [c for c in BROAD_SAMPLES if bash_decision(data, c) == "allow"]
+    if abiertos:
+        yield Finding("adapter.claude.settings-allow-broad", "HS-SEC-012",
+                      f"permissions.allow deja ejecutar sin confirmación: {', '.join(f'`{c}`' for c in abiertos[:5])}.",
+                      "Acota las reglas allow a comandos sin efectos (adaptador §3) o añade un ask más específico.", SETTINGS)
 
 
 # ─────────────── agente en CI ───────────────

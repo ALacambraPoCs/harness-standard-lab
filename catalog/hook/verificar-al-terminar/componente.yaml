@@ -1,6 +1,6 @@
 id: verificar-al-terminar
 tipo: hook
-version: 0.2.0
+version: 0.3.0
 estado: experimental
 titulo: No dar el trabajo por terminado si check o las tareas fallan
 proposito: >-
@@ -28,7 +28,7 @@ permisos:
   red: ninguna
   secretos: false
 control:
-  es_control: false   # retroalimentación determinista: tiene salida tras 3 intentos y falla en abierto (FICHA §11)
+  es_control: false   # retroalimentación determinista: tiene salida tras 2 intentos (o suspendido con HARNESS_STOP_MAX=0) y falla en abierto (FICHA §11)
   capa: L3
   determinista: true
   hook_tipo: command
@@ -46,10 +46,10 @@ configuracion:
               timeout: 300
 pruebas:
   - tipo: unitaria
-    descripcion: "check en verde y en rojo, límite de reintentos, reinicio del contador, manifiesto ausente, check entre comillas, tareas inválidas"
+    descripcion: "check en verde y en rojo, límite por defecto (2) y configurable, suspensión con HARNESS_STOP_MAX=0, valor inválido, reinicio del contador, manifiesto ausente, check entre comillas, tareas inválidas"
     comando: "python -m pytest catalog/hook/verificar-al-terminar/tests"
   - tipo: integracion
-    descripcion: "Sesión real de Claude Code en harness-example-greenfield (F3.6): el agente no puede terminar con check en rojo"
+    descripcion: "Sesión real de Claude Code en harness-example-greenfield (F3.6, E-015): el agente no puede terminar con check en rojo"
 metricas:
   - "Bloqueos por sesión (contador) y porcentaje de sesiones que terminan tras corregir"
   - "PR que llegan a la CI con check en rojo (debería bajar frente a la línea base)"
@@ -58,7 +58,8 @@ coste:
   contexto: "Nulo si pasa; el resumen de errores (≤ 25 líneas por verificación) si bloquea"
   latencia: "La duración de commands.check en cada parada (límite 240 s por comando)"
 riesgos:
-  - "Bucle de bloqueos si el agente no sabe corregir: mitigado con un máximo de 3 bloqueos por sesión"
+  - "Bucle de bloqueos si el agente no sabe corregir: mitigado con un máximo de 2 bloqueos por sesión"
+  - "Rojo intencionado (TDD) gasta turnos: la persona suspende el hook con HARNESS_STOP_MAX=0 (H-1, D-045)"
   - "Latencia alta si check es lento: usar un check rápido o subir HARNESS_STOP_TIMEOUT con criterio"
   - "Falsa sensación de control: es retroalimentación L3; la autoridad sigue siendo la CI (ADR-016)"
   - "Ejecuta commands.check del repositorio: el mismo código que ya ejecuta la persona; no usar en carpetas no confiables"

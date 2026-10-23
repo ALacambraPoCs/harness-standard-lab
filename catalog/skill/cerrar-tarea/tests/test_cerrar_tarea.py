@@ -45,3 +45,17 @@ def test_cubre_los_errores_de_la_ci():
     for regla in ("tasks.done-pr", "tasks.transition", "tasks.acceptance", "pr.issue", "tasks.index"):
         assert regla in TEXT
     assert "No cambies los criterios de aceptación" in TEXT
+
+
+def test_usa_tasks_close_y_no_edicion_manual():
+    """P-4 (D-044): el cierre lo hace la CLI; la skill no describe la edición a mano."""
+    assert "harness tasks close T-NNNN --pr <número>" in TEXT
+    assert "git mv docs/plans/active" not in TEXT
+    assert TEXT.index("Abre el PR") < TEXT.index("harness tasks close T-NNNN")
+
+
+def test_evidencia_literal_y_sin_confirmaciones_extra():
+    """P-6 (D-046): bloque literal del verificador, sin confirmación propia antes del push y sin depender de gh."""
+    for frase in ("<!-- verificador:inicio -->", "<!-- verificador:fin -->", "harness:evidencia", "copiado literal",
+                  "no pidas otra confirmación tú", "Sin `gh`", "No uses `gh api`"):
+        assert frase in TEXT, frase

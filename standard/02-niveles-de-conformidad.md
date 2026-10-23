@@ -132,6 +132,16 @@ Aplican a instancias que declaran `standard.version` ≥ 0.3.0 (regla 7). Los de
 |---|---|---|---|---|
 | HS-CMP-009 | DEBERÍA | N0,N1,N2,N3 | Los componentes de `.harness/components.lock` están instalados sin deriva (ADR-017) | automática |
 
+## 3e. Requisitos añadidos en 0.5.0 (F3.7) — estado: aprobados (D-041…D-043)
+
+Solo aplican a instancias que declaran `standard.version` ≥ 0.5.0 (regla 7, D-029).
+
+| ID | Nivel | Niveles | Requisito (resumen) | Verificación |
+|---|---|---|---|---|
+| HS-SEC-010 | DEBE | N1,N2,N3 | `settings.json` fija `disableAutoMode: "disable"` | automática |
+| HS-SEC-011 | DEBERÍA | N1,N2,N3 | `ask` para `gh api` y `deny` para `gh repo delete`, `gh secret`, `gh ruleset` y `gh auth` | automática |
+| HS-SEC-012 | DEBERÍA | N1,N2,N3 | Las reglas `allow` no abren intérpretes, red, borrado, `git`/`gh` en general ni la ejecución del contrato | automática |
+
 ## 4. Waivers
 
 1. Un waiver DEBE declararse en `waivers` del manifiesto con los campos `requirement`, `reason`, `approved_by`, `approved_on` y `expires` (HS-GOV-003).

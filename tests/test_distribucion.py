@@ -85,8 +85,9 @@ def test_componente_inexistente(std, inst):
 
 def test_sync_actualiza_si_no_hay_cambios_locales(std, inst):
     D.add(inst, std, ["verificador"])
-    bump(std, "verificador", "0.2.0", edit="src/verificador.md")
-    assert "actualizado 0.1.0 → 0.2.0" in D.sync(inst, std)[0]
+    antes = D.leer_lock(inst)["componentes"]["verificador"]["version"]
+    bump(std, "verificador", "9.9.9", edit="src/verificador.md")
+    assert f"actualizado {antes} → 9.9.9" in D.sync(inst, std)[0]
     assert "<!-- cambio -->" in (inst / ".claude/agents/verificador.md").read_text()
     assert D.deriva(inst, D.leer_lock(inst)["componentes"]["verificador"]) == []
 
@@ -94,7 +95,7 @@ def test_sync_actualiza_si_no_hay_cambios_locales(std, inst):
 def test_sync_se_detiene_con_cambios_locales(std, inst):
     D.add(inst, std, ["verificador"])
     (inst / ".claude/agents/verificador.md").write_text("modificado\n")
-    bump(std, "verificador", "0.2.0")
+    bump(std, "verificador", "9.9.9")
     with pytest.raises(D.DistribucionError, match="cambios locales"):
         D.sync(inst, std)
     assert (inst / ".claude/agents/verificador.md").read_text() == "modificado\n"
@@ -102,7 +103,8 @@ def test_sync_se_detiene_con_cambios_locales(std, inst):
 
 def test_sync_al_dia(std, inst):
     D.add(inst, std, ["verificador"])
-    assert D.sync(inst, std) == ["verificador 0.1.0: al día"]
+    v = D.leer_lock(inst)["componentes"]["verificador"]["version"]
+    assert D.sync(inst, std) == [f"verificador {v}: al día"]
 
 
 def test_remove_protege_modificados_y_dependencias(std, inst):

@@ -1,7 +1,7 @@
 """Ciclo de vida de tareas (ADR-005, ADR-016) y comprobación de PR (D-023, pr.template).
 
 Funciones puras sobre el árbol de trabajo y, opcionalmente, una referencia git base para
-validar transiciones. No escribe en el repositorio salvo `write_index`.
+validar transiciones. Solo escribe en el repositorio `close` (P-4); el índice lo escribe la CLI.
 """
 from __future__ import annotations
 
@@ -246,6 +246,107 @@ def render_index(tasks: list[Task]) -> str:
         rows.append(f"| {t.id} | {m.get('title', '')} | {m.get('status', '')} | {m.get('risk', '')} | {m.get('owner', '')} | "
                     f"{', '.join(m.get('segments') or []) or '—'} | {issue} | [{Path(t.path).name}]({rel}) |")
     return "\n".join(rows) + "\n"
+
+
+# ─────────────────────────── cierre (P-4, D-044) ───────────────────────────
+class CloseError(Exception):
+    """Precondición de `harness tasks close` no cumplida: no se ha modificado nada."""
+
+
+def _section_re(anchor: str) -> re.Pattern:
+    return re.compile(rf"(<!--\s*harness:{re.escape(anchor)}\s*-->)(.*?)(?=<!--\s*harness:[a-z0-9-]+\s*-->|\Z)", re.S)
+
+
+def _replace_section(body: str, anchor: str, heading: str, text: str) -> str:
+    m = _section_re(anchor).search(body)
+    new = f"\n## {heading}\n{text.strip()}\n"
+    if not m:
+        return body.rstrip("\n") + f"\n\n<!-- harness:{anchor} -->{new}"
+    tail = "\n" if m.end() < len(body) else ""
+    return body[:m.start(2)] + new + tail + body[m.end():]
+
+
+def _append_to_section(body: str, anchor: str, line: str) -> str:
+    m = _section_re(anchor).search(body)
+    if not m:
+        raise CloseError(f"la tarea no tiene la sección `{anchor}`")
+    rest = body[m.end():]
+    sep = "\n\n" if rest else "\n"
+    return body[:m.start(2)] + m.group(2).rstrip("\n") + "\n" + line + sep + rest
+
+
+def _set_front(front: str, key: str, value: str, after: str) -> str:
+    line = re.compile(rf"(?m)^{key}:.*$")
+    if line.search(front):
+        return line.sub(f"{key}: {value}", front, count=1)
+    return re.sub(rf"(?m)^({after}:.*)$", lambda mm: f"{mm.group(1)}\n{key}: {value}", front, count=1)
+
+
+def close(ctx: Context, task_id: str, pr: int, *, resultado: str | None = None,
+          verified_by: str | None = None, autor: str | None = None,
+          today: dt.date | None = None) -> list[str]:
+    """Lleva una tarea a `done` de forma determinista (ADR-016). Devuelve las rutas modificadas.
+
+    No ejecuta criterios de aceptación, ni crea el PR, ni hace commit. Si una precondición
+    falla, lanza CloseError sin escribir nada. Es idempotente con el mismo PR.
+    """
+    if not isinstance(pr, int) or pr <= 0:
+        raise CloseError("--pr debe ser un entero positivo")
+    tasks = [t for t in load_worktree(ctx) if t.id == task_id]
+    if not tasks:
+        raise CloseError(f"no existe la tarea {task_id}")
+    if len(tasks) > 1:
+        raise CloseError(f"{task_id} aparece en varios archivos: {', '.join(t.path for t in tasks)}")
+    t = tasks[0]
+    if t.errors:
+        raise CloseError(f"{t.path}: {t.errors[0]}")
+    _, completed_dir = _dirs(ctx)
+    if t.status == "done":
+        if t.meta.get("done_pr") == pr and str(Path(t.path).parent) == completed_dir:
+            return []
+        raise CloseError(f"{task_id} ya está en done con done_pr={t.meta.get('done_pr')}")
+    if "done" not in ALLOWED.get(t.status, set()):
+        origen = ", ".join(sorted(k for k, v in ALLOWED.items() if k and "done" in v))
+        raise CloseError(f"{task_id} está en `{t.status}`; solo se cierra desde {origen}")
+    manual = [ac for ac in t.meta.get("acceptance") or [] if ac.get("check") == "manual"]
+    if any(not ac.get("verified_by") for ac in manual) and not verified_by:
+        raise CloseError("hay criterios manuales sin `verified_by`: indica --verified-by @persona (debe aprobar el PR)")
+    if not resultado and not section(t.body, "resultado"):
+        raise CloseError('la sección Resultado está vacía: indica --resultado "…"')
+
+    text = (ctx.root / t.path).read_text(encoding="utf-8")
+    m = FRONT.match(text)
+    front, body = m.group(1), text[m.end():]
+    front = _set_front(front, "status", "done", "status")
+    front = _set_front(front, "done_pr", str(pr), "status")
+    if verified_by:
+        who = verified_by if verified_by.startswith("@") else f"@{verified_by}"
+        front = re.sub(r"(?m)^(\s+)check:\s*[\"']?manual[\"']?\s*$(?!\n\s+verified_by:)",
+                       lambda mm: f'{mm.group(0)}\n{mm.group(1)}verified_by: "{who}"', front)
+    day = (today or dt.date.today()).isoformat()
+    quien = autor or t.meta.get("owner") or "—"
+    body = _append_to_section(body, "progreso", f"- {day} — cerrada en el PR #{pr} — {quien}")
+    if resultado:
+        body = _replace_section(body, "resultado", "Resultado", resultado)
+    new_text = f"---\n{front}\n---\n{body}"
+
+    nt = parse_task(new_text, t.path)
+    errs = nt.errors + [e.message for e in ctx.standard.validator("task").iter_errors(nt.meta)]
+    if errs:
+        raise CloseError(f"el resultado no valida contra task.schema.json: {errs[0]}")
+
+    dest = f"{completed_dir}/{Path(t.path).name}"
+    (ctx.root / dest).parent.mkdir(parents=True, exist_ok=True)
+    (ctx.root / dest).write_text(new_text, encoding="utf-8")
+    changed = [dest]
+    if dest != t.path:
+        (ctx.root / t.path).unlink()
+        changed.insert(0, t.path)
+    idx = ctx.role_path("plans.index")
+    _, found = validate(ctx)
+    (ctx.root / idx).parent.mkdir(parents=True, exist_ok=True)
+    (ctx.root / idx).write_text(render_index(found), encoding="utf-8")
+    return changed + [idx]
 
 
 # ─────────────────────────── PR ───────────────────────────

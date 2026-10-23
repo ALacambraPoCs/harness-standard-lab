@@ -9,7 +9,10 @@ Contrato:
 - Es retroalimentación (L3), no autoridad: la autoridad es la CI (ADR-016).
 - Falla en abierto (exit 0 con aviso) si no puede leer el manifiesto: un hook roto no debe bloquear
   el trabajo; HS-CMP-006 y la CI cubren ese caso.
-- Límite de reintentos por sesión (MAX_BLOQUEOS) para evitar bucles, sin depender de campos no verificados.
+- Límite de reintentos por sesión (MAX_BLOQUEOS, 2 por defecto) para evitar bucles, sin depender de campos
+  no verificados.
+- Suspensión: una persona puede arrancar la sesión con `HARNESS_STOP_MAX=0` (p. ej. en TDD, con una prueba
+  en rojo a propósito). El hook no bloquea, pero sigue informando de lo que falla (P-5, D-045).
 
 Solo usa la biblioteca estándar (la instancia no tiene por qué tener PyYAML).
 """
@@ -24,8 +27,17 @@ import sys
 import tempfile
 from pathlib import Path
 
-MAX_BLOQUEOS = int(os.environ.get("HARNESS_STOP_MAX", "3"))
-TIMEOUT = int(os.environ.get("HARNESS_STOP_TIMEOUT", "240"))
+
+
+def _entero(nombre: str, defecto: int) -> int:
+    try:
+        return max(0, int(os.environ.get(nombre, defecto)))
+    except ValueError:
+        return defecto
+
+
+MAX_BLOQUEOS = _entero("HARNESS_STOP_MAX", 2)
+TIMEOUT = _entero("HARNESS_STOP_TIMEOUT", 240) or 240
 COLA = 25  # líneas de salida que se muestran al agente
 
 
@@ -91,6 +103,10 @@ def main() -> int:
     if not fallos:
         cont.unlink(missing_ok=True)
         return 0
+    if MAX_BLOQUEOS == 0:
+        print("verificar-al-terminar suspendido (HARNESS_STOP_MAX=0): se permite parar con estas verificaciones "
+              "en rojo.\n\n" + "\n\n".join(fallos), file=sys.stderr)
+        return 0
     n = int(cont.read_text() or 0) + 1 if cont.exists() else 1
     if n > MAX_BLOQUEOS:
         cont.unlink(missing_ok=True)
@@ -99,7 +115,9 @@ def main() -> int:
         return 0
     cont.write_text(str(n))
     print("No des el trabajo por terminado: estas verificaciones fallan "
-          f"(intento {n} de {MAX_BLOQUEOS}). Corrígelas o explica por qué no puedes.\n\n" + "\n\n".join(fallos),
+          f"(intento {n} de {MAX_BLOQUEOS}). Corrígelas o explica por qué no puedes. Si la persona te pidió "
+          "dejarlas en rojo a propósito (TDD), díselo: puede arrancar la sesión con HARNESS_STOP_MAX=0.\n\n"
+          + "\n\n".join(fallos),
           file=sys.stderr)
     return 2
 

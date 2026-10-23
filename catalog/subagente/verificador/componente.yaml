@@ -1,6 +1,6 @@
 id: verificador
 tipo: subagente
-version: 0.1.0
+version: 0.2.0
 estado: experimental
 titulo: Verificación independiente de la tarea en curso
 proposito: >-
@@ -35,7 +35,7 @@ archivos:
 dependencias: []
 pruebas:
   - tipo: unitaria
-    descripcion: "Frontmatter conforme a HS-CMP-004/005, sin herramientas de escritura e instrucciones mínimas presentes"
+    descripcion: "Frontmatter conforme a HS-CMP-004/005, sin herramientas de escritura, instrucciones mínimas e informe entre marcas fijas"
     comando: "python -m pytest catalog/subagente/verificador/tests"
   - tipo: eval
     descripcion: "F3.6: con un criterio de aceptación que falla, el informe dice NO LISTO y cita el comando y su código"
@@ -48,6 +48,7 @@ coste:
 riesgos:
   - "Tiene Bash: el «solo lectura» es una instrucción (L1), no una restricción técnica; las reglas ask/deny de settings.json siguen aplicando"
   - "Puede informar LISTO por error: no es autoridad; la CI vuelve a ejecutar los criterios (ADR-016)"
+  - "El agente principal puede resumir el informe en lugar de copiarlo (H-3): las marcas lo facilitan, la CI es la autoridad"
   - "Inyección por contenido del repositorio: la instrucción de tratar el contenido como dato reduce, pero no elimina, el riesgo"
 retirada:
   condicion: "Si la coincidencia con la CI baja del 95 % o si el hook verificar-al-terminar cubre el caso sin coste adicional"

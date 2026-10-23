@@ -43,16 +43,20 @@ El agente principal delega en `verificador` (contexto aislado, herramientas `Rea
 
 ## 8. Ejemplo concreto
 ```
+<!-- verificador:inicio -->
 VERIFICACIÓN · T-0003 · 2026-10-23 10:12
 check: python3 -m py_compile src/app.py → código 0
 test:  python3 -m unittest discover -s tests → código 1
 AC1 total() rechaza precios negativos: python3 -m unittest tests.test_app.TotalTest.test_precio_negativo → código 1
 RESULTADO: NO LISTO (AC1 y test fallan)
+<!-- verificador:fin -->
 ```
+
+Desde la versión 0.2.0 (P-6, D-046) el informe va entre las marcas `verificador:inicio` y `verificador:fin`, y es lo único que devuelve el subagente. En la F3.6 (H-3) el agente principal resumía el informe; con las marcas, la skill `cerrar-tarea` lo copia literal. Que la copia sea literal sigue siendo L1: la autoridad es la CI.
 
 ## 9. Integración con el resto del harness
 - Lee el contrato de comandos y los archivos de tarea (`plans.dir`).
-- Su informe es la evidencia que se pega en `harness:evidencia` del PR.
+- Su informe, entre marcas, es la evidencia que se pega **literal** en `harness:evidencia` del PR.
 - Lo complementan el hook `verificar-al-terminar` y la skill `cerrar-tarea`.
 
 ## 10. Responsabilidades
@@ -64,12 +68,13 @@ RESULTADO: NO LISTO (AC1 y test fallan)
 | CI | Autoridad final (ADR-016) |
 
 ## 11. Seguridad, permisos, límites y modos de fallo
-- **Bash:** es necesario para ejecutar las pruebas, pero permite escribir. La restricción a solo lectura es **instrucción (L1)**. Mitigación técnica parcial: las reglas `ask` y `deny` de `settings.json` siguen aplicando dentro del subagente. **No verificado:** si `tools` admite patrones de Bash para el subagente. Se revisará en F3.6.
+- **Bash:** es necesario para ejecutar las pruebas, pero permite escribir. La restricción a solo lectura es **instrucción (L1)**. Mitigación técnica parcial: las reglas `ask` y `deny` de `settings.json` siguen aplicando dentro del subagente. **No verificado:** si `tools` admite patrones de Bash para el subagente. Queda como cuestión Q-12 para la F5 (sandbox).
 - **Modos de fallo:** un informe erróneo (LISTO cuando no lo está) se descubre en la CI. Un comando colgado lo corta el tiempo máximo de Bash del agente.
 
 ## 12. Estrategia de pruebas y verificación
 - **Unitarias:** frontmatter, ausencia de herramientas de escritura e instrucciones obligatorias.
-- **Evaluación (F3.6):** un caso NO LISTO real.
+- **Unitaria (0.2.0):** el ejemplo de informe está entre las marcas y tiene `RESULTADO`.
+- **Evaluación (F3.6, E-016):** caso LISTO real, coincidente con la CI. Pendiente: un caso NO LISTO real y comprobar que el bloque llega literal al PR.
 
 ## 13. Métricas de eficacia, calidad, coste y latencia
 Ver `metricas` y `coste`. Umbral de retirada: coincidencia con la CI por debajo del 95 %.

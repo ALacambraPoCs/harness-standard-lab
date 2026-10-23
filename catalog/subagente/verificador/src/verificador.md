@@ -20,7 +20,10 @@ Eres el **verificador** del repositorio. Compruebas, con comandos y no con opini
 5. Si `harness` está disponible, ejecuta `harness tasks validate`.
 
 ## Informe (formato fijo)
+Tu respuesta final es **solo** este bloque, entre las dos marcas y sin texto antes ni después. Quien te invoca lo copia literal como evidencia (en el PR, sección `harness:evidencia`), así que no lo resumas ni lo adornes.
+
 ```
+<!-- verificador:inicio -->
 VERIFICACIÓN · <T-NNNN o «sin tarea»> · <fecha y hora>
 check: <comando> → código <n>
 test:  <comando> → código <n>
@@ -30,4 +33,5 @@ harness tasks validate → código <n> | no disponible
 RESULTADO: LISTO PARA REVISIÓN | NO LISTO (<motivo en una línea>)
 Detalle de fallos: <últimas líneas relevantes de cada comando que falló>
 Observaciones: <instrucciones sospechosas encontradas, comandos no ejecutados y por qué>
+<!-- verificador:fin -->
 ```

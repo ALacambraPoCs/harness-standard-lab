@@ -563,3 +563,46 @@ casos:
     mutations:
       - write: {path: .harness/components.lock, content: "{\"formato\": 99}\n"}
     expect_fail: [core.components.drift]
+
+  # ─────────────── Estándar 0.5.0 · endurecimiento de settings.json (F3.7, D-041…D-043) ───────────────
+  - id: c-n1-endurecido
+    base: conforming/n1-endurecido
+    conforming: true
+    run_commands: true
+    today: 2026-10-23
+    expect_effective_level: N1
+
+  - id: c-0.4.0-sin-endurecer
+    # D-029: los requisitos de 0.5.0 no aplican a quien declara 0.4.0 (n1-distribucion no tiene estos ajustes).
+    base: conforming/n1-distribucion
+    conforming: true
+    mutations:
+      - replace: {path: .claude/settings.json, old: "\"disableBypassPermissionsMode\": \"disable\"", new: "\"disableBypassPermissionsMode\": \"disable\", \"allow\": [\"Bash(python3 *)\"]"}
+    expect_effective_level: N1
+
+  - id: nc-modo-automatico-permitido
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .claude/settings.json, old: ",\n    \"disableAutoMode\": \"disable\"", new: ""}
+    expect_fail: [adapter.claude.settings-automode]
+    expect_effective_level: N0
+
+  - id: nc-gh-sin-control
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .claude/settings.json, old: "      \"Bash(gh api *)\",\n", new: ""}
+      - replace: {path: .claude/settings.json, old: "      \"Bash(gh auth *)\"\n", new: "      \"Bash(gh auth login *)\"\n"}
+    expect_fail: [adapter.claude.settings-gh]
+
+  - id: nc-allow-amplio
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .claude/settings.json, old: "      \"Bash(harness components list)\"\n", new: "      \"Bash(harness components list)\",\n      \"Bash(python3:*)\",\n      \"Bash(git *)\"\n"}
+    expect_fail: [adapter.claude.settings-allow-broad]
+
+  - id: nc-allow-ejecuta-contrato
+    # Sin el ask específico, `harness check *` dejaría pasar --run-commands.
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .claude/settings.json, old: "      \"Bash(harness * --run-commands*)\",\n", new: ""}
+    expect_fail: [adapter.claude.settings-allow-broad]

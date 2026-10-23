@@ -12,7 +12,8 @@ HOOK = Path(__file__).resolve().parents[1] / "src" / "verificar_al_terminar.py"
 
 
 def run(root: Path, session: str, env_extra=None):
-    env = {**os.environ, "CLAUDE_PROJECT_DIR": str(root), "PATH": "/usr/bin:/bin", **(env_extra or {})}
+    base = {k: v for k, v in os.environ.items() if not k.startswith("HARNESS_STOP_")}
+    env = {**base, "CLAUDE_PROJECT_DIR": str(root), "PATH": "/usr/bin:/bin", **(env_extra or {})}
     p = subprocess.run([sys.executable, str(HOOK)], input=json.dumps({"session_id": session, "hook_event_name": "Stop"}),
                        capture_output=True, text=True, env=env, timeout=60)
     return p.returncode, p.stderr
@@ -36,13 +37,13 @@ def test_check_pasa_permite_parar(tmp_path, sesion):
 
 def test_check_falla_bloquea_con_mensaje(tmp_path, sesion):
     code, err = run(instancia(tmp_path, "python3 -c \"import sys; print('rojo'); sys.exit(3)\""), sesion)
-    assert code == 2 and "código 3" in err and "rojo" in err and "intento 1 de 3" in err
+    assert code == 2 and "código 3" in err and "rojo" in err and "intento 1 de 2" in err and "HARNESS_STOP_MAX=0" in err
 
 
 def test_limite_de_reintentos(tmp_path, sesion):
     root = instancia(tmp_path, "false")
-    codes = [run(root, sesion)[0] for _ in range(4)]
-    assert codes == [2, 2, 2, 0]
+    codes = [run(root, sesion)[0] for _ in range(3)]
+    assert codes == [2, 2, 0]
 
 
 def test_contador_se_reinicia_al_pasar(tmp_path, sesion):
@@ -52,7 +53,25 @@ def test_contador_se_reinicia_al_pasar(tmp_path, sesion):
     assert run(root, sesion)[0] == 0
     (root / "ok").unlink()
     _, err = run(root, sesion)
-    assert "intento 1 de 3" in err
+    assert "intento 1 de 2" in err
+
+
+def test_limite_configurable(tmp_path, sesion):
+    root = instancia(tmp_path, "false")
+    codes = [run(root, sesion, {"HARNESS_STOP_MAX": "3"})[0] for _ in range(4)]
+    assert codes == [2, 2, 2, 0]
+
+
+def test_suspendido_no_bloquea_pero_informa(tmp_path, sesion):
+    root = instancia(tmp_path, "python3 -c \"import sys; print('rojo'); sys.exit(1)\"")
+    for _ in range(2):
+        code, err = run(root, sesion, {"HARNESS_STOP_MAX": "0"})
+        assert code == 0 and "suspendido" in err and "rojo" in err
+
+
+def test_valor_invalido_usa_el_defecto(tmp_path, sesion):
+    code, err = run(instancia(tmp_path, "false"), sesion, {"HARNESS_STOP_MAX": "dos"})
+    assert code == 2 and "intento 1 de 2" in err
 
 
 def test_sin_manifiesto_falla_en_abierto(tmp_path, sesion):

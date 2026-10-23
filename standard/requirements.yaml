@@ -1,7 +1,7 @@
 # Registro de requisitos del Estándar de Harness.
 # Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
 # Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
-version_estandar: 0.4.0
+version_estandar: 0.5.0
 # Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
 niveles_definidos: [N0, N1]
 # Versión del estándar desde la que existe cada nivel (D-029). N1 exige declarar `standard.version` ≥ 0.2.0.
@@ -1020,6 +1020,57 @@ requisitos:
     estado: aprobado
     desde: 0.3.0
     retirada: Si la organización lo impone en managed settings.
+
+  - id: HS-SEC-010
+    titulo: settings.json desactiva el modo automático
+    texto: '`.claude/settings.json` DEBE fijar `permissions.disableAutoMode: "disable"`.'
+    nivel: DEBE
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [adapter.claude.settings-automode]
+    fuentes: [S-CC-SET, ADR-009, D-041]
+    nota: En modo automático un clasificador decide las confirmaciones en lugar de la persona. Desde el proyecto es protección por defecto, no frontera (un settings.local.json puede anularlo); la frontera es managed settings (F5).
+    estado: aprobado
+    desde: 0.5.0
+    retirada: Si la organización lo impone en managed settings, o si la F5 aprueba el modo automático con evidencia para algún perfil.
+
+  - id: HS-SEC-011
+    titulo: settings.json controla gh api y rechaza operaciones de gh sobre repo, secretos, rulesets y sesión
+    texto: '`.claude/settings.json` DEBERÍA incluir `Bash(gh api *)` en `permissions.ask` y `Bash(gh repo delete *)`, `Bash(gh secret *)`, `Bash(gh ruleset *)` y `Bash(gh auth *)` en `permissions.deny`.'
+    nivel: DEBERÍA
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.settings-gh]
+    fuentes: [S-CC-SET, D-042]
+    nota: Reducción de riesgo, no frontera. Las reglas Bash no detienen otras formas de invocar el programa (sh -c, rutas absolutas). La frontera es un token de mínimo privilegio y el sandbox (F5).
+    estado: aprobado
+    desde: 0.5.0
+    retirada: Cuando el agente use un token de GitHub de mínimo privilegio que impida estas operaciones (F5).
+
+  - id: HS-SEC-012
+    titulo: Las reglas allow no abren intérpretes, red, borrado ni la ejecución del contrato
+    texto: 'Las reglas `permissions.allow` de `.claude/settings.json` NO DEBERÍAN permitir sin confirmación intérpretes (`python -c`, `bash -c`, `node -e`…), red (`curl`, `wget`), borrado (`rm`), `git` o `gh` en general, ni `harness … --run-commands` o `--run-acceptance`.'
+    nivel: DEBERÍA
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.settings-allow-broad]
+    fuentes: [S-CC-SET, D-043]
+    nota: Permitir los comandos check o test de una instancia es ejecutar sin confirmación código escrito por el agente. Es una decisión de cada instancia, preferiblemente con sandbox (adaptador §3).
+    estado: aprobado
+    desde: 0.5.0
+    retirada: Si el sandbox de la F5 se vuelve obligatorio y hace innecesario acotar las reglas allow.
 
   - id: HS-CI-004
     titulo: El agente en CI no carga la configuración del repositorio

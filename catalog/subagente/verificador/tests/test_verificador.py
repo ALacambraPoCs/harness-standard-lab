@@ -37,3 +37,13 @@ def test_conforme_en_una_instancia(tmp_path):
     res = run_check(tmp_path / "repo", standard=load_standard(), today=dt.date(2026, 10, 22),
                     only_rules={"adapter.claude.agents-valid", "adapter.claude.agents-tools"})
     assert [f.message for f in res.findings] == []
+
+
+def test_informe_literal_entre_marcas():
+    """P-6 (D-046): el informe va entre marcas fijas para copiarlo literal en harness:evidencia."""
+    body = SRC.read_text(encoding="utf-8")
+    m = re.search(r"<!-- verificador:inicio -->\n(.*?)\n<!-- verificador:fin -->", body, re.S)
+    assert m, "faltan las marcas del informe"
+    bloque = m.group(1)
+    assert bloque.startswith("VERIFICACIÓN") and "\nRESULTADO: " in bloque
+    assert "**solo** este bloque" in body

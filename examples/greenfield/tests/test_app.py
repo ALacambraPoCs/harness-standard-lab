@@ -14,6 +14,10 @@ class TotalTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "línea 2"):
             total([(1, 2.0), (-3, 1.0)])
 
+    def test_precio_negativo(self):
+        with self.assertRaisesRegex(ValueError, "línea 2"):
+            total([(1, 2.0), (3, -1.0)])
+
 
 if __name__ == "__main__":
     unittest.main()

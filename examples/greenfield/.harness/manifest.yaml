@@ -1,6 +1,6 @@
 # Manifiesto de instancia — Estándar de Harness (ADR-004)
 standard:
-  version: 0.2.0
+  version: 0.4.0
   level: N1
 project:
   name: harness-example-greenfield
@@ -15,5 +15,5 @@ adapters:
     id: github
 commands:
   setup: python3 scripts/setup.py
-  check: python3 -m py_compile src/app.py
+  check: python3 -m py_compile src/app.py && python3 -m unittest discover -s tests
   test: python3 -m unittest discover -s tests

@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-22 (F3.5 aprobada; F3.6 en preparación)
+actualizado: 2026-10-23 (F3.6 ejecutada; cierre de la F3 propuesto)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -51,6 +51,12 @@ actualizado: 2026-10-22 (F3.5 aprobada; F3.6 en preparación)
 | E-011 | **ADR-016 validado (rechazo):** PR #7, commit `d60fd2d`. T-0002 declarada `done` sin implementar; `harness tasks` en rojo (AC1/AC2 con código 1) y merge bloqueado, con la conformidad en verde. | 2026-10-22 | Usuario |
 | E-012 | **ADR-016 validado (aceptación):** PR #7, commit `2abc558`, con la implementación; ambos checks en verde y merge `e9946bd`. T-0001 pasó a `done` en el PR #6 tras volver a ejecutar `harness check --strict` como criterio. | 2026-10-22 | Usuario |
 | E-013 | **X-01 de extremo a extremo:** issue #4 `status:ready` → `status:in_progress` → cerrada por `Closes #4` → `status:done` y comentario con enlace a la ejecución 39779093407, siempre por `github-actions`. | 2026-10-22 | Usuario |
+| E-014 | **Regla `ask` (F3.6):** en modo *accept edits*, crear un archivo de control no pide confirmación y editar `AGENTS.md` sí (diálogo solo Yes/No). | 2026-10-23 | Usuario |
+| E-015 | **Hook `verificar-al-terminar`:** con la prueba en rojo bloqueó la parada 3 veces con el mensaje exacto y después la permitió; con `check` en verde no intervino. | 2026-10-23 | Usuario |
+| E-016 | **Subagente `verificador`:** ejecución en segundo plano (48 s); `check`, AC1, AC2 y `harness tasks validate` con código 0, sin editar. Informe resumido, no literal (H-3). | 2026-10-23 | Usuario |
+| E-017 | **Skill `cerrar-tarea`:** cargada desde `.claude/skills/`; PR #10 con `done_pr` escrito tras abrir el PR y `tasks / harness tasks` en verde en el primer push del cierre. Con T-0003 (PR #11) no siguió el orden y la CI lo rechazó una vez (H-8). | 2026-10-23 | Usuario |
+| E-018 | **Adopción 0.4.0 con componentes:** PR #9 de `harness-example-greenfield` con ambos checks requeridos en verde (incluida HS-CMP-009). Estado final `6bbe505`: 60 reglas, 0 errores, 0 avisos. | 2026-10-23 | Usuario |
+| E-019 | **X-01:** issue #8 `in_progress` → cerrada por `Closes #8` → `status:done` con comentario, automáticamente. | 2026-10-23 | Usuario |
 | D-031 | **Fase 2 cerrada** con el criterio 1 parcial: 5 fichas aplazadas a la fase dueña de su subsistema (`adapter.claude.settings` → F3, `project.rules` → F4, `ci.workflows` y `runbooks.dir` → F5, `quality.doc` → F6). `fase-2/INFORME.md`. | 2026-10-22 | Usuario |
 | D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |
 | D-033 | **Plan de la F3 aprobado** (`fase-3/PLAN.md`): 6 incrementos, de F3.1 (modelo de componentes) a F3.6 (prueba en el laboratorio). | 2026-10-22 | Usuario |
@@ -65,7 +71,9 @@ actualizado: 2026-10-22 (F3.5 aprobada; F3.6 en preparación)
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F3.6** — prueba en el laboratorio. Requiere Claude Code ≥ 2.1.277 (el usuario tiene 2.1.238).
+- **Cierre de la F3** (`fase-3/INFORME.md`): criterios 1–5 cumplidos.
+- **Propuestas P-1…P-6** derivadas de los hallazgos de la F3.6 (`fase-3/INFORME.md` §4), para un incremento F3.7. Se deciden una a una.
+- **Siguiente fase:** F4 (segmentación y concurrencia; requiere un repositorio brownfield, Q-09) o F5 (CI/CD y seguridad; incluye el modo automático y `claude-code-action`).
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -101,15 +109,18 @@ actualizado: 2026-10-22 (F3.5 aprobada; F3.6 en preparación)
 | R-12 | ~~Mitigado por D-018 (repos públicos: no hace falta token)~~. En privado, la instancia lee el repo del estándar con un **PAT fine-grained personal** (Contents: read, 1 repo, caducidad ≤ 90 días): credencial de larga duración ligada a una persona. | Media | Medio | Aceptado para el laboratorio. F5: sustituir por GitHub App de solo lectura o publicar la CLI como paquete interno. |
 | R-13 | **Hallazgo F2.2:** con el `CLAUDE.md` raíz que exige ADR-003, Claude Code (ajuste por defecto) **no carga** los `AGENTS.md` de subdirectorios (S-CC-MEM). Sin mitigación, las instrucciones de segmento serían invisibles para Claude. | Alta (si hay segmentos) | Alto | `<segmento>/CLAUDE.md` con `@AGENTS.md` obligatorio (fichas F2.2; requisito candidato C-07 en F2.5) |
 | R-14 | **Hallazgo F3 (H5):** con `claude -p` sin `--bare`, Claude Code ejecuta los hooks y los MCP de `.claude/settings.json` y `.mcp.json` del repositorio aunque la carpeta no sea de confianza. Un PR malicioso podría ejecutar código en el runner de CI si el agente se lanza sobre ese PR. | Media | Alto | En CI, el agente siempre con `--bare` y `--settings`/`--mcp-config` explícitos desde una ruta de confianza (no del PR). Se norma en F3.2 y F5 |
+| R-15 | **Hallazgo F3.6 (H-4, H-9):** el coste en confirmaciones (26 en dos sesiones) empuja a aprobar «y no volver a preguntar» o a activar el modo automático, que Claude Code sugiere en el propio diálogo. La base no desactiva el modo automático. | Alta | Alto | P-1 (`disableAutoMode`) y P-3 (`allow` para comandos del contrato sin efectos); medir confirmaciones en F6 |
+| R-16 | **Hallazgo F3.6 (H-7):** cuando un comando `gh` falla, el agente recurre a `gh api`, que puede escribir en GitHub sin regla específica. Las reglas Bash no son frontera (otras formas de invocación). | Media | Alto | P-2 (`ask` para `gh api`, `deny` para operaciones destructivas); sandbox y token de mínimo privilegio en F5 |
 | R-08 | Afirmaciones sobre la documentación oficial obtenidas por un subagente que no se han revisado a mano. | Media | Medio | Se revisaron a mano las críticas para ADR-003 y ADR-012 (memoria y skills de Claude Code). El resto se reverifica en la fase en que se norme. |
 
 ## Próximos pasos
 
-1. **Usuario:** aprobar el cierre de la Fase 2 y la siguiente fase (`fase-2/INFORME.md` §6); subir `f2-cierre.patch` al central.
-2. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas).
+1. **Usuario:** aprobar el cierre de la F3, decidir P-1…P-6 una a una y elegir la siguiente fase; subir `f3-cierre.patch` al central.
+2. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 3. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;
    - borrar el secreto `HARNESS_STANDARD_TOKEN` del ejemplo y revocar el PAT;
    - escáner de secretos (F5);
    - verificar a mano S-CODEX-AGENTSMD (R-08);
-   - segundo mantenedor (R-10).
+   - segundo mantenedor (R-10);
+   - candidato K-14 (avisar si cambian los criterios de aceptación en un PR que cierra la tarea).

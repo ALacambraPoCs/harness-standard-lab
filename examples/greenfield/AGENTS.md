@@ -1,7 +1,7 @@
 # harness-example-greenfield
 
 <!-- harness:resumen -->
-Servicio de ejemplo que calcula totales de pedidos. Instancia N1 de ejemplo del Estándar de Harness (repositorio de pruebas de extremo a extremo).
+Servicio de ejemplo que calcula totales de pedidos. Instancia N1 de ejemplo del Estándar de Harness 0.4.0 (repositorio de pruebas de extremo a extremo).
 
 <!-- harness:comandos -->
 ## Comandos
@@ -9,7 +9,7 @@ Servicio de ejemplo que calcula totales de pedidos. Instancia N1 de ejemplo del 
 | Rol | Comando |
 |---|---|
 | setup | `python3 scripts/setup.py` |
-| check | `python3 -m py_compile src/app.py` |
+| check | `python3 -m py_compile src/app.py && python3 -m unittest discover -s tests` |
 | test | `python3 -m unittest discover -s tests` |
 
 Ejecuta `check` después de cada cambio y `test` antes de pedir revisión.

@@ -72,5 +72,6 @@ for _id, _doc in [
     ("pr.sensitive", "`sensible: no` no se declara si el diff toca rutas sensibles."),
     ("pr.risk-sensitive", "Un PR que toca rutas sensibles no se declara de riesgo bajo."),
     ("pr.adr-immutable", "Un ADR aceptado solo cambia estado/reemplazada_por."),
+    ("pr.risk-min", "El riesgo declarado no es menor que el calculado por `harness pr risk` (D-058)."),
 ]:
     _pr_rule(_id, _doc)

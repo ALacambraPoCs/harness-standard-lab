@@ -9,7 +9,7 @@
 #   condicion       Cuándo aplica (obligatoriedad condicional) o por qué no se versiona.
 #   nivel_minimo    Primer nivel de conformidad en que el rol es exigible.
 #   ficha           Ficha normativa del rol (standard/04-archivos/), o "pendiente:<fase>".
-version_estandar: 0.5.0
+version_estandar: 0.6.0
 roles:
 
   # ─────────────── Gobierno de la instancia ───────────────
@@ -225,7 +225,7 @@ roles:
     obligatoriedad: obligatorio
     capa: adaptador:github
     nivel_minimo: N0
-    ficha: pendiente:F5
+    ficha: standard/04-archivos/ci.workflows.md
     descripcion: Workflows de GitHub Actions (conformidad en N0; ciclo de vida de tareas en N1).
 
 # Rutas de ejemplo que CODEOWNERS DEBE cubrir (HS-SEC-002, ADR-013).
@@ -257,6 +257,24 @@ patrones_sensibles:
   - /.harness/
   - /.github/workflows/
   - /.github/CODEOWNERS
+
+# Rutas críticas (D-058): cambian la propia autoridad (workflows de CI, CODEOWNERS, manifiesto y lock de
+# componentes). Un PR que toque alguna tiene riesgo mínimo `alto` y pasa por la puerta explícita (ADR-010
+# rev. 2). La instancia puede añadir las suyas en `riesgo.rutas_criticas` del manifiesto.
+rutas_criticas:
+  - /.github/workflows/
+  - /.github/CODEOWNERS
+  - /.harness/
+
+# Archivos de prueba (D-058): borrarlos o renombrarlos sube el riesgo mínimo a `medio`.
+patrones_pruebas:
+  - /tests/
+  - /test/
+  - "test_*.py"
+  - "*_test.py"
+  - "*_test.go"
+  - "*.test.*"
+  - "*.spec.*"
 
 # Patrones por defecto que puede tocar un PR declarado `trivial` (D-023): documentación y
 # lockfiles de dependencias. Excluye los sensibles (se comprueba aparte). Ajustable en

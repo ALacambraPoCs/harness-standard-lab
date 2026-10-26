@@ -377,3 +377,91 @@ def test_close_cli(repo, capsys):
     assert "No se ha modificado nada" in capsys.readouterr().err
     assert main(["tasks", "close", "T-0001", "--pr", "7", "--resultado", "Hecho.", "--path", str(repo)]) == 0
     assert DONE in capsys.readouterr().out
+
+
+# ─────────────── Riesgo calculado (D-058, HS-CI-005) ───────────────
+from harness_cli import risk as R  # noqa: E402
+
+PR_BODY = """<!-- harness:tarea -->
+**Tarea:** {tarea}
+<!-- harness:riesgo -->
+**Riesgo:** {riesgo} — prueba
+<!-- harness:sensible -->
+**¿Toca configuración de agentes, CI o seguridad?** {sens}
+"""
+
+
+def _v06(root):
+    p = root / ".harness/manifest.yaml"
+    p.write_text(p.read_text(encoding="utf-8").replace("version: 0.1.0", "version: 0.6.0"), encoding="utf-8")
+
+
+@pytest.mark.parametrize("cambios,esperado,motivo", [
+    ({"docs/guia.md": "x"}, "bajo", "sin señales"),
+    ({"src/app.py": "print(1)\n"}, "bajo", "sin señales"),
+    ({"CLAUDE.md": "@AGENTS.md\nmás\n"}, "medio", "configuración de agentes"),
+    ({".github/workflows/x.yml": "name: x\n"}, "alto", "ruta crítica"),
+    ({".harness/manifest.yaml": None}, "alto", "ruta crítica"),
+])
+def test_riesgo_por_rutas(repo, cambios, esperado, motivo):
+    for rel, text in cambios.items():
+        if text is None:
+            p = repo / rel
+            p.write_text(p.read_text(encoding="utf-8") + "# cambio\n", encoding="utf-8")
+        else:
+            write(repo, rel, text)
+    commit(repo)
+    r = R.compute(ctx(repo), "HEAD~1")
+    assert r.clase == esperado and any(motivo in m for _, m in r.senales), r.senales
+
+
+def test_riesgo_prueba_borrada_y_rutas_criticas_del_manifiesto(repo):
+    write(repo, "tests/test_x.py", "def test_x(): pass\n")
+    write(repo, "deploy/main.tf", "x\n")
+    commit(repo, "base2")
+    (repo / "tests/test_x.py").unlink()
+    commit(repo)
+    assert R.compute(ctx(repo), "HEAD~1").clase == "medio"
+    p = repo / ".harness/manifest.yaml"
+    p.write_text(p.read_text(encoding="utf-8") + "riesgo:\n  rutas_criticas: [/deploy/]\n", encoding="utf-8")
+    commit(repo, "manifest")
+    write(repo, "deploy/main.tf", "y\n")
+    commit(repo)
+    r = R.compute(ctx(repo), "HEAD~1")
+    assert r.clase == "alto" and any("deploy/main.tf" in m for _, m in r.senales)
+
+
+def test_riesgo_tarea_que_se_cierra(repo):
+    write(repo, ACTIVE, task_text(status="in_progress", extra=""))
+    commit(repo, "tarea")
+    T.close(ctx(repo), "T-0001", 7, resultado="Hecho.")
+    text = (repo / DONE).read_text(encoding="utf-8").replace('check: "true"', 'check: "true # debilitado"').replace("risk: bajo", "risk: alto")
+    (repo / DONE).write_text(text, encoding="utf-8")
+    commit(repo)
+    r = R.compute(ctx(repo), "HEAD~1")
+    motivos = " ".join(m for _, m in r.senales)
+    assert r.clase == "alto" and "K-14" in motivos and "risk: alto" in motivos
+
+
+def test_pr_risk_min_solo_desde_0_6(repo):
+    write(repo, ".github/workflows/x.yml", "name: x\n")
+    write(repo, ACTIVE, task_text(status="in_progress"))
+    commit(repo)
+    body = PR_BODY.format(tarea="T-0001", riesgo="bajo", sens="sí")
+    assert "pr.risk-min" not in rules(T.check_pr(ctx(repo), body, "HEAD~1"))   # 0.1.0: no aplica (D-029)
+    _v06(repo)
+    commit(repo, "v06")
+    assert "pr.risk-min" in rules(T.check_pr(ctx(repo), body, "HEAD~2"))
+    ok = PR_BODY.format(tarea="T-0001", riesgo="alto", sens="sí")
+    assert "pr.risk-min" not in rules(T.check_pr(ctx(repo), ok, "HEAD~2"))
+
+
+def test_pr_risk_cli(repo, capsys, monkeypatch, tmp_path):
+    from harness_cli.cli import main
+    write(repo, ".github/CODEOWNERS", "* @x\n")
+    commit(repo)
+    out = tmp_path / "gh_out"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(out))
+    assert main(["pr", "risk", "--base", "HEAD~1", "--path", str(repo), "--github-output"]) == 0
+    assert "Riesgo calculado: alto" in capsys.readouterr().out
+    assert out.read_text() == "clase=alto\n"

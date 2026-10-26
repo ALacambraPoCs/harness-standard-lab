@@ -46,6 +46,7 @@
       "Bash(harness tasks index --check)",
       "Bash(harness tasks close *)",
       "Bash(harness pr check *)",
+      "Bash(harness pr risk *)",
       "Bash(harness components list)",
       "Bash(git add *)",
       "Bash(git commit *)",

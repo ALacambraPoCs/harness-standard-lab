@@ -69,6 +69,7 @@ Generada por `harness matrix`. No editar a mano.
 | HS-SEC-011 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-gh` | nc-gh-sin-control |
 | HS-SEC-012 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-allow-broad` | nc-allow-amplio<br>nc-allow-ejecuta-contrato<br>nc-allow-git-sin-ask-especifico |
 | HS-CI-004 | DEBE | N1,N2,N3 | enforcement | automatica | `core.ci.agent-bare` | nc-agente-ci-sin-bare |
+| HS-CI-005 | DEBE | N1,N2,N3 | enforcement | automatica | `pr.risk-min` | test_tasks.py |
 | HS-CMP-010 | DEBE | — | enforcement | automatica | `catalog.entry` | test_catalog.py |
 | HS-CMP-011 | DEBE | — | enforcement | automatica | `catalog.ficha` | test_catalog.py |
 | HS-CMP-012 | DEBE | — | enforcement | automatica | `catalog.skill` | test_catalog.py |

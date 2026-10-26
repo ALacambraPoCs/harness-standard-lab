@@ -4,6 +4,11 @@
 #  - verify (pull_request, merge_group): valida tareas y transiciones, RE-EJECUTA los criterios de
 #    aceptación de las tareas que pasan a done (ADR-016), comprueba el cuerpo del PR contra el diff
 #    (pr.template, D-023) y que el índice esté al día. Debe ser check requerido en el ruleset.
+#  - puerta-riesgo-alto (pull_request, solo si la clase calculada es `alto`): se ejecuta en un environment con
+#    revisores obligatorios, que pausa el job hasta que un revisor lo aprueba (ADR-010 rev. 2, D-060). Si la
+#    clase no es `alto`, el job se salta y GitHub lo cuenta como éxito aunque sea check requerido.
+#    El environment DEBE existir con revisores: si no existe, GitHub lo crea sin protección (lo comprueba
+#    `harness platform check`, F5.3).
 #  - sync-issues (push a la rama por defecto): experimento X-01, refleja estado/responsable en la issue
 #    enlazada y deja el enlace a la ejecución como evidencia. No escribe en el repositorio.
 #
@@ -19,10 +24,14 @@ on:
         default: ""
       cli-ref:
         type: string
-        default: cli-v0.5.1-rc.1
+        default: cli-v0.6.0-rc.1
       python-version:
         type: string
         default: "3.12"
+      gate-environment:
+        type: string
+        default: aprobacion-riesgo-alto
+        description: Environment con revisores obligatorios para los PR de riesgo alto (ADR-010 rev. 2).
     secrets:
       standard-token:
         required: false
@@ -39,6 +48,8 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
+    outputs:
+      clase: ${{ steps.riesgo.outputs.clase }}
     steps:
       - name: Checkout instancia (historial completo para comparar con la base)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -96,6 +107,30 @@ jobs:
 
       - name: Índice de tareas al día
         run: harness tasks index --check
+
+      - name: Clase de riesgo calculada (D-058)
+        id: riesgo
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          harness pr risk --base "$BASE_SHA" --github-output | tee -a "$GITHUB_STEP_SUMMARY"
+          exit "${PIPESTATUS[0]}"
+
+  puerta-riesgo-alto:
+    name: puerta riesgo alto
+    needs: verify
+    if: github.event_name == 'pull_request' && needs.verify.outputs.clase == 'alto'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    environment: ${{ inputs.gate-environment }}
+    steps:
+      - name: Riesgo alto confirmado
+        run: |
+          echo "PR de riesgo alto aprobado en el environment '${GATE}' (ADR-010 rev. 2). Quién y cuándo: historial de despliegues del environment." >> "$GITHUB_STEP_SUMMARY"
+        env:
+          GATE: ${{ inputs.gate-environment }}
 
   sync-issues:
     name: harness tasks · issues (X-01)

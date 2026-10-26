@@ -15,7 +15,7 @@ Un ADR aprobado no se edita: se reemplaza por otro nuevo que lo cite en `reempla
 | [ADR-007](ADR-007-niveles-de-conformidad-n0n3-y-waivers-con-caduci.md) | Niveles de conformidad N0–N3 y waivers con caducidad | aprobado |
 | [ADR-008](ADR-008-lenguaje-y-forma-de-distribucion-de-la-cli.md) | Lenguaje y forma de distribución de la CLI | aprobado-parcial |
 | [ADR-009](ADR-009-guidance-frente-a-enforcement-los-controles-crit.md) | Guidance frente a enforcement: los controles críticos viven en la plataforma y en la CI | aprobado |
-| [ADR-010](ADR-010-autorizacion-de-merge-y-despliegue-separada-de-l.md) | Autorización de merge y despliegue separada de la revisión por agentes | propuesto |
+| [ADR-010](ADR-010-autorizacion-de-merge-y-despliegue-separada-de-l.md) | Autorización de merge y despliegue separada de la revisión por agentes | aprobado (rev. 2, D-060) |
 | [ADR-011](ADR-011-concurrencia-tarea-rama-worktree-con-lease-y-pro.md) | Concurrencia: tarea → rama → worktree, con lease y propiedad por segmento | propuesto |
 | [ADR-012](ADR-012-skills-fuente-neutra-en-agents-skills-y-copia-ge.md) | Skills: fuente canónica en `.claude/skills/` con perfil portable (rev. 2) | aprobado |
 | [ADR-013](ADR-013-la-configuracion-de-agentes-es-codigo-sensible.md) | La configuración de agentes es código sensible | aprobado |

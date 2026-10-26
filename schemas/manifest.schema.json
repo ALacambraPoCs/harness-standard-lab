@@ -107,6 +107,14 @@
         "trivial_paths": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Patrones (sintaxis CODEOWNERS) que un PR 'trivial' puede tocar. Sustituye a la lista por defecto." },
         "acceptance_timeout": { "type": "integer", "minimum": 10, "maximum": 3600, "description": "Segundos por criterio de aceptación en CI (600 por defecto)." }
       }
+    },
+    "riesgo": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Clase de riesgo calculada (D-058, HS-CI-005).",
+      "properties": {
+        "rutas_criticas": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Patrones (sintaxis CODEOWNERS) que se AÑADEN a las rutas críticas del estándar (despliegue, infraestructura, migraciones…). No se pueden quitar las del estándar." }
+      }
     }
   },
   "$defs": {

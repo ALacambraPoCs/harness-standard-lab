@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-26 (F3.8: D-047…D-052)
+actualizado: 2026-10-26 (F5.1 y F5.2: D-053…D-060)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -84,13 +84,21 @@ actualizado: 2026-10-26 (F3.8: D-047…D-052)
 | D-050 | **P-10 aprobada:** cerrar la tarea en el PR que la completa (guía) y commit vacío en la skill si la rama no tiene commits (H-14). | 2026-10-26 | Usuario |
 | D-051 | **P-11 aprobada:** el hook avisa con `systemMessage` al suspenderse o agotar reintentos; ficha corregida (H-11). | 2026-10-26 | Usuario |
 | D-052 | **P-12 aprobada:** `allow` para `git add`, `git commit`, `gh pr view|create|ready`, con `ask` para `-f/--force`, `-n/--no-verify` y `gh pr edit`. | 2026-10-26 | Usuario |
+| D-053 | **Plan de la F5 aprobado** (`fase-5/PLAN.md`): 7 incrementos, de F5.1 (fuentes y amenazas) a F5.7 (laboratorio). | 2026-10-26 | Usuario |
+| D-054 | **Q-05 resuelta:** el laboratorio despliega en GitHub Pages (environment `github-pages`), con rollback propio. | 2026-10-26 | Usuario |
+| D-055 | **Sin clave de API del usuario para el agente en CI:** F5.4 se prueba con un simulador de agente comprometido; el modelo real, en el piloto con federación OIDC corporativa. | 2026-10-26 | Usuario |
+| D-056 | **R-10:** el usuario es por ahora el único validador. Las reglas que exigen a otra persona se especifican y comprueban, y su prueba de extremo a extremo pasa a F8. | 2026-10-26 | Usuario |
+| D-057 | **F5.1 aprobada:** verificación de fuentes de GitHub y Claude Code (`fase-5/01-verificacion-fuentes.md`) y modelo de amenazas (`02-modelo-amenazas.md`). | 2026-10-26 | Usuario |
+| D-058 | **R1 aprobada:** clase de riesgo mínima calculada por `harness pr risk` (rutas críticas → alto; configuración de agentes, pruebas borradas o criterios cambiados → medio); declarar solo puede subirla. HS-CI-005 (DEBE, N1, desde 0.6.0). | 2026-10-26 | Usuario |
+| D-059 | **R2 aprobada:** matriz de escalado por clase (fusión) y disparadores de parada del agente (`fase-5/03-riesgo-y-escalado.md` §2). | 2026-10-26 | Usuario |
+| D-060 | **ADR-010 rev. 2 aprobado:** revisión de agentes informativa, autorización por ruleset y puerta explícita de riesgo alto con un environment con revisores. | 2026-10-26 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F3.8** (D-047…D-052; CLI 0.5.1rc1): pendiente de revisión y fusión.
-- **Plan de la F5** (CI/CD y seguridad): por proponer.
+- **F5.2** (D-058…D-060; estándar 0.6.0, CLI 0.6.0rc1): pendiente de revisión y fusión.
+- **F5.3** (autoridad comprobable: `harness platform check`): siguiente.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -101,13 +109,13 @@ actualizado: 2026-10-26 (F3.8: D-047…D-052)
 | Q-02 | ~~Idioma de los archivos de instancia~~ **Resuelta (D-020): libre, declarado en el manifiesto.** | — | — |
 | Q-03 | ~~Lenguaje de la CLI~~ | — | **Resuelta (D-014): Python** |
 | Q-04 | ~~Estado de tareas y GitHub Issues~~ **Resuelta como experimento (D-021, X-01 aprobado D-022).** | — | — |
-| Q-05 | Plataforma de despliegue (Actions + environments, ArgoCD, otra). | F5 | Por confirmar |
+| Q-05 | ~~Plataforma de despliegue~~ **Resuelta (D-054): GitHub Pages en el laboratorio.** | — | — |
 | Q-06 | Fuente de la telemetría de coste y tokens del agente (consola de la organización, OpenTelemetry, logs de CI). | F6 | Por verificar qué expone Claude Code |
 | Q-07 | En la v1, ¿skills en `.agents/skills` con sincronización o directamente en `.claude/skills`? | F3 | ADR-012 |
 | Q-08 | ¿Hay requisitos regulatorios o de cliente (datos, auditoría, EU AI Act) que afecten al uso de agentes? | F5 | Por confirmar con seguridad y legal |
 | Q-10 | ~~Organización y visibilidad~~ **Resuelta:** `ALacambraPoCs`, repos públicos, plan Free (D-018). Pendiente solo: equipos (se usa `@AlbertoLacambra`). | F2 | — |
 | Q-11 | ~~Umbral de tarea trivial~~ **Resuelta (D-023).** | — | — |
-| Q-12 | ¿Se pueden restringir los comandos Bash de un subagente (p. ej. el `verificador`) por configuración, o solo con sandbox? Hoy su «solo lectura» es L1. | F5 | Verificar en la documentación de subagentes y sandbox |
+| Q-12 | ~~Restringir Bash de un subagente~~ **Resuelta (F5-01, C6):** `tools` no admite patrones y `disallowedTools: Bash(x)` quita Bash entero; las vías reales son un hook `PreToolUse` con lista blanca o el sandbox (F5.5). | — | — |
 | Q-09 | Repositorios candidatos para el piloto (1 greenfield + 1 brownfield grande). | F8 (identificar en F2) | Por designar |
 
 ## Riesgos
@@ -134,7 +142,7 @@ actualizado: 2026-10-26 (F3.8: D-047…D-052)
 
 ## Próximos pasos
 
-1. **Usuario:** fusionar la F3.8 y publicar `cli-v0.5.1-rc.1`. Después, revisar el plan de la F5. Comprobación pendiente en el laboratorio (se puede hacer al inicio de la F5): que `Stop` muestra `systemMessage` y un cierre completo con ≤ 4 confirmaciones.
+1. **Usuario:** fusionar la F5.2 (`f5.2.patch`) y publicar `cli-v0.6.0-rc.1` (falta también `cli-v0.5.1-rc.1` de la F3.8).
 2. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 3. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

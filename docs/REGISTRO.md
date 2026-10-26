@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-23 (F3 cerrada, D-040; F3.7 con D-041…D-046)
+actualizado: 2026-10-26 (F3.8: D-047…D-052)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -57,6 +57,11 @@ actualizado: 2026-10-23 (F3 cerrada, D-040; F3.7 con D-041…D-046)
 | E-017 | **Skill `cerrar-tarea`:** cargada desde `.claude/skills/`; PR #10 con `done_pr` escrito tras abrir el PR y `tasks / harness tasks` en verde en el primer push del cierre. Con T-0003 (PR #11) no siguió el orden y la CI lo rechazó una vez (H-8). | 2026-10-23 | Usuario |
 | E-018 | **Adopción 0.4.0 con componentes:** PR #9 de `harness-example-greenfield` con ambos checks requeridos en verde (incluida HS-CMP-009). Estado final `6bbe505`: 60 reglas, 0 errores, 0 avisos. | 2026-10-23 | Usuario |
 | E-019 | **X-01:** issue #8 `in_progress` → cerrada por `Closes #8` → `status:done` con comentario, automáticamente. | 2026-10-23 | Usuario |
+| E-020 | **`disableAutoMode` (F3.7):** con Shift+Tab solo aparecen *manual → accept edits → plan*; no `auto`. | 2026-10-24 | Usuario |
+| E-021 | **Hook suspendido:** con `HARNESS_STOP_MAX=0` y rojo intencionado, Claude terminó en un turno sin bloqueo (F3.6: 3 turnos). Sin rastro visible del aviso (H-11). | 2026-10-24 | Usuario |
+| E-022 | **Reglas de gh:** `gh api` pide confirmación citando la regla; `gh auth status` se deniega sin diálogo; `gh auth token`, rechazado por el propio modelo. | 2026-10-24 | Usuario |
+| E-023 | **Cierre con `tasks close`:** PR #14 y #15 con la tarea cerrada por la CLI, sin edición manual, sin confirmación propia antes del push y con el bloque literal del verificador en el cuerpo. `gh pr edit` falló y el cuerpo lo subió la persona (H-13). | 2026-10-24 | Usuario |
+| E-024 | **Confirmaciones:** 4 de edición y 25 de comandos en tres sesiones; 5 evitables sin tocar la seguridad (`fase-3/VALIDACION-F3.7.md` §2). | 2026-10-24 | Usuario |
 | D-031 | **Fase 2 cerrada** con el criterio 1 parcial: 5 fichas aplazadas a la fase dueña de su subsistema (`adapter.claude.settings` → F3, `project.rules` → F4, `ci.workflows` y `runbooks.dir` → F5, `quality.doc` → F6). `fase-2/INFORME.md`. | 2026-10-22 | Usuario |
 | D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |
 | D-033 | **Plan de la F3 aprobado** (`fase-3/PLAN.md`): 6 incrementos, de F3.1 (modelo de componentes) a F3.6 (prueba en el laboratorio). | 2026-10-22 | Usuario |
@@ -73,13 +78,19 @@ actualizado: 2026-10-23 (F3 cerrada, D-040; F3.7 con D-041…D-046)
 | D-044 | **P-4 aprobada:** `harness tasks close T-NNNN --pr N` (transición determinista) y skill `cerrar-tarea` 0.2.0 que lo usa; `gh` opcional. | 2026-10-23 | Usuario |
 | D-045 | **P-5 aprobada:** hook `verificar-al-terminar` 0.3.0 con límite 2 y suspensión con `HARNESS_STOP_MAX=0`. | 2026-10-23 | Usuario |
 | D-046 | **P-6 aprobada:** verificador 0.2.0 con informe literal entre marcas; la skill lo copia en `harness:evidencia` y no pide confirmación propia antes del push. | 2026-10-23 | Usuario |
+| D-047 | **Validación de la F3.7 aceptada** (`fase-3/VALIDACION-F3.7.md`, E-020…E-024). | 2026-10-26 | Usuario |
+| D-048 | **P-8 aprobada:** skill y verificador ejecutan un comando por llamada, sin envoltorios (`; echo $?`, `\| tail`, `command -v`) ni encadenados; el verificador no repite comandos (H-12, H-15). | 2026-10-26 | Usuario |
+| D-049 | **P-9 aprobada:** cuerpo del PR escrito desde la plantilla antes de abrirlo y `gh pr create --body-file`; la skill no usa `gh pr edit` (H-13, H-16). | 2026-10-26 | Usuario |
+| D-050 | **P-10 aprobada:** cerrar la tarea en el PR que la completa (guía) y commit vacío en la skill si la rama no tiene commits (H-14). | 2026-10-26 | Usuario |
+| D-051 | **P-11 aprobada:** el hook avisa con `systemMessage` al suspenderse o agotar reintentos; ficha corregida (H-11). | 2026-10-26 | Usuario |
+| D-052 | **P-12 aprobada:** `allow` para `git add`, `git commit`, `gh pr view|create|ready`, con `ask` para `-f/--force`, `-n/--no-verify` y `gh pr edit`. | 2026-10-26 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F3.7** (implementa D-041…D-046; estándar 0.5.0, CLI 0.5.0rc1): pendiente de revisión y fusión.
-- **Siguiente fase:** F4 (segmentación y concurrencia; requiere un repositorio brownfield, Q-09) o F5 (CI/CD y seguridad; incluye el modo automático y `claude-code-action`).
+- **F3.8** (D-047…D-052; CLI 0.5.1rc1): pendiente de revisión y fusión.
+- **Plan de la F5** (CI/CD y seguridad): por proponer.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -118,11 +129,12 @@ actualizado: 2026-10-23 (F3 cerrada, D-040; F3.7 con D-041…D-046)
 | R-14 | **Hallazgo F3 (H5):** con `claude -p` sin `--bare`, Claude Code ejecuta los hooks y los MCP de `.claude/settings.json` y `.mcp.json` del repositorio aunque la carpeta no sea de confianza. Un PR malicioso podría ejecutar código en el runner de CI si el agente se lanza sobre ese PR. | Media | Alto | En CI, el agente siempre con `--bare` y `--settings`/`--mcp-config` explícitos desde una ruta de confianza (no del PR). Se norma en F3.2 y F5 |
 | R-15 | **Hallazgo F3.6 (H-4, H-9):** el coste en confirmaciones (26 en dos sesiones) empuja a aprobar «y no volver a preguntar» o a activar el modo automático, que Claude Code sugiere en el propio diálogo. La base no desactiva el modo automático. | Alta | Alto | P-1 (`disableAutoMode`) y P-3 (`allow` para comandos del contrato sin efectos); medir confirmaciones en F6 |
 | R-16 | **Hallazgo F3.6 (H-7):** cuando un comando `gh` falla, el agente recurre a `gh api`, que puede escribir en GitHub sin regla específica. Las reglas Bash no son frontera (otras formas de invocación). | Media | Alto | P-2 (`ask` para `gh api`, `deny` para operaciones destructivas); sandbox y token de mínimo privilegio en F5 |
+| R-17 | **Hallazgo de la validación F3.7 (H-12, H-13, H-15):** el agente compone comandos (`; echo $?`, `\| tail`, `&&`) que anulan las reglas `allow` y ocultan errores; un paso fallido puede darse por bueno. | Alta | Medio | P-8 y P-9; la CI sigue siendo la autoridad y detectó todos los casos |
 | R-08 | Afirmaciones sobre la documentación oficial obtenidas por un subagente que no se han revisado a mano. | Media | Medio | Se revisaron a mano las críticas para ADR-003 y ADR-012 (memoria y skills de Claude Code). El resto se reverifica en la fase en que se norme. |
 
 ## Próximos pasos
 
-1. **Usuario:** revisar y fusionar la F3.7 (`f3.7.patch`), publicar `cli-v0.5.0-rc.1` y elegir la siguiente fase (F4 o F5). Opcional: repetir un cierre de tarea en el laboratorio con los componentes nuevos para medir confirmaciones.
+1. **Usuario:** fusionar la F3.8 y publicar `cli-v0.5.1-rc.1`. Después, revisar el plan de la F5. Comprobación pendiente en el laboratorio (se puede hacer al inicio de la F5): que `Stop` muestra `systemMessage` y un cierre completo con ≤ 4 confirmaciones.
 2. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 3. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

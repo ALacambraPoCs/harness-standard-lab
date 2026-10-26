@@ -1,6 +1,6 @@
 id: verificador
 tipo: subagente
-version: 0.2.0
+version: 0.3.0
 estado: experimental
 titulo: Verificación independiente de la tarea en curso
 proposito: >-
@@ -35,7 +35,7 @@ archivos:
 dependencias: []
 pruebas:
   - tipo: unitaria
-    descripcion: "Frontmatter conforme a HS-CMP-004/005, sin herramientas de escritura, instrucciones mínimas e informe entre marcas fijas"
+    descripcion: "Frontmatter conforme a HS-CMP-004/005, sin herramientas de escritura, instrucciones mínimas, informe entre marcas fijas y comandos sin envoltorios"
     comando: "python -m pytest catalog/subagente/verificador/tests"
   - tipo: eval
     descripcion: "F3.6: con un criterio de aceptación que falla, el informe dice NO LISTO y cita el comando y su código"

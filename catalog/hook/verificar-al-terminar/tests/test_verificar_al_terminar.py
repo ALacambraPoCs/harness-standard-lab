@@ -19,6 +19,14 @@ def run(root: Path, session: str, env_extra=None):
     return p.returncode, p.stderr
 
 
+def run_full(root: Path, session: str, env_extra=None):
+    base = {k: v for k, v in os.environ.items() if not k.startswith("HARNESS_STOP_")}
+    env = {**base, "CLAUDE_PROJECT_DIR": str(root), "PATH": "/usr/bin:/bin", **(env_extra or {})}
+    p = subprocess.run([sys.executable, str(HOOK)], input=json.dumps({"session_id": session, "hook_event_name": "Stop"}),
+                       capture_output=True, text=True, env=env, timeout=60)
+    return p.returncode, p.stdout, p.stderr
+
+
 def instancia(tmp_path: Path, check: str) -> Path:
     (tmp_path / ".harness").mkdir()
     (tmp_path / ".harness/manifest.yaml").write_text(
@@ -67,6 +75,29 @@ def test_suspendido_no_bloquea_pero_informa(tmp_path, sesion):
     for _ in range(2):
         code, err = run(root, sesion, {"HARNESS_STOP_MAX": "0"})
         assert code == 0 and "suspendido" in err and "rojo" in err
+
+
+def test_suspendido_avisa_con_systemmessage(tmp_path, sesion):
+    """P-11 (D-051): con exit 0 stderr no se muestra; el aviso va en systemMessage (JSON en stdout)."""
+    root = instancia(tmp_path, "python3 -c \"import sys; print('rojo'); sys.exit(1)\"")
+    code, out, _ = run_full(root, sesion, {"HARNESS_STOP_MAX": "0"})
+    assert code == 0
+    msg = json.loads(out)["systemMessage"]
+    assert "suspendido" in msg and "código 1" in msg
+
+
+def test_agotar_reintentos_avisa_con_systemmessage(tmp_path, sesion):
+    root = instancia(tmp_path, "false")
+    run_full(root, sesion)
+    run_full(root, sesion)
+    code, out, _ = run_full(root, sesion)
+    assert code == 0 and "tras 2 intentos" in json.loads(out)["systemMessage"]
+
+
+def test_al_bloquear_stdout_vacio(tmp_path, sesion):
+    """Exit 2: el mensaje va en stderr (Claude lo ve); sin JSON en stdout."""
+    code, out, err = run_full(instancia(tmp_path, "false"), sesion)
+    assert code == 2 and out == "" and "intento 1 de 2" in err
 
 
 def test_valor_invalido_usa_el_defecto(tmp_path, sesion):

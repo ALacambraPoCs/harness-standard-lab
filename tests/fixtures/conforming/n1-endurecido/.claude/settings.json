@@ -24,11 +24,21 @@
       "Edit(/.github/workflows/**)",
       "Edit(/.github/CODEOWNERS)",
       "Bash(git push *)",
+      "Bash(git add -f*)",
+      "Bash(git add * -f*)",
+      "Bash(git add --force*)",
+      "Bash(git add * --force*)",
+      "Bash(git commit -n *)",
+      "Bash(git commit * -n *)",
+      "Bash(git commit * -n)",
+      "Bash(git commit --no-verify*)",
+      "Bash(git commit * --no-verify*)",
       "Bash(gh pr merge *)",
       "Bash(gh api *)",
       "Bash(harness * --run-commands*)",
       "Bash(harness * --run-acceptance*)",
-      "Bash(harness * --json-out*)"
+      "Bash(harness * --json-out*)",
+      "Bash(gh pr edit *)"
     ],
     "allow": [
       "Bash(harness check *)",
@@ -36,7 +46,12 @@
       "Bash(harness tasks index --check)",
       "Bash(harness tasks close *)",
       "Bash(harness pr check *)",
-      "Bash(harness components list)"
+      "Bash(harness components list)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr ready *)"
     ],
     "disableBypassPermissionsMode": "disable",
     "disableAutoMode": "disable"

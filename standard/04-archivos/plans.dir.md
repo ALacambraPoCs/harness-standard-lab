@@ -68,6 +68,7 @@ Una tarea no se borra (`tasks.deleted`): se cancela y se conserva su historia.
 - Ancla `hallazgos` con comportamientos inesperados y su evidencia.
 - `lease` para reservar la tarea ante trabajo concurrente; su verificación llega con la Fase 4 (concurrencia).
 - `issue` para el espejo en GitHub Issues del experimento X-01.
+- **Cerrar la tarea en el PR que la completa** (ADR-016). Si el plan necesita una validación posterior (p. ej. una sesión en el laboratorio), esa validación es **otra tarea** con sus propios criterios, no un paso pendiente de la misma. Una tarea que solo queda por cerrar obliga a abrir un PR sin cambios (H-14, D-050).
 
 ## Contenido excluido
 

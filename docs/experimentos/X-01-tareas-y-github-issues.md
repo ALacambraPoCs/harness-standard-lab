@@ -43,3 +43,4 @@ sin coste de sincronización apreciable y sin crear una segunda fuente de verdad
 |---|---|---|---|---|---|
 | 2026-10-22 | 1 (T-0002 → #4) | 3 (PR #5, #6 y #7) | 0 | Pendiente de leer en Actions | Inicio en `harness-example-greenfield` (E-013). Fricción observada: hay que predecir `issue` y `done_pr` |
 | 2026-10-23 | 2 (T-0002 → #4, T-0004 → #8) | 6 (PR #5, #6, #7, #9, #10 y #11) | 0 | Pendiente de leer en Actions | E-019. La skill `cerrar-tarea` elimina la predicción de `done_pr` (se escribe tras abrir el PR); `issue` sigue creándose a mano antes del archivo. Fricción nueva: dependencia de `gh` (H-10) |
+| 2026-10-24 | 3 (T-0002 → #4, T-0004 → #8, T-0006 → #12) | 9 (+ PR #13, #14 y #15) | 0 | Pendiente de leer en Actions | E-022/E-023. Sin fricción nueva en la sincronización; la fricción está en `gh pr edit` (H-13), no en X-01 |

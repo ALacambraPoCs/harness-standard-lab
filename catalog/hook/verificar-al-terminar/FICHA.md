@@ -57,7 +57,7 @@ Agente decide terminar ──► Stop ──► verificar_al_terminar.py
 ```
 Variables opcionales: `HARNESS_STOP_MAX` (2) y `HARNESS_STOP_TIMEOUT` (240 s por comando).
 
-**Suspensión en TDD (P-5, D-045).** Si la persona quiere terminar con pruebas en rojo a propósito, arranca la sesión con `HARNESS_STOP_MAX=0 claude`. El hook no bloquea, pero sigue escribiendo en stderr lo que falla (visible en el detalle de la sesión). La variable tiene que estar en el entorno de Claude Code: el agente no la controla, y la vía indirecta (`env` en `.claude/settings*.json`) está bajo la regla `ask` de `/.claude/**`.
+**Suspensión en TDD (P-5, D-045).** Si la persona quiere terminar con pruebas en rojo a propósito, arranca la sesión con `HARNESS_STOP_MAX=0 claude`. El hook no bloquea, pero avisa a la persona de lo que falla con el campo JSON `systemMessage` (desde la 0.3.1, D-051). Con código 0, Claude Code no muestra el stderr de un hook: solo llega al log de depuración (documentación de hooks, «Exit code 0»). La 0.3.0 lo usaba y el aviso no se veía (H-11, validación F3.7). **Pendiente de comprobar en el laboratorio** que `Stop` muestra `systemMessage`; si no, el detalle sigue disponible con `claude --debug`. La variable tiene que estar en el entorno de Claude Code: el agente no la controla, y la vía indirecta (`env` en `.claude/settings*.json`) está bajo la regla `ask` de `/.claude/**`.
 
 ## 9. Integración con el resto del harness
 - Usa el contrato de comandos (manifiesto, HS-VER-001).
@@ -77,14 +77,14 @@ Variables opcionales: `HARNESS_STOP_MAX` (2) y `HARNESS_STOP_TIMEOUT` (240 s por
 - **Entradas:** ejecuta `commands.check` del repositorio, el mismo código que ejecutaría la persona. Por eso no debe usarse en carpetas no confiables (en `-p` sin `--bare` los hooks del proyecto se ejecutan igualmente, R-14).
 - **Modos de fallo:**
   - sin manifiesto o sin `check`: falla en abierto (exit 0 con aviso), porque la CI cubre el caso;
-  - error persistente: tras 2 bloqueos (configurable) deja parar y pide escalar a la persona;
+  - error persistente: tras 2 bloqueos (configurable) deja parar y avisa a la persona con `systemMessage`;
   - `HARNESS_STOP_MAX` no numérico: se usa el valor por defecto;
   - suspendido (`HARNESS_STOP_MAX=0`): no bloquea; si alguien lo deja fijo en su perfil, el hook deja de ayudar a esa persona, pero la CI sigue siendo la autoridad.
   - timeout: se trata como fallo.
 - **No verificado:** el campo `stop_hook_active` del evento; el límite de reintentos no depende de él. Tampoco que un `export` en un comando Bash del agente llegue al entorno del hook (por arquitectura no debería: los hooks los lanza el proceso de Claude Code).
 
 ## 12. Estrategia de pruebas y verificación
-- 10 pruebas unitarias (`pruebas`): verde y rojo, límite por defecto y configurable, suspensión, valor inválido, reinicio, sin manifiesto, comillas, tareas inválidas.
+- 13 pruebas unitarias (`pruebas`): verde y rojo, límite por defecto y configurable, suspensión, valor inválido, reinicio, sin manifiesto, comillas, tareas inválidas, y `systemMessage` al suspender o agotar los reintentos (stdout vacío al bloquear).
 - Integración en F3.6 con una sesión real (E-015, con la versión 0.2.0: 3 bloqueos y después deja parar). Hallazgo H-1 (rojo intencionado en TDD) → versión 0.3.0.
 
 ## 13. Métricas de eficacia, calidad, coste y latencia

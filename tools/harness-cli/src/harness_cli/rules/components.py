@@ -317,6 +317,9 @@ BROAD_SAMPLES = [
     "curl https://ejemplo.invalid", "wget https://ejemplo.invalid", "rm -rf build",
     "git reset --hard HEAD~1", "git push origin main", "gh pr merge 1", "gh api repos/o/r",
     "harness check --run-commands", "harness tasks validate --base origin/main --run-acceptance",
+    # F3.8 (D-052): si se permite git add/commit, sus formas que fuerzan o se saltan controles siguen en ask.
+    "git add -f .env", "git add . --force", "git commit -m x --no-verify", "git commit -n -m x",
+    "gh pr edit 1 --body x",
 ]
 
 

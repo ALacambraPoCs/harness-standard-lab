@@ -12,7 +12,8 @@ Contrato:
 - Límite de reintentos por sesión (MAX_BLOQUEOS, 2 por defecto) para evitar bucles, sin depender de campos
   no verificados.
 - Suspensión: una persona puede arrancar la sesión con `HARNESS_STOP_MAX=0` (p. ej. en TDD, con una prueba
-  en rojo a propósito). El hook no bloquea, pero sigue informando de lo que falla (P-5, D-045).
+  en rojo a propósito). El hook no bloquea, pero avisa a la persona de lo que falla con `systemMessage`
+  (P-5, D-045; P-11, D-051).
 
 Solo usa la biblioteca estándar (la instancia no tiene por qué tener PyYAML).
 """
@@ -39,6 +40,18 @@ def _entero(nombre: str, defecto: int) -> int:
 MAX_BLOQUEOS = _entero("HARNESS_STOP_MAX", 2)
 TIMEOUT = _entero("HARNESS_STOP_TIMEOUT", 240) or 240
 COLA = 25  # líneas de salida que se muestran al agente
+
+
+def avisar(titulo: str, fallos: list[str]) -> None:
+    """Aviso a la persona cuando el hook deja parar con verificaciones en rojo (P-11, D-051).
+
+    Con exit 0, Claude Code no muestra stderr (solo va al log de depuración); el campo JSON
+    `systemMessage` en stdout es el mecanismo documentado para mostrar un aviso al usuario.
+    El detalle completo se deja también en stderr para `claude --debug`.
+    """
+    resumen = "; ".join(f.splitlines()[0] for f in fallos)
+    print(json.dumps({"systemMessage": f"{titulo}: {resumen}"[:1000]}, ensure_ascii=False))
+    print(titulo + ".\n\n" + "\n\n".join(fallos), file=sys.stderr)
 
 
 def comando_check(manifest: Path) -> str | None:
@@ -104,14 +117,14 @@ def main() -> int:
         cont.unlink(missing_ok=True)
         return 0
     if MAX_BLOQUEOS == 0:
-        print("verificar-al-terminar suspendido (HARNESS_STOP_MAX=0): se permite parar con estas verificaciones "
-              "en rojo.\n\n" + "\n\n".join(fallos), file=sys.stderr)
+        avisar("verificar-al-terminar suspendido (HARNESS_STOP_MAX=0): se permite parar con estas verificaciones "
+               "en rojo", fallos)
         return 0
     n = int(cont.read_text() or 0) + 1 if cont.exists() else 1
     if n > MAX_BLOQUEOS:
         cont.unlink(missing_ok=True)
-        print(f"verificar-al-terminar: siguen fallando las verificaciones tras {MAX_BLOQUEOS} intentos; "
-              "se permite parar. Informa a la persona responsable de lo que falla.", file=sys.stderr)
+        avisar(f"verificar-al-terminar: siguen fallando las verificaciones tras {MAX_BLOQUEOS} intentos; "
+               "se permite parar. Revisa lo que falla antes de dar el trabajo por bueno", fallos)
         return 0
     cont.write_text(str(n))
     print("No des el trabajo por terminado: estas verificaciones fallan "

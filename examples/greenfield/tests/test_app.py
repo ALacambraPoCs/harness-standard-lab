@@ -18,6 +18,18 @@ class TotalTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "línea 2"):
             total([(1, 2.0), (3, -1.0)])
 
+    def test_descuento(self):
+        lineas = [(2, 1.5), (1, 3.0)]
+        self.assertEqual(total(lineas), 6.0)
+        self.assertEqual(total(lineas, 0), 6.0)
+        self.assertEqual(total(lineas, 10), 5.4)
+        self.assertEqual(total(lineas, 100), 0.0)
+        self.assertEqual(total([(1, 3.33)], 33), 2.23)
+        with self.assertRaises(ValueError):
+            total(lineas, -1)
+        with self.assertRaises(ValueError):
+            total(lineas, 101)
+
 
 if __name__ == "__main__":
     unittest.main()

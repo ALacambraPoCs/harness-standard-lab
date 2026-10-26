@@ -597,7 +597,7 @@ casos:
   - id: nc-allow-amplio
     base: conforming/n1-endurecido
     mutations:
-      - replace: {path: .claude/settings.json, old: "      \"Bash(harness components list)\"\n", new: "      \"Bash(harness components list)\",\n      \"Bash(python3:*)\",\n      \"Bash(git *)\"\n"}
+      - replace: {path: .claude/settings.json, old: "      \"Bash(gh pr ready *)\"\n", new: "      \"Bash(gh pr ready *)\",\n      \"Bash(python3:*)\",\n      \"Bash(git *)\"\n"}
     expect_fail: [adapter.claude.settings-allow-broad]
 
   - id: nc-allow-ejecuta-contrato
@@ -605,4 +605,12 @@ casos:
     base: conforming/n1-endurecido
     mutations:
       - replace: {path: .claude/settings.json, old: "      \"Bash(harness * --run-commands*)\",\n", new: ""}
+    expect_fail: [adapter.claude.settings-allow-broad]
+
+  - id: nc-allow-git-sin-ask-especifico
+    # F3.8 (D-052): permitir git add/commit exige ask para -f/--force y -n/--no-verify.
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .claude/settings.json, old: "      \"Bash(git add -f*)\",\n", new: ""}
+      - replace: {path: .claude/settings.json, old: "      \"Bash(git commit --no-verify*)\",\n", new: ""}
     expect_fail: [adapter.claude.settings-allow-broad]

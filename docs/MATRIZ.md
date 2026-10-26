@@ -67,7 +67,7 @@ Generada por `harness matrix`. No editar a mano.
 | HS-SEC-009 | DEBE | N1,N2,N3 | enforcement | automatica | `adapter.claude.settings-modes` | nc-settings-modos |
 | HS-SEC-010 | DEBE | N1,N2,N3 | enforcement | automatica | `adapter.claude.settings-automode` | nc-modo-automatico-permitido |
 | HS-SEC-011 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-gh` | nc-gh-sin-control |
-| HS-SEC-012 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-allow-broad` | nc-allow-amplio<br>nc-allow-ejecuta-contrato |
+| HS-SEC-012 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-allow-broad` | nc-allow-amplio<br>nc-allow-ejecuta-contrato<br>nc-allow-git-sin-ask-especifico |
 | HS-CI-004 | DEBE | N1,N2,N3 | enforcement | automatica | `core.ci.agent-bare` | nc-agente-ci-sin-bare |
 | HS-CMP-010 | DEBE | — | enforcement | automatica | `catalog.entry` | test_catalog.py |
 | HS-CMP-011 | DEBE | — | enforcement | automatica | `catalog.ficha` | test_catalog.py |
@@ -165,6 +165,7 @@ Generada por `harness matrix`. No editar a mano.
 | nc-gh-sin-control | ✅ | ok |
 | nc-allow-amplio | ✅ | ok |
 | nc-allow-ejecuta-contrato | ✅ | ok |
+| nc-allow-git-sin-ask-especifico | ✅ | ok |
 
 ## Incidencias
 

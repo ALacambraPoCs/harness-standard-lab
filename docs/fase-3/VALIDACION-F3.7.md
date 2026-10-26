@@ -1,7 +1,7 @@
 ---
 documento: F3-VALIDACION-F3.7
 titulo: Validación de la F3.7 en el laboratorio
-estado: propuesto
+estado: aceptada (D-047)
 fecha: 2026-10-24
 guia: GUIA-F3.7-VALIDACION.md
 ---
@@ -65,3 +65,5 @@ Los controles nuevos (`disableAutoMode`, reglas de `gh`, `ask` de las opciones q
 2. **`gh pr edit`**, que no funciona en este repositorio y del que la skill depende para el cuerpo del PR.
 
 Las dos cosas se corrigen en la skill y en el verificador, sin tocar la seguridad. Propuestas P-8…P-12 en el REGISTRO.
+
+**Resultado:** P-8…P-12 aprobadas como D-048…D-052 e implementadas en F3.8.

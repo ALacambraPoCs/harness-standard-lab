@@ -47,3 +47,16 @@ def test_informe_literal_entre_marcas():
     bloque = m.group(1)
     assert bloque.startswith("VERIFICACIÓN") and "\nRESULTADO: " in bloque
     assert "**solo** este bloque" in body
+
+
+ENVOLTORIOS = re.compile(r"`[^`]*(\$\?|\|\s*tail|&&|<<|command -v)[^`]*`")
+
+
+def test_sin_envoltorios_en_los_comandos_citados():
+    """P-8 (D-048): el prompt no enseña comandos compuestos ni envoltorios, y explica por qué evitarlos."""
+    body = SRC.read_text(encoding="utf-8")
+    regla = body[body.index("## Cómo ejecutar comandos"):body.index("## Informe")]
+    resto = body.replace(regla, "")
+    assert not ENVOLTORIOS.search(resto), ENVOLTORIOS.search(resto)
+    for frase in ("Un comando por llamada", "Sin envoltorios", "Sin encadenar"):
+        assert frase in regla

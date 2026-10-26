@@ -16,7 +16,7 @@ VALUES = {
     "{{OWNER}}": "@org/demo", "{{KIND}}": "service", "{{DOCS_LANGUAGE}}": "es", "{{DATE}}": "2026-10-21",
     "{{SETUP}}": "python3 -c pass", "{{CHECK}}": "python3 -c pass", "{{TEST}}": "python3 -c pass",
     "{{HARNESS_OWNERS}}": "@org/harness-owners", "{{SECURITY_OWNERS}}": "@org/security",
-    "{{PLATFORM_OWNERS}}": "@org/platform", "{{CLI_REF}}": "cli-v0.5.0-rc.1", "{{STANDARD_REPO}}": "org/harness-standard",
+    "{{PLATFORM_OWNERS}}": "@org/platform", "{{CLI_REF}}": "cli-v0.5.1-rc.1", "{{STANDARD_REPO}}": "org/harness-standard",
 }
 
 
@@ -108,6 +108,21 @@ EFECTOS = {
     "harness check --strict": "allow",
     "harness tasks close T-0001 --pr 7": "allow",
     "harness components list": "allow",
+    # F3.8 (D-052)
+    "git add src/app.py": "allow",
+    "git commit -m \"T-0001: cerrar la tarea\"": "allow",
+    "git add -f .env": "ask",
+    "git add docs --force": "ask",
+    "git commit -m x --no-verify": "ask",
+    "git commit -n -m x": "ask",
+    "git commit -m x -n": "ask",
+    "git add --force .env": "ask",
+    "git push -u origin rama": "ask",
+    "gh pr view 7": "allow",
+    "gh pr create --draft --title x --body-file cuerpo.md": "allow",
+    "gh pr ready 7": "allow",
+    "gh pr merge 7": "ask",
+    "gh pr edit 7 --body-file cuerpo.md": "ask",
 }
 
 

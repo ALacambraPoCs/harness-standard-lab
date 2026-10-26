@@ -4,6 +4,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 3 (cerrada, D-040) y F3.7
 
+### Cambiado (F3.8, 2026-10-26) — CLI 0.5.1rc1, estándar 0.5.0 sin cambios de requisitos
+Ajustes por la validación de la F3.7 en el laboratorio (D-047…D-052):
+- `cerrar-tarea` 0.3.0: cuerpo del PR desde la plantilla **antes** de abrirlo y `gh pr create --body-file`; nunca `gh pr edit` (D-049); sección «Cómo ejecutar comandos» (un comando por llamada, sin `; echo $?`, `| tail` ni `&&`, D-048); commit vacío si la rama no tiene commits (D-050). 4 pruebas nuevas.
+- `verificador` 0.3.0: las mismas reglas de comandos; no repite `test` ni criterios iguales a `check`; sin `command -v` ni `date` (D-048).
+- `verificar-al-terminar` 0.3.1: avisa con `systemMessage` (JSON en stdout, exit 0) al suspenderse o agotar los reintentos, porque Claude Code no muestra el stderr de un hook que termina con 0 (D-051). 3 pruebas nuevas.
+- Plantilla `settings.json` (D-052): `allow` para `git add`, `git commit`, `gh pr view|create|ready`; `ask` para `git add -f/--force`, `git commit -n/--no-verify` y `gh pr edit`. HS-SEC-012 comprueba esas formas y un caso nuevo lo cubre.
+- Guía: la tarea se cierra en el PR que la completa; una validación posterior es otra tarea (ficha `plans.dir` y plantilla de tarea, D-050).
+- Workflows reutilizables a `cli-v0.5.1-rc.1`. `tests/test_distribucion.py` sin versiones fijas.
+
 ### Añadido (F3.7, 2026-10-23) — estándar 0.5.0 (sin publicar)
 - Requisitos aprobados `desde: 0.5.0` (D-041…D-043), con sus reglas:
   - HS-SEC-010 (DEBE) `adapter.claude.settings-automode`: `disableAutoMode: "disable"`;

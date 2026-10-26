@@ -37,7 +37,7 @@ Qué cambia para quién y cómo se nota. Sin jerga sin definir.
 
 <!-- harness:plan -->
 ## Plan
-Pasos concretos, en orden. Comandos exactos cuando proceda.
+Pasos concretos, en orden. Comandos exactos cuando proceda. La tarea se cierra en el PR que la completa: si después hace falta validar algo más, crea otra tarea.
 
 <!-- harness:progreso -->
 ## Progreso

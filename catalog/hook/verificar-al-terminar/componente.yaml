@@ -1,6 +1,6 @@
 id: verificar-al-terminar
 tipo: hook
-version: 0.3.0
+version: 0.3.1
 estado: experimental
 titulo: No dar el trabajo por terminado si check o las tareas fallan
 proposito: >-
@@ -20,6 +20,7 @@ contrato:
   salidas:
     - "Exit 0: el agente puede parar"
     - "Exit 2 con el resumen de errores en stderr: el agente continúa"
+    - "Exit 0 con {\"systemMessage\": …} en stdout si deja parar con verificaciones en rojo (suspendido o reintentos agotados): aviso a la persona"
   efectos:
     - "Escribe un contador por sesión en el directorio temporal del sistema (no en el repositorio)"
 permisos:
@@ -46,7 +47,7 @@ configuracion:
               timeout: 300
 pruebas:
   - tipo: unitaria
-    descripcion: "check en verde y en rojo, límite por defecto (2) y configurable, suspensión con HARNESS_STOP_MAX=0, valor inválido, reinicio del contador, manifiesto ausente, check entre comillas, tareas inválidas"
+    descripcion: "check en verde y en rojo, límite por defecto (2) y configurable, suspensión con HARNESS_STOP_MAX=0, systemMessage al suspender o agotar, valor inválido, reinicio del contador, manifiesto ausente, check entre comillas, tareas inválidas"
     comando: "python -m pytest catalog/hook/verificar-al-terminar/tests"
   - tipo: integracion
     descripcion: "Sesión real de Claude Code en harness-example-greenfield (F3.6, E-015): el agente no puede terminar con check en rojo"

@@ -3,46 +3,46 @@
   "componentes": {
     "cerrar-tarea": {
       "tipo": "skill",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "estado": "experimental",
       "origen": {
         "estandar": "0.5.0",
-        "cli": "0.5.0rc1"
+        "cli": "0.5.1rc1"
       },
       "archivos": [
         {
           "destino": ".claude/skills/cerrar-tarea/SKILL.md",
-          "sha256": "960db24803330d5c01443fea8521e60aeba56bf899f4bb58e5cd185dda9cf525"
+          "sha256": "77d9f90e78ab0152660902ae350cd05496ab2ab42f25ef83be51a20f57df163b"
         }
       ]
     },
     "verificador": {
       "tipo": "subagente",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "estado": "experimental",
       "origen": {
         "estandar": "0.5.0",
-        "cli": "0.5.0rc1"
+        "cli": "0.5.1rc1"
       },
       "archivos": [
         {
           "destino": ".claude/agents/verificador.md",
-          "sha256": "93a935d8d17bacfbed4193627827ae69d7e129c14b5c93ff49f52bbf334ea156"
+          "sha256": "06b0b6500f1c09e0f85a431ae0fa6fac51985a192460bbdac5517c3e18dfba00"
         }
       ]
     },
     "verificar-al-terminar": {
       "tipo": "hook",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "estado": "experimental",
       "origen": {
         "estandar": "0.5.0",
-        "cli": "0.5.0rc1"
+        "cli": "0.5.1rc1"
       },
       "archivos": [
         {
           "destino": ".claude/hooks/verificar_al_terminar.py",
-          "sha256": "cc3b0802302a873662a195be016dc99ea1641411098b5a5afd27c68d8938008a"
+          "sha256": "a13d0089897b36f3a73023a6d1ea796a1a6da680811581f5464af0102d3e89e4"
         }
       ],
       "claude_settings": {

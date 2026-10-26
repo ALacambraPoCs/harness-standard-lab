@@ -52,6 +52,8 @@ RESULTADO: NO LISTO (AC1 y test fallan)
 <!-- verificador:fin -->
 ```
 
+Desde la versión 0.3.0 (P-8, D-048) ejecuta cada comando por separado y sin envoltorios (`; echo $?`, `| tail`, `command -v`), y no repite `test` ni criterios idénticos a `check`. En la validación de la F3.7 (H-12) esos envoltorios hicieron que comandos permitidos pidieran confirmación (4 de 7 en las dos ejecuciones).
+
 Desde la versión 0.2.0 (P-6, D-046) el informe va entre las marcas `verificador:inicio` y `verificador:fin`, y es lo único que devuelve el subagente. En la F3.6 (H-3) el agente principal resumía el informe; con las marcas, la skill `cerrar-tarea` lo copia literal. Que la copia sea literal sigue siendo L1: la autoridad es la CI.
 
 ## 9. Integración con el resto del harness
@@ -74,7 +76,8 @@ Desde la versión 0.2.0 (P-6, D-046) el informe va entre las marcas `verificador
 ## 12. Estrategia de pruebas y verificación
 - **Unitarias:** frontmatter, ausencia de herramientas de escritura e instrucciones obligatorias.
 - **Unitaria (0.2.0):** el ejemplo de informe está entre las marcas y tiene `RESULTADO`.
-- **Evaluación (F3.6, E-016):** caso LISTO real, coincidente con la CI. Pendiente: un caso NO LISTO real y comprobar que el bloque llega literal al PR.
+- **Unitaria (0.3.0):** el prompt no cita comandos con envoltorios ni compuestos y contiene la sección «Cómo ejecutar comandos».
+- **Evaluación (F3.6, E-016):** caso LISTO real, coincidente con la CI. Validación F3.7 (E-023): el bloque llegó literal al cuerpo de los PR #14 y #15. Pendiente: un caso NO LISTO real.
 
 ## 13. Métricas de eficacia, calidad, coste y latencia
 Ver `metricas` y `coste`. Umbral de retirada: coincidencia con la CI por debajo del 95 %.

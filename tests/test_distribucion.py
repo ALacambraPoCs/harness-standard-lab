@@ -131,9 +131,9 @@ def test_crlf_no_es_deriva(std, inst):
 
 def test_listado(std, inst):
     D.add(inst, std, ["verificador"])
-    bump(std, "verificador", "0.3.0")
+    bump(std, "verificador", "9.9.9")
     rows = "\n".join(D.listado(inst, std))
-    assert "desactualizado (catálogo 0.3.0)" in rows and "cerrar-tarea" in rows and "disponible" in rows
+    assert "desactualizado (catálogo 9.9.9)" in rows and "cerrar-tarea" in rows and "disponible" in rows
 
 
 def test_catalogo_viaja_en_el_paquete():

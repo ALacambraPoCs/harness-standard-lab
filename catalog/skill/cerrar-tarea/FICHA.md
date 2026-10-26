@@ -31,7 +31,12 @@ Cero fallos de forma en los PR de cierre y un solo push hasta tener la CI de tar
   - para cancelar una tarea, que es otra transición (`cancelled`).
 
 ## 6. Arquitectura y funcionamiento
-El agente carga la skill por su descripción cuando la tarea está lista. La skill le guía en 5 pasos y se apoya en la CLI (`harness tasks close`, `tasks validate`, `pr check`) y en el subagente `verificador` si existe. Desde la versión 0.2.0 (P-4, D-044) la transición a `done` la hace `harness tasks close`, de forma determinista; la skill solo ordena los pasos: abrir el PR, cerrar con la CLI, pegar la evidencia y verificar.
+El agente carga la skill por su descripción cuando la tarea está lista. La skill le guía en 6 pasos y se apoya en la CLI (`harness tasks close`, `tasks validate`, `pr check`) y en el subagente `verificador` si existe. Desde la versión 0.2.0 (P-4, D-044) la transición a `done` la hace `harness tasks close`, de forma determinista; la skill solo ordena los pasos: abrir el PR, cerrar con la CLI, pegar la evidencia y verificar.
+
+**Cambios de la 0.3.0** (validación de la F3.7, D-048…D-050):
+- El cuerpo del PR se escribe **antes** de abrirlo, desde la plantilla y conservando sus etiquetas, y se pasa a `gh pr create --body-file`. La skill no usa `gh pr edit`, que falló en los PR #14 y #15 sin que el agente lo detectara (H-13, H-16).
+- Sección «Cómo ejecutar comandos»: un comando por llamada, sin `; echo $?`, `| tail` ni `&&` (H-12, H-15).
+- Si la rama no tiene commits (tarea que solo se cierra), commit vacío para poder abrir el PR (H-14).
 
 ## 7. Implementación paso a paso
 1. Copiar `src/SKILL.md` a `.claude/skills/cerrar-tarea/SKILL.md` (ADR-012).

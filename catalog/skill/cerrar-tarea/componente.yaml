@@ -1,12 +1,13 @@
 id: cerrar-tarea
 tipo: skill
-version: 0.2.0
+version: 0.3.0
 estado: experimental
 titulo: Cerrar una tarea en el PR que la completa (ADR-016)
 proposito: >-
-  Procedimiento para que el agente cierre una tarea sin errores de forma: abrir el PR para conocer su
-  número, cerrar la tarea con `harness tasks close` (determinista), pegar literal la evidencia del
-  verificador, enlazar la issue y verificar en local con los mismos comandos que la CI.
+  Procedimiento para que el agente cierre una tarea sin errores de forma: escribir el cuerpo del PR desde
+  la plantilla (con la evidencia literal del verificador y Closes #n), abrir el PR ya con ese cuerpo para
+  conocer su número, cerrar la tarea con `harness tasks close` (determinista) y verificar en local con los
+  mismos comandos que la CI. Un comando por llamada, sin envoltorios.
 propietario: "@AlbertoLacambra"
 compatibilidad:
   adaptadores: [claude-code]
@@ -38,10 +39,10 @@ archivos:
 dependencias: [verificador]
 pruebas:
   - tipo: unitaria
-    descripcion: "Especificación de Agent Skills y perfil portable; cada comando harness citado lo acepta la CLI real (opciones incluidas); cubre los errores de la CI; usa tasks close tras abrir el PR; evidencia literal"
+    descripcion: "Especificación de Agent Skills y perfil portable; cada comando harness citado lo acepta la CLI real (opciones incluidas); cubre los errores de la CI; usa tasks close tras abrir el PR; evidencia literal; cuerpo antes de abrir el PR y sin gh pr edit; comandos sin envoltorios; commit vacío si la rama no tiene commits"
     comando: "python -m pytest catalog/skill/cerrar-tarea/tests"
   - tipo: eval
-    descripcion: "F3.6 (0.1.0): PR #10 en verde al primer push (E-017) y T-0003 en el segundo (H-8). Pendiente con la 0.2.0"
+    descripcion: "F3.6 (0.1.0): PR #10 en verde al primer push (E-017) y T-0003 en el segundo (H-8). Validación F3.7 (0.2.0): orden y evidencia correctos, pero gh pr edit falló en #14 y #15 (H-13). Pendiente con la 0.3.0"
 metricas:
   - "Fallos de la CI por tasks.done-pr, tasks.index o pr.issue en PR de cierre (objetivo: 0)"
   - "Pushes necesarios hasta tener harness tasks en verde en el PR de cierre"

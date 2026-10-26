@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-24 (F3.7 fusionada y validada en el laboratorio; E-020…E-024)
+actualizado: 2026-10-26 (F3.8: D-047…D-052)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -78,14 +78,19 @@ actualizado: 2026-10-24 (F3.7 fusionada y validada en el laboratorio; E-020…E-
 | D-044 | **P-4 aprobada:** `harness tasks close T-NNNN --pr N` (transición determinista) y skill `cerrar-tarea` 0.2.0 que lo usa; `gh` opcional. | 2026-10-23 | Usuario |
 | D-045 | **P-5 aprobada:** hook `verificar-al-terminar` 0.3.0 con límite 2 y suspensión con `HARNESS_STOP_MAX=0`. | 2026-10-23 | Usuario |
 | D-046 | **P-6 aprobada:** verificador 0.2.0 con informe literal entre marcas; la skill lo copia en `harness:evidencia` y no pide confirmación propia antes del push. | 2026-10-23 | Usuario |
+| D-047 | **Validación de la F3.7 aceptada** (`fase-3/VALIDACION-F3.7.md`, E-020…E-024). | 2026-10-26 | Usuario |
+| D-048 | **P-8 aprobada:** skill y verificador ejecutan un comando por llamada, sin envoltorios (`; echo $?`, `\| tail`, `command -v`) ni encadenados; el verificador no repite comandos (H-12, H-15). | 2026-10-26 | Usuario |
+| D-049 | **P-9 aprobada:** cuerpo del PR escrito desde la plantilla antes de abrirlo y `gh pr create --body-file`; la skill no usa `gh pr edit` (H-13, H-16). | 2026-10-26 | Usuario |
+| D-050 | **P-10 aprobada:** cerrar la tarea en el PR que la completa (guía) y commit vacío en la skill si la rama no tiene commits (H-14). | 2026-10-26 | Usuario |
+| D-051 | **P-11 aprobada:** el hook avisa con `systemMessage` al suspenderse o agotar reintentos; ficha corregida (H-11). | 2026-10-26 | Usuario |
+| D-052 | **P-12 aprobada:** `allow` para `git add`, `git commit`, `gh pr view|create|ready`, con `ask` para `-f/--force`, `-n/--no-verify` y `gh pr edit`. | 2026-10-26 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **Validación de la F3.7** (`fase-3/VALIDACION-F3.7.md`): aceptar el resultado.
-- **Propuestas por hallazgos de la validación** (se deciden una a una): P-8 forma de los comandos en skill y verificador (H-12, H-15); P-9 cuerpo del PR al crearlo, sin `gh pr edit` (H-13, H-16); P-10 tareas que solo se cierran (H-14); P-11 corregir la ficha del hook (H-11); P-12 `allow` para `git commit` y `gh pr create|view|ready`.
-- **Siguiente fase:** F4 (segmentación y concurrencia; requiere un repositorio brownfield, Q-09) o F5 (CI/CD y seguridad; incluye el modo automático y `claude-code-action`).
+- **F3.8** (D-047…D-052; CLI 0.5.1rc1): pendiente de revisión y fusión.
+- **Plan de la F5** (CI/CD y seguridad): por proponer.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -129,7 +134,7 @@ actualizado: 2026-10-24 (F3.7 fusionada y validada en el laboratorio; E-020…E-
 
 ## Próximos pasos
 
-1. **Usuario:** aceptar la validación de la F3.7 y decidir P-8…P-12 una a una. Después, plan de la F5 (recomendada por encima de la F4).
+1. **Usuario:** fusionar la F3.8 y publicar `cli-v0.5.1-rc.1`. Después, revisar el plan de la F5. Comprobación pendiente en el laboratorio (se puede hacer al inicio de la F5): que `Stop` muestra `systemMessage` y un cierre completo con ≤ 4 confirmaciones.
 2. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 3. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

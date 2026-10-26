@@ -29,6 +29,7 @@ Principio rector (encargo, ADR-015): **ningún componente entra por defecto**. C
 | **F3.5** ✅ (D-039) | Distribución | Cómo llega un componente del catálogo central a una instancia: copia versionada (`harness sync`) frente a plugin y marketplace interno (`enabledPlugins`). Prototipo de la opción elegida | F3.4 |
 | **F3.6** ✅ (D-040) | Prueba en el laboratorio | `harness-example-greenfield` instala los 3 componentes y se ejecuta una tarea real (T-0003) con Claude Code. Evidencias: el hook pide confirmación, el verificador informa, la skill cierra la tarea y la CI lo verifica | F3.5 |
 | **F3.7** ✅ (PR #16; validada, `VALIDACION-F3.7.md`) | Ajustes por hallazgos | P-1…P-6 del `INFORME.md` (D-041…D-046): `disableAutoMode`, reglas `gh`, `allow` acotados, `harness tasks close`, hook 0.3.0, verificador y skill 0.2.0. Estándar 0.5.0 | F3.6 |
+| **F3.8** | Ajustes por la validación | P-8…P-12 (D-048…D-052): forma de los comandos, cuerpo del PR sin `gh pr edit`, tareas que solo se cierran, `systemMessage` en el hook y `allow` para `git add/commit` y `gh pr view/create/ready`. CLI 0.5.1rc1 | F3.7 |
 
 ## Decisiones que se tomarán (una a una, cuando toque)
 

@@ -1,7 +1,7 @@
 # Registro de requisitos del Estándar de Harness.
 # Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
 # Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
-version_estandar: 0.6.0
+version_estandar: 0.7.0
 # Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
 niveles_definidos: [N0, N1]
 # Versión del estándar desde la que existe cada nivel (D-029). N1 exige declarar `standard.version` ≥ 0.2.0.
@@ -1104,6 +1104,54 @@ requisitos:
     estado: aprobado
     desde: 0.6.0
     retirada: Si la plataforma ofrece una clasificación de riesgo equivalente y comprobable.
+
+  - id: HS-CI-006
+    titulo: La configuración real de la plataforma se comprueba de forma periódica
+    texto: 'La instancia DEBE ejecutar `harness platform check` al menos semanalmente y en cada push a la rama por defecto, y DEBE corregir los fallos: PR obligatorio (N1+), checks requeridos del nivel, sin force push ni borrado, environment de la puerta de riesgo alto con revisores (0.6.0+) y, en N2+, aprobaciones, Code Owners y aprobación del último push por otra persona.'
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: semiautomatica
+    verificacion_manual: Que el workflow programado `harness-platform.yml` está activo y que sus fallos se corrigen (la issue «harness platform check falla» no queda abierta).
+    exentable: false
+    reglas: [platform.reachable, platform.pull-request, platform.required-checks, platform.no-force-push, platform.no-deletion, platform.approvals, platform.gate-environment, platform.deploy-environment]
+    fuentes: [ADR-010, D-062, F5-01]
+    nota: Solo lee la API de GitHub (sin token en repositorios públicos). No se ejecuta en los PR. La plantilla N1 incluye el workflow programado `harness-platform.yml`.
+    estado: aprobado
+    desde: 0.7.0
+    retirada: Si la plataforma se gestiona como código con verificación equivalente (p. ej. IaC con plan en CI).
+
+  - id: HS-CI-007
+    titulo: Los workflows no abren vías de ejecución con privilegios
+    texto: 'Los workflows de la instancia NO DEBEN usar `pull_request_target` (salvo waiver con ADR), NO DEBEN interpolar datos del evento controlados por terceros en `run:` o `script:`, DEBEN declarar `permissions:` de nivel superior sin escritura global, y un job con credenciales del modelo NO DEBE tener permisos de escritura (salvo `id-token`).'
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: true
+    reglas: [ci.no-pr-target, ci.no-untrusted-interpolation, ci.permissions, ci.model-readonly]
+    fuentes: [ADR-013, D-063, F5-01]
+    nota: Reglas estáticas sobre el YAML; reducen el riesgo de V2, V3 y V12, no son prueba formal. Linters externos (zizmor, actionlint) son un complemento opcional.
+    estado: aprobado
+    desde: 0.7.0
+    retirada: Si GitHub impone estas restricciones por política de organización comprobable.
+
+  - id: HS-CI-008
+    titulo: Dependencias de workflows fijadas y compatibles con merge queue
+    texto: 'Las actions y workflows reutilizables de terceros DEBERÍAN fijarse a un SHA completo (los del estándar, a un tag `cli-v…`) y los workflows que se ejecutan en `pull_request` DEBERÍAN ejecutarse también en `merge_group`.'
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [ci.pinned, ci.merge-group]
+    fuentes: [D-063, F5-01]
+    estado: aprobado
+    desde: 0.7.0
+    retirada: Si se adoptan los lockfiles de dependencias de workflows de GitHub (pendiente de verificar su formato).
   - id: HS-CMP-010
     titulo: Las entradas del catálogo son válidas y coherentes
     texto: Cada componente del catálogo central DEBE tener `componente.yaml` válido contra `schemas/catalog-entry.schema.json`, con `id` y `tipo` iguales a su ruta `catalog/<tipo>/<id>/` y con archivos de origen existentes.

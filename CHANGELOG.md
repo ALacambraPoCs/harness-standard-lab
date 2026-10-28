@@ -4,6 +4,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 5
 
+### Añadido (F5.3, 2026-10-28) — estándar 0.7.0, CLI 0.7.0rc1
+- `harness platform check [--repo] [--branch]` (`platform.py`, D-062): compara el ruleset de la rama por defecto y los environments (puerta de riesgo alto, despliegue) con lo que exige el nivel. Solo lee; sin token en repos públicos. Reglas `platform.*` y requisito **HS-CI-006**.
+- Workflow reutilizable `harness-platform.yml` (programado y en push a `main`; abre o comenta una issue si falla) y plantilla N1.
+- Reglas de seguridad de workflows en `harness check` (`rules/ci.py`, D-063): **HS-CI-007** (DEBE: `ci.no-pr-target`, `ci.no-untrusted-interpolation`, `ci.permissions`, `ci.model-readonly`) y **HS-CI-008** (DEBERÍA: `ci.pinned`, `ci.merge-group`).
+- `standard/plataforma/`: rulesets de referencia N1 y N2, ruleset de tags `cli-v*` del estándar y guía del environment de la puerta.
+- Manifiesto: `plataforma.checks_requeridos`, `plataforma.entorno_puerta`, `plataforma.entorno_despliegue`.
+
 ### Añadido (F5.1–F5.2, 2026-10-26) — estándar 0.6.0, CLI 0.6.0rc1
 - `docs/fase-5/`: plan (D-053), verificación de fuentes de GitHub y Claude Code y modelo de amenazas (D-057), riesgo, escalado y autorización (D-058…D-060).
 - ADR-010 rev. 2 aprobado: revisión de agentes informativa, autorización por ruleset y puerta explícita de riesgo alto (environment con revisores).

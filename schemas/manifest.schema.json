@@ -108,6 +108,16 @@
         "acceptance_timeout": { "type": "integer", "minimum": 10, "maximum": 3600, "description": "Segundos por criterio de aceptación en CI (600 por defecto)." }
       }
     },
+    "plataforma": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Lo que comprueba `harness platform check` (F5.3-A, HS-CI-006).",
+      "properties": {
+        "checks_requeridos": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Nombres de job de los checks requeridos; sustituye a los del nivel." },
+        "entorno_puerta": { "type": "string", "minLength": 1, "description": "Environment de la puerta de riesgo alto (por defecto aprobacion-riesgo-alto)." },
+        "entorno_despliegue": { "type": "string", "minLength": 1, "description": "Environment de despliegue a producción (F5.6)." }
+      }
+    },
     "riesgo": {
       "type": "object",
       "additionalProperties": false,

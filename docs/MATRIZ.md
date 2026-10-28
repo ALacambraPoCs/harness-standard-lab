@@ -70,6 +70,9 @@ Generada por `harness matrix`. No editar a mano.
 | HS-SEC-012 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-allow-broad` | nc-allow-amplio<br>nc-allow-ejecuta-contrato<br>nc-allow-git-sin-ask-especifico |
 | HS-CI-004 | DEBE | N1,N2,N3 | enforcement | automatica | `core.ci.agent-bare` | nc-agente-ci-sin-bare |
 | HS-CI-005 | DEBE | N1,N2,N3 | enforcement | automatica | `pr.risk-min` | test_tasks.py |
+| HS-CI-006 | DEBE | N1,N2,N3 | enforcement | semiautomatica | `platform.reachable`<br>`platform.pull-request`<br>`platform.required-checks`<br>`platform.no-force-push`<br>`platform.no-deletion`<br>`platform.approvals`<br>`platform.gate-environment`<br>`platform.deploy-environment` | test_platform.py |
+| HS-CI-007 | DEBE | N1,N2,N3 | enforcement | automatica | `ci.no-pr-target`<br>`ci.no-untrusted-interpolation`<br>`ci.permissions`<br>`ci.model-readonly` | nc-interpolacion-no-confiable<br>nc-modelo-con-escritura<br>nc-pull-request-target<br>nc-workflow-sin-permissions |
+| HS-CI-008 | DEBERÍA | N1,N2,N3 | guidance | automatica | `ci.pinned`<br>`ci.merge-group` | nc-action-sin-sha-y-sin-merge-group |
 | HS-CMP-010 | DEBE | — | enforcement | automatica | `catalog.entry` | test_catalog.py |
 | HS-CMP-011 | DEBE | — | enforcement | automatica | `catalog.ficha` | test_catalog.py |
 | HS-CMP-012 | DEBE | — | enforcement | automatica | `catalog.skill` | test_catalog.py |
@@ -167,6 +170,12 @@ Generada por `harness matrix`. No editar a mano.
 | nc-allow-amplio | ✅ | ok |
 | nc-allow-ejecuta-contrato | ✅ | ok |
 | nc-allow-git-sin-ask-especifico | ✅ | ok |
+| c-n1-workflows-0.7 | ✅ | conforme |
+| nc-pull-request-target | ✅ | ok |
+| nc-interpolacion-no-confiable | ✅ | ok |
+| nc-workflow-sin-permissions | ✅ | ok |
+| nc-modelo-con-escritura | ✅ | ok |
+| nc-action-sin-sha-y-sin-merge-group | ✅ | ok |
 
 ## Incidencias
 

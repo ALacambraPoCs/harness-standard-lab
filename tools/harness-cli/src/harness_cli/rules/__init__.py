@@ -21,7 +21,7 @@ class Rule:
     needs_commands: bool = False
     platform: str | None = None
     doc: str = ""
-    context: str = "check"   # check: harness check · pr: solo con base del PR (tasks validate --base, pr check)
+    context: str = "check"   # check: harness check · pr: solo con base del PR · catalog: repo central · platform: harness platform check
 
 
 REGISTRY: dict[str, Rule] = {}
@@ -39,5 +39,5 @@ def rule(rule_id: str, requirements: Iterable[str], *, needs_valid_manifest: boo
 
 
 def load_all() -> dict[str, Rule]:
-    from . import catalog, claude, components, core, github, lifecycle, n1  # noqa: F401  (registran sus reglas al importarse)
+    from . import catalog, ci, claude, components, core, github, lifecycle, n1, platform  # noqa: F401  (registran sus reglas al importarse)
     return REGISTRY

@@ -32,7 +32,9 @@ def run_check(root: Path, *, standard: Standard | None = None, today: dt.date | 
             continue
         if rule.context != "check":
             result.rules_skipped[rule.id] = ("se verifica en el PR (harness tasks validate --base / harness pr check)"
-                                             if rule.context == "pr" else "se verifica en el repositorio central (harness catalog validate)")
+                                             if rule.context == "pr" else
+                                             "se verifica contra la plataforma (harness platform check)" if rule.context == "platform" else
+                                             "se verifica en el repositorio central (harness catalog validate)")
             continue
         if rule.needs_valid_manifest and not ctx.manifest_valid:
             result.rules_skipped[rule.id] = "manifiesto ausente o inválido (ver core.manifest.valid)"

@@ -6,8 +6,8 @@ version: 0.1.0
 consumidores: [plataforma, cli, personas]
 dependencias: [manifest, codeowners, pr.template, plans.active]
 propietario: Equipo de plataforma/harness (y seguridad para los cambios de permisos)
-requisitos: [HS-GOV-004, HS-CI-003, HS-CI-004, HS-CI-005]
-reglas: [core.ci.agent-bare]
+requisitos: [HS-GOV-004, HS-CI-003, HS-CI-004, HS-CI-005, HS-CI-006, HS-CI-007, HS-CI-008]
+reglas: [core.ci.agent-bare, ci.no-pr-target, ci.no-untrusted-interpolation, ci.permissions, ci.model-readonly, ci.pinned, ci.merge-group]
 ejemplo_canonico: template/niveles/n1/.github/workflows/harness-tasks.yml
 fuentes: [S-GH, ADR-009, ADR-010, ADR-013, ADR-016, D-058, D-060, F5-01]
 evolucion: >-
@@ -29,6 +29,7 @@ Concentrar la **autoridad L4** del harness: los checks que deciden si un PR se p
 | `harness.yml` → `harness-conformance.yml` | N0 | `harness check` de la instancia | `harness / conformance / harness check` | HS-GOV-004 |
 | `harness-tasks.yml` → `harness-tasks-lifecycle.yml` | N1 | Tareas y transiciones, aceptación de las que pasan a `done` (ADR-016), cuerpo del PR contra el diff, clase de riesgo calculada (D-058) e índice | `tasks / harness tasks` | HS-CI-003, HS-CI-005 |
 | Ídem, job `puerta-riesgo-alto` | N1 | Solo si la clase es `alto`: espera la aprobación en el environment `aprobacion-riesgo-alto`. Si no, se salta y cuenta como éxito | `tasks / puerta riesgo alto` | ADR-010 rev. 2 |
+| `harness-platform.yml` → `harness-platform.yml` | N1 (0.7.0+) | `harness platform check` semanal y en cada push a la rama por defecto; si falla, abre o comenta una issue. **No es check de PR** | — (programado) | HS-CI-006 |
 
 Reglas de forma para cualquier workflow de la instancia:
 - `permissions:` a nivel de workflow con `contents: read`, y ampliación **por job** solo de lo que usa (G8: un workflow reutilizable no puede ampliar lo que le da quien lo llama).
@@ -53,7 +54,7 @@ Reglas de forma para cualquier workflow de la instancia:
 
 ## Ejemplo canónico
 
-`template/adapters/github/.github/workflows/harness.yml` (N0) y `template/niveles/n1/.github/workflows/harness-tasks.yml` (N1).
+`template/adapters/github/.github/workflows/harness.yml` (N0), `template/niveles/n1/.github/workflows/harness-tasks.yml` y `harness-platform.yml` (N1).
 
 ## Validaciones
 
@@ -61,8 +62,9 @@ Reglas de forma para cualquier workflow de la instancia:
 |---|---|---|
 | Existen los workflows del nivel | L4 (`harness check`) | Vigente |
 | `claude -p` con `--bare --setting-sources user` | L4 (`core.ci.agent-bare`) | Vigente desde 0.3.0 |
-| Permisos mínimos, sin `pull_request_target`, `merge_group` y SHA fijados | L4 | Pendiente (F5.3) |
-| Los checks requeridos y el environment de la puerta existen y están protegidos | L5 vía API (`harness platform check`) | Pendiente (F5.3) |
+| Sin `pull_request_target`, sin interpolación no confiable, `permissions:` en lectura, modelo sin escritura | L4 (`ci.*`, HS-CI-007) | Vigente desde 0.7.0 |
+| Actions fijadas a SHA y `merge_group` | L4 (`ci.pinned`, `ci.merge-group`, HS-CI-008) | Vigente desde 0.7.0 |
+| Los checks requeridos y el environment de la puerta existen y están protegidos | L5 vía API (`harness platform check`, HS-CI-006) | Vigente desde 0.7.0; plantillas en `standard/plataforma/` |
 
 ## Criterios de aceptación
 

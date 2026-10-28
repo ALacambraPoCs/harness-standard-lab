@@ -2,6 +2,18 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Hay dos líneas de versión: **standard** (A) y **cli** (B).
 
+## [Sin publicar] — Fase 5
+
+### Añadido (F5.1–F5.2, 2026-10-26) — estándar 0.6.0, CLI 0.6.0rc1
+- `docs/fase-5/`: plan (D-053), verificación de fuentes de GitHub y Claude Code y modelo de amenazas (D-057), riesgo, escalado y autorización (D-058…D-060).
+- ADR-010 rev. 2 aprobado: revisión de agentes informativa, autorización por ruleset y puerta explícita de riesgo alto (environment con revisores).
+- `harness pr risk --base <ref> [--format json] [--github-output]` (`risk.py`): clase mínima calculada a partir del diff y de las tareas que el PR cierra.
+- Regla `pr.risk-min` y requisito **HS-CI-005** (DEBE, N1, desde 0.6.0). Con 0.6.0 sustituye al aviso `pr.risk-sensitive`.
+- `roles.yaml`: `rutas_criticas` y `patrones_pruebas`; manifiesto: `riesgo.rutas_criticas` (solo amplía).
+- Workflow `harness-tasks-lifecycle`: paso «Clase de riesgo calculada» y job `puerta-riesgo-alto` en el environment `aprobacion-riesgo-alto` (input `gate-environment`).
+- Ficha `ci.workflows` (aplazada desde F2).
+- Plantilla: `allow` para `harness pr risk *`; `AGENTS.md` con los disparadores de parada (D-059).
+
 ## [Sin publicar] — Fase 3 (cerrada, D-040) y F3.7
 
 ### Cambiado (F3.8, 2026-10-26) — CLI 0.5.1rc1, estándar 0.5.0 sin cambios de requisitos

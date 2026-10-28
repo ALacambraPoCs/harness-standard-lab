@@ -1,7 +1,7 @@
 # Registro de requisitos del Estándar de Harness.
 # Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
 # Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
-version_estandar: 0.5.0
+version_estandar: 0.6.0
 # Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
 niveles_definidos: [N0, N1]
 # Versión del estándar desde la que existe cada nivel (D-029). N1 exige declarar `standard.version` ≥ 0.2.0.
@@ -1088,6 +1088,22 @@ requisitos:
     desde: 0.3.0
     retirada: Si Claude Code deja de cargar en `-p` la configuración de proyectos no confiables.
 
+
+  - id: HS-CI-005
+    titulo: La clase de riesgo declarada no es menor que la calculada
+    texto: 'El riesgo declarado en el PR DEBE ser mayor o igual que la clase mínima que calcula `harness pr risk` a partir del diff y de las tareas que el PR cierra: `alto` si toca rutas críticas (workflows, CODEOWNERS, `.harness/` y las que añada el manifiesto en `riesgo.rutas_criticas`) o cierra una tarea de riesgo alto; `medio` si toca configuración de agentes, borra o renombra pruebas o cambia los criterios de aceptación de una tarea que cierra; `bajo` en otro caso.'
+    nivel: DEBE
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: enforcement
+    verificacion: automatica
+    exentable: false
+    reglas: [pr.risk-min]
+    fuentes: [ADR-010, D-058, K-14]
+    nota: La clase `alto` activa la puerta explícita del workflow de tareas (ADR-010 rev. 2). Declarar puede subir la clase, nunca bajarla.
+    estado: aprobado
+    desde: 0.6.0
+    retirada: Si la plataforma ofrece una clasificación de riesgo equivalente y comprobable.
   - id: HS-CMP-010
     titulo: Las entradas del catálogo son válidas y coherentes
     texto: Cada componente del catálogo central DEBE tener `componente.yaml` válido contra `schemas/catalog-entry.schema.json`, con `id` y `tipo` iguales a su ruta `catalog/<tipo>/<id>/` y con archivos de origen existentes.

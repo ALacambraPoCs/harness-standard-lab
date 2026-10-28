@@ -1,5 +1,6 @@
 # Ciclo de vida de tareas (N1): valida tareas y PR, verifica la aceptación de las tareas que pasan a done
-# (ADR-016) y refleja el estado en las issues enlazadas (X-01). Márcalo como check requerido.
+# (ADR-016) y refleja el estado en las issues enlazadas (X-01). Marca como checks requeridos
+# "tasks / harness tasks" y "tasks / puerta riesgo alto" (se salta salvo en riesgo alto, ADR-010 rev. 2).
 name: harness-tasks
 on:
   pull_request:

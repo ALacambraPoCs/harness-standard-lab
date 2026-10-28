@@ -16,7 +16,7 @@ VALUES = {
     "{{OWNER}}": "@org/demo", "{{KIND}}": "service", "{{DOCS_LANGUAGE}}": "es", "{{DATE}}": "2026-10-21",
     "{{SETUP}}": "python3 -c pass", "{{CHECK}}": "python3 -c pass", "{{TEST}}": "python3 -c pass",
     "{{HARNESS_OWNERS}}": "@org/harness-owners", "{{SECURITY_OWNERS}}": "@org/security",
-    "{{PLATFORM_OWNERS}}": "@org/platform", "{{CLI_REF}}": "cli-v0.5.1-rc.1", "{{STANDARD_REPO}}": "org/harness-standard",
+    "{{PLATFORM_OWNERS}}": "@org/platform", "{{CLI_REF}}": "cli-v0.6.0-rc.1", "{{STANDARD_REPO}}": "org/harness-standard",
 }
 
 
@@ -97,6 +97,7 @@ REVISADAS = {
     ("tasks", "close"): {"--pr", "--resultado", "--verified-by", "--autor", "--path"},
     ("tasks", "index"): {"--path", "--write", "--check"},
     ("pr", "check"): {"--path", "--base", "--body-file", "--body-env", "--title-env", "--format"},
+    ("pr", "risk"): {"--path", "--base", "--format", "--github-output"},
     ("components", "list"): None,  # se compara abajo con lo que exista
 }
 EFECTOS = {
@@ -108,6 +109,7 @@ EFECTOS = {
     "harness check --strict": "allow",
     "harness tasks close T-0001 --pr 7": "allow",
     "harness components list": "allow",
+    "harness pr risk --base origin/main": "allow",
     # F3.8 (D-052)
     "git add src/app.py": "allow",
     "git commit -m \"T-0001: cerrar la tarea\"": "allow",

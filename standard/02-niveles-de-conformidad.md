@@ -142,6 +142,12 @@ Solo aplican a instancias que declaran `standard.version` ≥ 0.5.0 (regla 7, D-
 | HS-SEC-011 | DEBERÍA | N1,N2,N3 | `ask` para `gh api` y `deny` para `gh repo delete`, `gh secret`, `gh ruleset` y `gh auth` | automática |
 | HS-SEC-012 | DEBERÍA | N1,N2,N3 | Las reglas `allow` no abren intérpretes, red, borrado, `git`/`gh` en general ni la ejecución del contrato | automática |
 
+## 3f. Requisitos añadidos en 0.6.0 (F5.2) — estado: aprobados (D-058)
+
+| ID | Nivel | Niveles | Requisito (resumen) | Verificación |
+|---|---|---|---|---|
+| HS-CI-005 | DEBE | N1,N2,N3 | El riesgo declarado en el PR no es menor que la clase que calcula `harness pr risk` (rutas críticas → alto; configuración de agentes, pruebas borradas o criterios cambiados → medio) | automática (PR) |
+
 ## 4. Waivers
 
 1. Un waiver DEBE declararse en `waivers` del manifiesto con los campos `requirement`, `reason`, `approved_by`, `approved_on` y `expires` (HS-GOV-003).

@@ -169,6 +169,20 @@ def _cmd_pr(args) -> int:
     import os
     from . import tasks as T
     ctx = _ctx(args)
+    if args.pr_cmd == "risk":
+        import json
+        from .risk import compute
+        r = compute(ctx, args.base)
+        if args.format == "json":
+            print(json.dumps(r.as_dict(), ensure_ascii=False, indent=2))
+        else:
+            print(f"Riesgo calculado: {r.clase}")
+            for c, m in r.senales:
+                print(f"  [{c}] {m}")
+        if args.github_output and os.environ.get("GITHUB_OUTPUT"):
+            with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+                fh.write(f"clase={r.clase}\n")
+        return 0
     if args.body_file:
         body = Path(args.body_file).read_text(encoding="utf-8")
     else:
@@ -293,6 +307,12 @@ def build_parser() -> argparse.ArgumentParser:
     pc.add_argument("--title-env", help="Variable de entorno con el título del PR.")
     pc.add_argument("--format", choices=["text", "json"], default="text")
     pc.set_defaults(func=_cmd_pr)
+    prr = prsub.add_parser("risk", help="Calcula la clase de riesgo mínima del PR a partir del diff y las tareas (D-058).")
+    prr.add_argument("--path", default=".")
+    prr.add_argument("--base", required=True, help="Referencia git base del PR (p. ej. origin/main).")
+    prr.add_argument("--format", choices=["text", "json"], default="text")
+    prr.add_argument("--github-output", action="store_true", help="Escribe `clase=<clase>` en $GITHUB_OUTPUT.")
+    prr.set_defaults(func=_cmd_pr)
 
     cg = sub.add_parser("catalog", help="Catálogo de componentes del repositorio central (F3).")
     cgsub = cg.add_subparsers(dest="catalog_cmd", required=True)

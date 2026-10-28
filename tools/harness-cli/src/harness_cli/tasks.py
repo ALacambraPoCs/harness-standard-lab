@@ -46,6 +46,7 @@ RULE_REQ = {
     "pr.anchors": "HS-CI-002", "pr.task": "HS-CI-002", "pr.trivial": "HS-CI-002", "pr.risk": "HS-CI-002",
     "pr.sensitive": "HS-SEC-006", "pr.risk-sensitive": "HS-SEC-006",
     "pr.adr-immutable": "HS-ARC-006",
+    "pr.risk-min": "HS-CI-005",
     "pr.issue": "X-01",
 }
 
@@ -354,6 +355,14 @@ def _matches_any(patterns: list[str], path: str) -> bool:
     return any(compile_pattern(p, codeowners=True).match(path) for p in patterns)
 
 
+def _requirement_applies(ctx: Context, req_id: str) -> bool:
+    """El requisito existe y su `desde` ≤ la versión declarada en el manifiesto (D-029)."""
+    from .standard import semver
+    req = ctx.standard.requirements.get(req_id)
+    declared = semver(ctx.declared_version) if ctx.declared_version else None
+    return bool(req) and declared is not None and (semver(req["desde"]) or (0, 0, 0)) <= declared
+
+
 def check_pr(ctx: Context, body: str, base: str, *, title: str = "") -> list[Finding]:
     """Comprueba el cuerpo del PR contra el diff y las tareas (pr.template, D-023)."""
     findings: list[Finding] = []
@@ -385,9 +394,17 @@ def check_pr(ctx: Context, body: str, base: str, *, title: str = "") -> list[Fin
     if sensitive and declared_sensitive is False:
         f("pr.sensitive", f"El PR declara `sensible: no` pero toca rutas sensibles: {', '.join(sensitive[:5])}.",
           "Declara `sí` y describe el cambio; requiere revisión de plataforma/seguridad (ADR-013).")
-    if sensitive and m_r and m_r.group(1) == "bajo":
+    if sensitive and m_r and m_r.group(1) == "bajo" and not _requirement_applies(ctx, "HS-CI-005"):
         f("pr.risk-sensitive", "Un PR que toca rutas sensibles no debería declararse de riesgo `bajo`.",
           "Usa al menos `medio`.", severity="warning")
+
+    if m_r and _requirement_applies(ctx, "HS-CI-005"):
+        from .risk import compute, rank
+        calc = compute(ctx, base)
+        if rank(m_r.group(1)) < rank(calc.clase):
+            motivos = "; ".join(m for c, m in calc.senales if c == calc.clase)[:300]
+            f("pr.risk-min", f"Riesgo declarado `{m_r.group(1)}` menor que el calculado `{calc.clase}` ({motivos}).",
+              f"Declara al menos `{calc.clase}`. Puedes subir la clase, no bajarla (D-058). Detalle: `harness pr risk --base <ref>`.")
 
     is_revert = bool(re.search(r"^\s*Reverts\s+#\d+", body, re.M)) or title.startswith("Revert")
     task_ids = re.findall(r"\bT-\d{4}\b", tarea)

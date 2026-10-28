@@ -8,7 +8,9 @@
     "roles",
     "rutas_sensibles",
     "patrones_sensibles",
-    "patrones_triviales"
+    "patrones_triviales",
+    "rutas_criticas",
+    "patrones_pruebas"
   ],
   "additionalProperties": false,
   "properties": {
@@ -138,6 +140,22 @@
         "type": "string"
       },
       "description": "Patrones por defecto que puede tocar un PR trivial (D-023)."
+    },
+    "rutas_criticas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "Patrones (sintaxis CODEOWNERS) de rutas que cambian la autoridad (CI, CODEOWNERS, manifiesto): un PR que las toque tiene riesgo mínimo `alto` (D-058). El manifiesto puede ampliarlas."
+    },
+    "patrones_pruebas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "Patrones de archivos de prueba: borrarlos o renombrarlos sube el riesgo mínimo a `medio` (D-058)."
     }
   }
 }

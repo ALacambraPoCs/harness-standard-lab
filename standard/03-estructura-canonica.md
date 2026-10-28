@@ -84,7 +84,7 @@ Leyenda: **O** obligatorio · **C** condicional · **R** recomendado · **P** op
 | `adapter.claude.settings` | `.claude/settings.json` | archivo | C | N1 | adaptador:claude-code | no | El manifiesto declara claude-code y el nivel es N1 o superior. | [ficha](04-archivos/adapter.claude.settings.md) |
 | `codeowners` | `.github/CODEOWNERS` (alt.: CODEOWNERS, docs/CODEOWNERS) | archivo | O | N0 | adaptador:github | no | — | [ficha](04-archivos/codeowners.md) |
 | `pr.template` | `.github/pull_request_template.md` (alt.: pull_request_template.md, docs/pull_request_template.md) | archivo | O | N1 | adaptador:github | no | — | [ficha](04-archivos/pr.template.md) |
-| `ci.workflows` | `.github/workflows` | directorio | O | N0 | adaptador:github | no | — | pendiente:F5 |
+| `ci.workflows` | `.github/workflows` | directorio | O | N0 | adaptador:github | no | — | [ficha](04-archivos/ci.workflows.md) |
 <!-- generado:roles:fin -->
 
 ## 4. Dónde vive cada tipo de conocimiento

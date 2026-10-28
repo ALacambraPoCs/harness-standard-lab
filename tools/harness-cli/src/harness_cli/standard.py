@@ -42,6 +42,8 @@ class Standard:
     sensitive_paths: list[str]
     sensitive_patterns: list[str] = field(default_factory=list)
     trivial_patterns: list[str] = field(default_factory=list)
+    critical_patterns: list[str] = field(default_factory=list)
+    test_patterns: list[str] = field(default_factory=list)
     defined_levels: tuple[str, ...] = ("N0",)
     levels_since: dict[str, str] = field(default_factory=dict)
     schemas: dict[str, dict[str, Any]] = field(default_factory=dict)
@@ -109,6 +111,8 @@ def load_standard(root: Path | None = None) -> Standard:
         levels_since=reqs_doc.get("niveles_desde") or {},
         sensitive_patterns=roles_doc["patrones_sensibles"],
         trivial_patterns=roles_doc["patrones_triviales"],
+        critical_patterns=roles_doc.get("rutas_criticas") or [],
+        test_patterns=roles_doc.get("patrones_pruebas") or [],
         schemas=schemas,
     )
     # El propio estándar debe ser válido: si no, es un defecto del producto A.

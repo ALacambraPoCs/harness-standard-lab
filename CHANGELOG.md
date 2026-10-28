@@ -4,6 +4,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 5
 
+### Añadido (F5.4, 2026-10-28) — estándar 0.7.1, CLI 0.7.1rc1
+- Componente de catálogo **`workflow/revisor-informativo`** 0.1.0 (`experimental`, D-065, D-066): revisión informativa de PR con el agente en jaula de solo lectura (`--bare --setting-sources user`, `--tools "Read,Grep,Glob"`, `dontAsk`, configuración desde la rama base) y un job de publicación sin credenciales del modelo que neutraliza el informe (`publicar.py`). Incluye `simulador_hostil.py` (ataques A1–A7) para probar la contención sin modelo (D-055). 9 pruebas.
+
+### Corregido (F5.4) — seguridad
+- **`ci.parseable` (HS-CI-007):** un workflow que la CLI no podía analizar se saltaba en silencio y pasaba la conformidad (vía de evasión). Ahora es un error. Lo detectaron las pruebas del revisor (H-17).
+- **`core.ci.agent-bare`:** un `claude -p … \` partido en varias líneas daba falso positivo; ahora une las líneas continuadas (H-18).
+- Estándar 0.7.1: el texto de HS-CI-007 incluye «DEBEN ser YAML analizable».
+
 ### Añadido (F5.3, 2026-10-28) — estándar 0.7.0, CLI 0.7.0rc1
 - `harness platform check [--repo] [--branch]` (`platform.py`, D-062): compara el ruleset de la rama por defecto y los environments (puerta de riesgo alto, despliegue) con lo que exige el nivel. Solo lee; sin token en repos públicos. Reglas `platform.*` y requisito **HS-CI-006**.
 - Workflow reutilizable `harness-platform.yml` (programado y en push a `main`; abre o comenta una issue si falla) y plantilla N1.

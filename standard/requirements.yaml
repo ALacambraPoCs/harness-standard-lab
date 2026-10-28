@@ -1,7 +1,7 @@
 # Registro de requisitos del Estándar de Harness.
 # Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
 # Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
-version_estandar: 0.7.0
+version_estandar: 0.7.1
 # Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
 niveles_definidos: [N0, N1]
 # Versión del estándar desde la que existe cada nivel (D-029). N1 exige declarar `standard.version` ≥ 0.2.0.
@@ -1124,14 +1124,14 @@ requisitos:
 
   - id: HS-CI-007
     titulo: Los workflows no abren vías de ejecución con privilegios
-    texto: 'Los workflows de la instancia NO DEBEN usar `pull_request_target` (salvo waiver con ADR), NO DEBEN interpolar datos del evento controlados por terceros en `run:` o `script:`, DEBEN declarar `permissions:` de nivel superior sin escritura global, y un job con credenciales del modelo NO DEBE tener permisos de escritura (salvo `id-token`).'
+    texto: 'Los workflows de la instancia DEBEN ser YAML analizable, NO DEBEN usar `pull_request_target` (salvo waiver con ADR), NO DEBEN interpolar datos del evento controlados por terceros en `run:` o `script:`, DEBEN declarar `permissions:` de nivel superior sin escritura global, y un job con credenciales del modelo NO DEBE tener permisos de escritura (salvo `id-token`).'
     nivel: DEBE
     ambito: instancia
     conformidad: [N1, N2, N3]
     naturaleza: enforcement
     verificacion: automatica
     exentable: true
-    reglas: [ci.no-pr-target, ci.no-untrusted-interpolation, ci.permissions, ci.model-readonly]
+    reglas: [ci.parseable, ci.no-pr-target, ci.no-untrusted-interpolation, ci.permissions, ci.model-readonly]
     fuentes: [ADR-013, D-063, F5-01]
     nota: Reglas estáticas sobre el YAML; reducen el riesgo de V2, V3 y V12, no son prueba formal. Linters externos (zizmor, actionlint) son un complemento opcional.
     estado: aprobado

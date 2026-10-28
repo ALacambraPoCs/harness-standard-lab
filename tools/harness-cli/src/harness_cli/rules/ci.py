@@ -24,12 +24,15 @@ SHA = re.compile(r"^[0-9a-f]{40}$")
 STANDARD_WORKFLOW = re.compile(r"/\.github/workflows/harness-[a-z-]+\.ya?ml@cli-v[0-9][0-9A-Za-z.\-]*$")
 
 
-def _workflows(ctx: Context):
+def _files(ctx: Context):
     wdir = ctx.root / ctx.standard.roles["ci.workflows"]["ruta"]
-    if not wdir.is_dir():
-        return []
+    return sorted(list(wdir.glob("*.yml")) + list(wdir.glob("*.yaml"))) if wdir.is_dir() else []
+
+
+def _workflows(ctx: Context):
+    """Workflows analizables. Los que no se pueden analizar los informa `ci.parseable` (no se saltan en silencio)."""
     out = []
-    for wf in sorted(list(wdir.glob("*.yml")) + list(wdir.glob("*.yaml"))):
+    for wf in _files(ctx):
         rel = wf.relative_to(ctx.root).as_posix()
         text = wf.read_text(encoding="utf-8", errors="replace")
         try:
@@ -39,6 +42,24 @@ def _workflows(ctx: Context):
         if isinstance(doc, dict):
             out.append((rel, doc, text))
     return out
+
+
+@rule("ci.parseable", ["HS-CI-007"], platform="github")
+def parseable(ctx: Context):
+    """Todo workflow se puede analizar: uno que la CLI no lee no se puede revisar (sería una vía de evasión)."""
+    for wf in _files(ctx):
+        rel = wf.relative_to(ctx.root).as_posix()
+        try:
+            doc = yaml.safe_load(wf.read_text(encoding="utf-8", errors="replace"))
+        except yaml.YAMLError as exc:
+            mark = getattr(exc, "problem_mark", None)
+            donde = f" (línea {mark.line + 1})" if mark else ""
+            yield Finding("ci.parseable", "HS-CI-007", f"{rel} no es YAML válido{donde}: las reglas de seguridad no lo pueden revisar.",
+                          "Corrige la sintaxis (p. ej. un `: ` dentro de un valor sin comillas: usa un bloque `run: |`).", rel)
+            continue
+        if not isinstance(doc, dict) or "jobs" not in doc:
+            yield Finding("ci.parseable", "HS-CI-007", f"{rel} no tiene la estructura de un workflow (falta `jobs`).",
+                          "Revisa el archivo; si no es un workflow, sácalo de .github/workflows/.", rel)
 
 
 def _triggers(doc: dict) -> set[str]:

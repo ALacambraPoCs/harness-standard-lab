@@ -156,6 +156,12 @@ Solo aplican a instancias que declaran `standard.version` ≥ 0.5.0 (regla 7, D-
 | HS-CI-007 | DEBE | N1,N2,N3 | Workflows sin `pull_request_target`, sin interpolar datos no confiables en `run:`, con `permissions:` de nivel superior en lectura, y sin escritura en jobs con credenciales del modelo | automática |
 | HS-CI-008 | DEBERÍA | N1,N2,N3 | Actions fijadas a SHA (las del estándar, a `cli-v…`) y `merge_group` en los workflows de PR | automática |
 
+## 3h. Requisitos añadidos en 0.8.0 (F5.5) — estado: aprobados (D-067)
+
+| ID | Nivel | Niveles | Requisito (resumen) | Verificación |
+|---|---|---|---|---|
+| HS-SEC-013 | DEBERÍA | N1,N2,N3 | `settings.json` activa el sandbox sin vía de escape; los comandos de red con GitHub, en `excludedCommands` | automática |
+
 ## 4. Waivers
 
 1. Un waiver DEBE declararse en `waivers` del manifiesto con los campos `requirement`, `reason`, `approved_by`, `approved_on` y `expires` (HS-GOV-003).

@@ -6,7 +6,7 @@ version: 0.1.0
 consumidores: [agentes, cli, plataforma]
 dependencias: [adapter.claude.instructions, adapter.claude.local, security.policy, codeowners, manifest]
 propietario: Propietario de plataforma/harness (CODEOWNERS, ADR-013), con revisión de seguridad para cambios en deny/ask
-requisitos: [HS-SEC-007, HS-SEC-008, HS-SEC-009, HS-SEC-010, HS-SEC-011, HS-SEC-012, HS-CMP-006, HS-CMP-007]
+requisitos: [HS-SEC-007, HS-SEC-008, HS-SEC-009, HS-SEC-010, HS-SEC-011, HS-SEC-012, HS-SEC-013, HS-CMP-006, HS-CMP-007]
 reglas: [adapter.claude.settings-secrets, adapter.claude.settings-sensitive, adapter.claude.settings-modes, adapter.claude.hooks-scripts, adapter.claude.hooks-nondeterministic]
 ejemplo_canonico: template/adapters/claude-code/.claude/settings.json
 fuentes: [S-CC-SET, ADR-009, ADR-013, S-OWASP-LLM01]
@@ -41,7 +41,7 @@ Fijar, para todo el equipo, **qué no puede hacer el agente sin preguntar y qué
 - `ask` para `Bash(git push *)` y `Bash(gh pr merge *)`.
 - Desde 0.5.0 (DEBERÍA): `ask` para `Bash(gh api *)` y `deny` para `gh repo delete`, `gh secret`, `gh ruleset` y `gh auth` (HS-SEC-011); `allow` solo para comandos del contrato sin efectos, con `ask` para las opciones que ejecutan o escriben (HS-SEC-012). Detalle en el adaptador §3.4.
 - Hooks `command` del catálogo, por ejemplo `verificar-al-terminar` (F3.4). Solo componentes del catálogo con su ficha.
-- `sandbox.enabled: true` en equipos con macOS o Linux/WSL2. En Windows nativo no está disponible, así que no se exige.
+- Desde 0.8.0 (DEBERÍA, HS-SEC-013): bloque `sandbox` con `enabled: true`, `allowUnsandboxedCommands: false` y los comandos de red con GitHub en `excludedCommands` (adaptador §3.5). En Windows nativo no está disponible: trabajar en WSL2.
 
 ## Contenido excluido
 

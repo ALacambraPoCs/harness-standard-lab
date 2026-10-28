@@ -68,9 +68,10 @@ Generada por `harness matrix`. No editar a mano.
 | HS-SEC-010 | DEBE | N1,N2,N3 | enforcement | automatica | `adapter.claude.settings-automode` | nc-modo-automatico-permitido |
 | HS-SEC-011 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-gh` | nc-gh-sin-control |
 | HS-SEC-012 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-allow-broad` | nc-allow-amplio<br>nc-allow-ejecuta-contrato<br>nc-allow-git-sin-ask-especifico |
+| HS-SEC-013 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-sandbox` | nc-sin-sandbox |
 | HS-CI-004 | DEBE | N1,N2,N3 | enforcement | automatica | `core.ci.agent-bare` | nc-agente-ci-sin-bare |
 | HS-CI-005 | DEBE | N1,N2,N3 | enforcement | automatica | `pr.risk-min` | test_tasks.py |
-| HS-CI-006 | DEBE | N1,N2,N3 | enforcement | semiautomatica | `platform.reachable`<br>`platform.pull-request`<br>`platform.required-checks`<br>`platform.no-force-push`<br>`platform.no-deletion`<br>`platform.approvals`<br>`platform.gate-environment`<br>`platform.deploy-environment` | test_platform.py |
+| HS-CI-006 | DEBE | N1,N2,N3 | enforcement | semiautomatica | `platform.manifest`<br>`platform.reachable`<br>`platform.pull-request`<br>`platform.required-checks`<br>`platform.no-force-push`<br>`platform.no-deletion`<br>`platform.approvals`<br>`platform.gate-environment`<br>`platform.deploy-environment` | test_platform.py |
 | HS-CI-007 | DEBE | N1,N2,N3 | enforcement | automatica | `ci.parseable`<br>`ci.no-pr-target`<br>`ci.no-untrusted-interpolation`<br>`ci.permissions`<br>`ci.model-readonly` | nc-interpolacion-no-confiable<br>nc-modelo-con-escritura<br>nc-pull-request-target<br>nc-workflow-no-analizable<br>nc-workflow-sin-permissions |
 | HS-CI-008 | DEBERÍA | N1,N2,N3 | guidance | automatica | `ci.pinned`<br>`ci.merge-group` | nc-action-sin-sha-y-sin-merge-group |
 | HS-CMP-010 | DEBE | — | enforcement | automatica | `catalog.entry` | test_catalog.py |
@@ -178,6 +179,8 @@ Generada por `harness matrix`. No editar a mano.
 | nc-action-sin-sha-y-sin-merge-group | ✅ | ok |
 | nc-workflow-no-analizable | ✅ | ok |
 | c-claude-p-multilinea | ✅ | conforme |
+| nc-sin-sandbox | ✅ | ok |
+| c-n1-sandbox-0.8 | ✅ | conforme |
 
 ## Incidencias
 

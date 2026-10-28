@@ -1,7 +1,7 @@
 # Registro de requisitos del Estándar de Harness.
 # Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
 # Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
-version_estandar: 0.7.1
+version_estandar: 0.8.0
 # Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
 niveles_definidos: [N0, N1]
 # Versión del estándar desde la que existe cada nivel (D-029). N1 exige declarar `standard.version` ≥ 0.2.0.
@@ -1072,6 +1072,23 @@ requisitos:
     desde: 0.5.0
     retirada: Si el sandbox de la F5 se vuelve obligatorio y hace innecesario acotar las reglas allow.
 
+
+  - id: HS-SEC-013
+    titulo: settings.json activa el sandbox sin vía de escape
+    texto: '`.claude/settings.json` DEBERÍA fijar `sandbox.enabled: true` y `sandbox.allowUnsandboxedCommands: false`. Los comandos que necesitan red con GitHub (`git push|fetch|pull`, `gh`) van en `sandbox.excludedCommands` y quedan sujetos a las reglas `ask`/`allow`/`deny`.'
+    nivel: DEBERÍA
+    ambito: instancia
+    adaptador: claude-code
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [adapter.claude.settings-sandbox]
+    fuentes: [S-CC-SET, D-067, F5-01]
+    nota: El sandbox existe en macOS, Linux y WSL2, no en Windows nativo (por eso DEBERÍA). Con él, `check` y `test` se ejecutan sin confirmación dentro de límites de escritura y red (cierra D-043). No es una frontera de aislamiento completa.
+    estado: aprobado
+    desde: 0.8.0
+    retirada: Si el aislamiento se hace con contenedores o devcontainers obligatorios.
   - id: HS-CI-004
     titulo: El agente en CI no carga la configuración del repositorio
     texto: Un paso de workflow que ejecute `claude -p` DEBE usar `--bare` y `--setting-sources user`, con su configuración tomada de fuera del PR.
@@ -1115,7 +1132,7 @@ requisitos:
     verificacion: semiautomatica
     verificacion_manual: Que el workflow programado `harness-platform.yml` está activo y que sus fallos se corrigen (la issue «harness platform check falla» no queda abierta).
     exentable: false
-    reglas: [platform.reachable, platform.pull-request, platform.required-checks, platform.no-force-push, platform.no-deletion, platform.approvals, platform.gate-environment, platform.deploy-environment]
+    reglas: [platform.manifest, platform.reachable, platform.pull-request, platform.required-checks, platform.no-force-push, platform.no-deletion, platform.approvals, platform.gate-environment, platform.deploy-environment]
     fuentes: [ADR-010, D-062, F5-01]
     nota: Solo lee la API de GitHub (sin token en repositorios públicos). No se ejecuta en los PR. La plantilla N1 incluye el workflow programado `harness-platform.yml`.
     estado: aprobado

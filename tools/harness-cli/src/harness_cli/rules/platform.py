@@ -5,6 +5,7 @@ from ..context import Context
 from . import rule
 
 _DOCS = {
+    "platform.manifest": "Hay un manifiesto válido que indica qué nivel comprobar.",
     "platform.reachable": "La API de GitHub devuelve el repositorio y las reglas de su rama por defecto.",
     "platform.pull-request": "La rama por defecto exige PR para cambiar (N1+).",
     "platform.required-checks": "Los checks del nivel son requeridos en la rama por defecto.",

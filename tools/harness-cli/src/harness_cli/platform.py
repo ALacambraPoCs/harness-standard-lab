@@ -24,6 +24,7 @@ GATE_DEFAULT = "aprobacion-riesgo-alto"
 
 # Regla → requisito (las comprobaciones de plataforma cuelgan de HS-CI-006).
 RULE_REQ = {
+    "platform.manifest": "HS-CI-006",
     "platform.reachable": "HS-CI-006",
     "platform.pull-request": "HS-CI-006",
     "platform.required-checks": "HS-CI-006",
@@ -100,6 +101,10 @@ def check(ctx: Context, repo: str, branch: str | None, fetch: Fetch) -> list[Fin
         findings.append(Finding(rule_id, req, msg, remedy, None, severity=sev,
                                 why=f"{req} ({spec['nivel']}): {spec['titulo']}" if spec else req))
 
+    if not ctx.manifest_valid:
+        f("platform.manifest", f"No hay un manifiesto válido en {ctx.root}: no se sabe qué nivel comprobar (H-19).",
+          "Ejecuta el comando en la raíz de la instancia o indica `--path <instancia>`.")
+        return findings
     level = ctx.level
     plat = (ctx.manifest or {}).get("plataforma") or {}
     if branch is None:

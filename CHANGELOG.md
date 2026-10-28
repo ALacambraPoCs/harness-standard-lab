@@ -4,6 +4,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 5
 
+### Añadido (F5.5, 2026-10-28) — estándar 0.8.0, CLI 0.8.0rc1
+- Plantilla `settings.json` con **sandbox** (D-067): sin reintento fuera del sandbox, sin red y con `git push|fetch|pull`, `gh` y `harness platform` en `excludedCommands`; lectura denegada de `~/.ssh`, `~/.aws`, `~/.config/gh` y `~/.config/harness`. Requisito **HS-SEC-013** (DEBERÍA) y regla `adapter.claude.settings-sandbox`.
+- `standard/plataforma/managed-settings.json` (D-068) y `token-agente.md` (D-069).
+- Adaptador de Claude Code §3.5 (sandbox) y §3.6 (configuración gestionada, modo automático desactivado por D-070, token del agente).
+
+### Corregido (F5.5)
+- `harness platform check` fuera de una instancia ya no asume N0 en silencio: regla `platform.manifest` (H-19).
+
 ### Añadido (F5.4, 2026-10-28) — estándar 0.7.1, CLI 0.7.1rc1
 - Componente de catálogo **`workflow/revisor-informativo`** 0.1.0 (`experimental`, D-065, D-066): revisión informativa de PR con el agente en jaula de solo lectura (`--bare --setting-sources user`, `--tools "Read,Grep,Glob"`, `dontAsk`, configuración desde la rama base) y un job de publicación sin credenciales del modelo que neutraliza el informe (`publicar.py`). Incluye `simulador_hostil.py` (ataques A1–A7) para probar la contención sin modelo (D-055). 9 pruebas.
 

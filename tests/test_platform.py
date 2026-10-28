@@ -117,3 +117,10 @@ def test_cli_sin_repo(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("GITHUB_REPOSITORY", raising=False)
     assert main(["platform", "check", "--path", str(tmp_path / "repo")]) == 2
     assert "--repo" in capsys.readouterr().err
+
+
+def test_sin_manifiesto_no_pasa_en_silencio(tmp_path):
+    """H-19: ejecutado fuera de una instancia, no asume N0."""
+    ctx = Context.build(tmp_path, STD, dt.date(2026, 10, 28))
+    f = P.check(ctx, "o/r", None, fake())
+    assert [x.rule for x in f] == ["platform.manifest"]

@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-28 (F5.4: D-064…D-066, H-17, H-18)
+actualizado: 2026-10-28 (F5.5: D-067…D-070, E-025, H-19)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -64,6 +64,8 @@ actualizado: 2026-10-28 (F5.4: D-064…D-066, H-17, H-18)
 | E-024 | **Confirmaciones:** 4 de edición y 25 de comandos en tres sesiones; 5 evitables sin tocar la seguridad (`fase-3/VALIDACION-F3.7.md` §2). | 2026-10-24 | Usuario |
 | H-17 | **Defecto de seguridad en la CLI (F5.4):** las reglas de workflows saltaban en silencio un archivo que no podían analizar; un workflow aceptado por GitHub pero no por PyYAML pasaría sin revisar. Corregido con `ci.parseable` (0.7.1). Lo encontraron las pruebas del componente revisor. | 2026-10-28 | Claude |
 | H-18 | `core.ci.agent-bare` analizaba línea a línea: un `claude -p … \` partido en varias líneas daba falso positivo. Corregido (0.7.1). | 2026-10-28 | Claude |
+| E-025 | **`harness platform check` contra GitHub real:** en `harness-example-greenfield` (N1) da 0 errores; reglas activas `deletion`, `non_fast_forward`, `pull_request` y `required_status_checks`, con `context` `conformance / harness check` y `tasks / harness tasks` (formato `<job que llama> / <job llamado>` verificado). | 2026-10-28 | Usuario |
+| H-19 | `harness platform check` ejecutado fuera de una instancia asumía N0 en silencio y daba 0 errores. Corregido con `platform.manifest` (0.8.0). | 2026-10-28 | Usuario |
 | D-031 | **Fase 2 cerrada** con el criterio 1 parcial: 5 fichas aplazadas a la fase dueña de su subsistema (`adapter.claude.settings` → F3, `project.rules` → F4, `ci.workflows` y `runbooks.dir` → F5, `quality.doc` → F6). `fase-2/INFORME.md`. | 2026-10-22 | Usuario |
 | D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |
 | D-033 | **Plan de la F3 aprobado** (`fase-3/PLAN.md`): 6 incrementos, de F3.1 (modelo de componentes) a F3.6 (prueba en el laboratorio). | 2026-10-22 | Usuario |
@@ -100,13 +102,17 @@ actualizado: 2026-10-28 (F5.4: D-064…D-066, H-17, H-18)
 | D-064 | **F5.3 aprobada** e implementada (estándar 0.7.0; PR #19, `cli-v0.7.0-rc.1`). | 2026-10-28 | Usuario |
 | D-065 | **F5.4-A aprobada:** revisor informativo en CI con dos jobs (modelo en solo lectura con `claude -p --bare`, configuración de la rama base; publicación sin credenciales del modelo y con neutralización); componente de catálogo `workflow`. | 2026-10-28 | Usuario |
 | D-066 | **F5.4-B aprobada:** prueba adversarial con un simulador de agente comprometido (A1–A7); el workflow falla si algún ataque tiene éxito. | 2026-10-28 | Usuario |
+| D-067 | **F5.5-A aprobada:** sandbox en la plantilla (sin vía de escape, sin red, comandos de GitHub fuera del sandbox) y HS-SEC-013 (DEBERÍA). Con él, `check`/`test` sin confirmación. | 2026-10-28 | Usuario |
+| D-068 | **F5.5-B aprobada:** plantilla de configuración gestionada para la organización (preferente desde servidor); sin `allowManagedPermissionRulesOnly`. Guía N2+, no requisito de instancia. | 2026-10-28 | Usuario |
+| D-069 | **F5.5-C aprobada:** el agente usa un token fine-grained de mínimo privilegio (Contents y Pull requests en escritura; sin Actions, Deployments, Administration, Secrets ni Workflows). | 2026-10-28 | Usuario |
+| D-070 | **F5.5-D aprobada:** el modo automático sigue desactivado (confirma D-041); se reevalúa si tras la F5.7 quedan > 3 confirmaciones por tarea en comandos que no son `ask` deliberados. | 2026-10-28 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F5.4** (D-065, D-066; estándar 0.7.1, CLI 0.7.1rc1): pendiente de revisión y fusión.
-- **F5.5** (sesión local endurecida: managed settings, sandbox, token de mínimo privilegio): siguiente.
+- **F5.5** (D-067…D-070; estándar 0.8.0, CLI 0.8.0rc1): pendiente de revisión y fusión.
+- **F5.6** (despliegue en GitHub Pages con rollback y auditoría): siguiente.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -150,7 +156,7 @@ actualizado: 2026-10-28 (F5.4: D-064…D-066, H-17, H-18)
 
 ## Próximos pasos
 
-1. **Usuario:** fusionar la F5.4 (`f5.4.patch`) y publicar `cli-v0.7.1-rc.1`. Probar en local `harness platform check --repo ALacambraPoCs/harness-example-greenfield` (no se pudo desde el entorno de Claude).
+1. **Usuario:** fusionar la F5.5 (`f5.5.patch`) y publicar `cli-v0.8.0-rc.1`.
 2. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 3. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

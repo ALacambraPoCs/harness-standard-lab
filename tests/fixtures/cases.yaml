@@ -688,3 +688,18 @@ casos:
           path: .github/workflows/revision.yml
           content: "name: revision\non:\n  pull_request:\n  merge_group:\npermissions:\n  contents: read\njobs:\n  r:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: |\n          claude -p \"revisa\" \\\n            --bare --setting-sources user\n"
     expect_effective_level: N1
+
+  # ─────────────── Estándar 0.8.0 · sandbox (F5.5-A, D-067) ───────────────
+  - id: nc-sin-sandbox
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.8.0"}
+    expect_fail: [adapter.claude.settings-sandbox]
+
+  - id: c-n1-sandbox-0.8
+    base: conforming/n1-endurecido
+    conforming: true
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.8.0"}
+      - replace: {path: .claude/settings.json, old: "  \"enableAllProjectMcpServers\": false,", new: "  \"enableAllProjectMcpServers\": false,\n  \"sandbox\": {\"enabled\": true, \"allowUnsandboxedCommands\": false},"}
+    expect_effective_level: N1

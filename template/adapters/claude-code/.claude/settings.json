@@ -57,5 +57,27 @@
     "disableBypassPermissionsMode": "disable",
     "disableAutoMode": "disable"
   },
-  "enableAllProjectMcpServers": false
+  "enableAllProjectMcpServers": false,
+  "sandbox": {
+    "enabled": true,
+    "allowUnsandboxedCommands": false,
+    "excludedCommands": [
+      "git push *",
+      "git fetch *",
+      "git pull *",
+      "gh *",
+      "harness platform *"
+    ],
+    "network": {
+      "allowedDomains": []
+    },
+    "filesystem": {
+      "denyRead": [
+        "~/.ssh",
+        "~/.aws",
+        "~/.config/gh",
+        "~/.config/harness"
+      ]
+    }
+  }
 }

@@ -248,6 +248,24 @@ def settings_modes(ctx: Context):
                       "No tiene efecto desde el proyecto y confunde; quítalo.", SETTINGS)
 
 
+@rule("adapter.claude.settings-sandbox", ["HS-SEC-013"])
+def settings_sandbox(ctx: Context):
+    """settings.json activa el sandbox sin vía de escape (D-067). No disponible en Windows nativo: usar WSL2."""
+    data, _ = _settings(ctx)
+    if not isinstance(data, dict):
+        return
+    sb = data.get("sandbox") if isinstance(data.get("sandbox"), dict) else {}
+    falta = []
+    if sb.get("enabled") is not True:
+        falta.append("`sandbox.enabled: true`")
+    if sb.get("allowUnsandboxedCommands") is not False:
+        falta.append("`sandbox.allowUnsandboxedCommands: false`")
+    if falta:
+        yield Finding("adapter.claude.settings-sandbox", "HS-SEC-013", f"Falta {' y '.join(falta)}.",
+                      "Copia el bloque `sandbox` de la plantilla (adaptador §3.5): comandos sin confirmación dentro de límites de "
+                      "escritura y red, y sin reintento fuera del sandbox. En Windows nativo, trabaja en WSL2.", SETTINGS)
+
+
 # ─────────────── reglas Bash (estándar 0.5.0, F3.7) ───────────────
 def bash_rule_matches(rule: str, cmd: str) -> bool:
     """Aproxima la coincidencia de una regla `Bash(...)` de Claude Code con un comando simple.

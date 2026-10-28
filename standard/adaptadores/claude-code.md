@@ -1,8 +1,8 @@
 ---
 documento: HS-ADP-CLAUDE
 titulo: Adaptador de agente — Claude Code
-version_estandar: 0.5.0
-estado: aprobado (D-036; §3.4 y §4 ampliados en F3.7, D-041…D-043)
+version_estandar: 0.8.0
+estado: aprobado (D-036; §3.4 y §4 ampliados en F3.7, D-041…D-043; §3.5–3.6 en F5.5, D-067…D-070)
 fecha: 2026-10-23
 verificado_contra: documentación oficial de code.claude.com, leída el 2026-10-22 y el 2026-10-23 (docs/fase-3/01-verificacion-fuentes.md, fase-3/INFORME.md §6)
 version_minima: 2.1.277
@@ -77,6 +77,32 @@ Traduce el núcleo neutro (`05-componentes`, `03-estructura-canonica`) a los arc
 - Un test de la CLI (`tests/test_template.py`) congela las opciones de estos subcomandos. Si se añade una opción con efectos y no se cubre con `ask`, la CI central falla.
 - **No se permiten en la base** los comandos `check` y `test` de cada instancia. Permitir `python3 -m unittest` es ejecutar sin confirmación código que acaba de escribir el agente. Es una decisión de cada instancia (por ejemplo `Bash(npm test)`), preferiblemente con sandbox. HS-SEC-012 avisa de las reglas que abren intérpretes (`python -c`, `bash -c`, `node -e`…), red, borrado, `git` o `gh` en general.
 
+### 3.5 Sandbox (F5.5-A, D-067; HS-SEC-013)
+
+Verificado a mano (code.claude.com/sandboxing, 2026-10-28): macOS, Linux y WSL2, no Windows nativo. Escritura limitada al directorio de trabajo y temporales; red con lista de dominios que empieza vacía. **Dentro del sandbox los comandos se aprueban sin preguntar** y las reglas `ask` con contenido siguen preguntando.
+
+```json
+"sandbox": {
+  "enabled": true,
+  "allowUnsandboxedCommands": false,
+  "excludedCommands": ["git push *", "git fetch *", "git pull *", "gh *", "harness platform *"],
+  "network": { "allowedDomains": [] },
+  "filesystem": { "denyRead": ["~/.ssh", "~/.aws", "~/.config/gh", "~/.config/harness"] }
+}
+```
+
+- `allowUnsandboxedCommands: false` anula el reintento fuera del sandbox (`dangerouslyDisableSandbox`).
+- Lo que necesita red con GitHub va en `excludedCommands`: se ejecuta **fuera** del sandbox y lo gobiernan las reglas de §3.4 (`git push` y `gh api` en `ask`, `gh auth`/`gh secret` en `deny`…). Así el sandbox no abre `github.com` a cualquier comando.
+- Con el sandbox, `check` y `test` de la instancia ya no piden confirmación (cierra la salvedad de D-043).
+- **Windows nativo:** sin sandbox; el estándar recomienda trabajar en WSL2 (por eso HS-SEC-013 es DEBERÍA).
+- Límite: no es una frontera de aislamiento completa (según la documentación, verificado por subagente).
+
+### 3.6 Configuración gestionada y modo automático (F5.5-B y D, D-068, D-070)
+
+- Lo que pone el proyecto lo puede anular `settings.local.json`. La frontera es la **configuración gestionada**: plantilla en `standard/plataforma/managed-settings.json`, preferentemente distribuida desde el servidor (en WSL, el archivo `/etc/claude-code/managed-settings.json` puede ser escribible por el usuario).
+- **Modo automático: desactivado** (D-041 confirmado por D-070). Su beneficio (menos confirmaciones) lo dan el sandbox y las `allow`, de forma determinista; el clasificador «does not guarantee safety». Se reevalúa si, tras la F5.7, quedan más de 3 confirmaciones por tarea en comandos que no son `ask` deliberados.
+- El agente usa un **token de GitHub de mínimo privilegio**, no la sesión de la persona (D-069, `standard/plataforma/token-agente.md`).
+
 ## 4. Configuración base
 
 `template/adapters/claude-code/.claude/settings.json`. Su contenido requerido está en la ficha `adapter.claude.settings`:
@@ -84,6 +110,7 @@ Traduce el núcleo neutro (`05-componentes`, `03-estructura-canonica`) a los arc
 - `deny` para leer y editar `.env*`, claves (`*.pem`, `*.key`) y `secrets/`;
 - `ask` para editar **cada** patrón de `patrones_sensibles` (`roles.yaml`), además de `git push` y `gh pr merge`;
 - las reglas de comandos de §3.4;
+- el bloque `sandbox` de §3.5;
 - `disableBypassPermissionsMode: "disable"` y `disableAutoMode: "disable"`;
 - `enableAllProjectMcpServers: false`.
 

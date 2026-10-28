@@ -1,0 +1,69 @@
+id: revisor-informativo
+tipo: workflow
+version: 0.1.0
+estado: experimental
+titulo: Revisor informativo de PR con agente, en jaula de solo lectura
+proposito: >-
+  Workflow de GitHub Actions que pide a un agente una revisión informativa del PR y la publica como
+  comentario. El job del modelo solo lee (contents y pull-requests en lectura, sin Bash ni edición) y su
+  configuración sale de la rama base; un job separado sin credenciales del modelo neutraliza y publica el
+  informe. Incluye un simulador de agente comprometido para probar la contención sin modelo (D-055).
+propietario: "@AlbertoLacambra"
+compatibilidad:
+  adaptadores: [claude-code]
+  agente_min: {claude-code: 2.1.277}
+  niveles: [N1, N2, N3]
+contrato:
+  entradas:
+    - "Evento pull_request de una rama del propio repositorio (los forks se saltan: no reciben secretos)"
+    - "Diff del PR y su contenido, tratados como no confiables"
+    - "Prompt, settings y scripts de .harness/revisor/ de la RAMA BASE"
+    - "Secreto ANTHROPIC_API_KEY (solo MODO=modelo)"
+  salidas:
+    - "Comentario informativo en el PR, neutralizado (sin menciones, órdenes de bot, HTML ni credenciales)"
+    - "En MODO=simulador: tabla de ataques A1–A7 en el resumen del job; el job falla si alguno tiene éxito"
+  efectos:
+    - "Publica un comentario en el PR (job publicar, pull-requests: write, sin credenciales del modelo)"
+permisos:
+  herramientas: [Read, Grep, Glob]
+  escritura: []
+  red: [api.anthropic.com, api.github.com, registry.npmjs.org]
+  secretos: true
+control:
+  es_control: false   # informativo: no es check requerido ni autoriza nada (ADR-010 rev. 2)
+  capa: L4
+  determinista: false
+archivos:
+  - origen: src/revisor-informativo.yml
+    destino: .github/workflows/revisor-informativo.yml
+  - origen: src/simulador_hostil.py
+    destino: .harness/revisor/simulador_hostil.py
+  - origen: src/publicar.py
+    destino: .harness/revisor/publicar.py
+  - origen: src/prompt.md
+    destino: .harness/revisor/prompt.md
+  - origen: src/settings.json
+    destino: .harness/revisor/settings.json
+dependencias: []
+pruebas:
+  - tipo: unitaria
+    descripcion: "publicar.py neutraliza credenciales, menciones, órdenes y HTML y rechaza su propio resultado si queda algo; el simulador marca como éxito solo respuestas 2xx; el workflow cumple HS-CI-004 y HS-CI-007/008"
+    comando: "python -m pytest catalog/workflow/revisor-informativo/tests"
+  - tipo: integracion
+    descripcion: "F5.7: PR en harness-example-greenfield con MODO=simulador; 7/7 ataques contenidos y comentario neutralizado. PR con permiso debilitado: el simulador y ci.model-readonly lo detectan"
+metricas:
+  - "Ataques del simulador contenidos (objetivo: 7/7)"
+  - "Con modelo (piloto): % de comentarios útiles según la persona revisora; coste por PR"
+  - "Comentarios en los que publicar.py tuvo que neutralizar algo"
+coste:
+  contexto: "Nulo en las sesiones locales; en CI, el diff y los archivos que lea el agente"
+  latencia: "1–3 minutos por PR (no bloquea: es informativo)"
+riesgos:
+  - "El informe puede engañar a quien lo lee: se presenta como no confiable y sin autoridad"
+  - "El simulador solo prueba los ataques previstos; el piloto con modelo real repite la batería"
+  - "--max-budget-usd no es un límite exacto: el límite real es el del proveedor"
+  - "Si un control fallara, los ataques del simulador tendrían efecto real: usar un PR de prueba"
+retirada:
+  condicion: "Si en el piloto los comentarios no resultan útiles para las personas revisoras, o si su coste supera el umbral acordado"
+  procedimiento: "harness components remove revisor-informativo (borra el workflow y .harness/revisor/)"
+ficha: FICHA.md

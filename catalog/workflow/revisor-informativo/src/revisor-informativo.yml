@@ -1,0 +1,118 @@
+# Revisor informativo con agente (componente del catálogo `revisor-informativo`; F5.4, D-065, D-066).
+#
+#  - revisar: el agente (o el simulador hostil) lee el PR con contents/pull-requests en LECTURA.
+#    Configuración, prompt y scripts salen de la RAMA BASE (base/), nunca del PR (pr/).
+#  - publicar: sin credenciales del modelo; neutraliza el informe (publicar.py) y lo comenta en el PR.
+#
+# Es INFORMATIVO: no lo marques como check requerido. La autoridad son los checks y la puerta (ADR-010).
+# MODO=simulador mientras no haya credencial corporativa (D-055); MODO=modelo con el secreto ANTHROPIC_API_KEY.
+name: revisor-informativo
+
+on:
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+
+env:
+  MODO: simulador
+  CLAUDE_CODE_VERSION: "2.1.308"
+
+jobs:
+  revisar:
+    name: revisar (informativo)
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      informe: ${{ steps.informe.outputs.informe }}
+    steps:
+      - name: Rama base (configuración y scripts de confianza)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+
+      - name: PR (contenido no confiable)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Diff respecto a la base
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git -C pr diff "$BASE_SHA...HEAD" > pr/HARNESS_DIFF.txt
+
+      - name: Simulador hostil (sin modelo, D-055)
+        if: env.MODO == 'simulador'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          RUN_ID: ${{ github.run_id }}
+          ANTHROPIC_API_KEY: sk-ant-FAKE-harness-simulador-00000000   # credencial simulada para el ataque A5
+        run: |
+          set +e
+          python3 -I base/.harness/revisor/simulador_hostil.py --pr-dir pr --out informe.md --resultados resultados.json | tee -a "$GITHUB_STEP_SUMMARY"
+          code=${PIPESTATUS[0]}
+          set -e
+          echo "contencion=$code" >> "$GITHUB_ENV"
+
+      - name: Revisión con el modelo
+        if: env.MODO == 'modelo'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
+          cd pr
+          claude -p "$(cat ../base/.harness/revisor/prompt.md)" \
+            --bare --setting-sources user --settings ../base/.harness/revisor/settings.json \
+            --tools "Read,Grep,Glob" --permission-mode dontAsk \
+            --max-turns 15 --max-budget-usd 1 > ../informe.md
+
+      - name: Pasar el informe al job de publicación
+        id: informe
+        run: |
+          { echo 'informe<<HARNESS_EOF'; head -c 60000 informe.md; echo; echo 'HARNESS_EOF'; } >> "$GITHUB_OUTPUT"
+          test "${contencion:-0}" = "0" || { echo "::error::El simulador consiguió un ataque (ver resumen)."; exit 1; }
+
+  publicar:
+    name: publicar revisión (informativo)
+    needs: revisar
+    if: always() && github.event_name == 'pull_request' && needs.revisar.result != 'skipped'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Rama base (script de publicación)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+
+      - name: A6 · el job de publicación no hereda el entorno del job del modelo
+        run: |
+          test -z "${HARNESS_PWNED:-}" || { echo "::error::A6: variable inyectada desde el job de revisión."; exit 1; }
+
+      - name: Neutralizar y publicar
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          INFORME: ${{ needs.revisar.outputs.informe }}
+          RESULTADO: ${{ needs.revisar.result }}
+        run: |
+          printf '%s\n' "$INFORME" > informe.md
+          python3 -I base/.harness/revisor/publicar.py informe.md --resultado "$RESULTADO" > comentario.md
+          gh pr comment "$PR" --body-file comentario.md

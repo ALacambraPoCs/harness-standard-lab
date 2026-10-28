@@ -353,7 +353,8 @@ def agent_bare(ctx: Context):
         for job in (doc.get("jobs") or {}).values() if isinstance(doc, dict) else []:
             for step in (job.get("steps") or []) if isinstance(job, dict) else []:
                 run = step.get("run") if isinstance(step, dict) else None
-                for line in CLAUDE_P.findall(run or ""):
+                run = re.sub(r"\\[ \t]*\n\s*", " ", run) if isinstance(run, str) else ""   # une líneas continuadas con «\»
+                for line in CLAUDE_P.findall(run):
                     if "--bare" not in line or not re.search(r"--setting-sources[ =]user\b", line):
                         yield Finding("core.ci.agent-bare", "HS-CI-004",
                                       f"{rel}: `{line.strip()[:80]}` sin `--bare --setting-sources user`.",

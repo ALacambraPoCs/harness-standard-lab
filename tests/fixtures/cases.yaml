@@ -667,3 +667,24 @@ casos:
           path: .github/workflows/lint.yml
           content: "name: lint\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  l:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@v4\n"
     expect_fail: [ci.pinned, ci.merge-group]
+
+  - id: nc-workflow-no-analizable
+    # F5.4: un workflow que la CLI no puede leer no se salta en silencio.
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.7.0"}
+      - write:
+          path: .github/workflows/roto.yml
+          content: "name: roto\non:\n  pull_request:\n  merge_group:\npermissions:\n  contents: read\njobs:\n  r:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: test -z x || { echo \"::error::A6: x\"; exit 1; }\n"
+    expect_fail: [ci.parseable]
+    expect_effective_level: N0
+
+  - id: c-claude-p-multilinea
+    # F5.4: `claude -p … \` con --bare en la línea siguiente es conforme (sin falso positivo).
+    base: conforming/n1-endurecido
+    conforming: true
+    mutations:
+      - write:
+          path: .github/workflows/revision.yml
+          content: "name: revision\non:\n  pull_request:\n  merge_group:\npermissions:\n  contents: read\njobs:\n  r:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: |\n          claude -p \"revisa\" \\\n            --bare --setting-sources user\n"
+    expect_effective_level: N1

@@ -37,9 +37,9 @@ def _matches(patterns: list[str], path: str) -> bool:
     return any(compile_pattern(p, codeowners=True).match(path) for p in patterns)
 
 
-def _name_status(ctx: Context, base: str) -> list[tuple[str, str, str | None]]:
-    """(estado, ruta, ruta_anterior) de `git diff --name-status -M base...HEAD`."""
-    out = subprocess.run(["git", "diff", "--name-status", "-M", f"{base}...HEAD"], cwd=ctx.root,
+def _name_status(ctx: Context, base: str, head: str = "HEAD") -> list[tuple[str, str, str | None]]:
+    """(estado, ruta, ruta_anterior) de `git diff --name-status -M base...head`."""
+    out = subprocess.run(["git", "diff", "--name-status", "-M", f"{base}...{head}"], cwd=ctx.root,
                          capture_output=True, text=True, check=True).stdout
     rows = []
     for line in out.splitlines():
@@ -59,13 +59,16 @@ def critical_patterns(ctx: Context) -> list[str]:
     return list(ctx.standard.critical_patterns) + [p for p in extra if isinstance(p, str)]
 
 
-def compute(ctx: Context, base: str) -> Riesgo:
-    """Clase mínima del PR (base...HEAD) según rutas, pruebas borradas y tareas que se cierran."""
+def compute(ctx: Context, base: str, head: str | None = None) -> Riesgo:
+    """Clase mínima del PR (base...HEAD) según rutas, pruebas borradas y tareas que se cierran.
+
+    Con `head`, calcula sobre commits ya fusionados (p. ej. `harness audit`: base `<sha>^1`, head `<sha>`)
+    sin tocar el árbol de trabajo."""
     from .tasks import load_at_ref, load_worktree
 
     r = Riesgo()
     crit = critical_patterns(ctx)
-    for st, path, old in _name_status(ctx, base):
+    for st, path, old in _name_status(ctx, base, head or "HEAD"):
         if _matches(crit, path) or (old and _matches(crit, old)):
             r.subir("alto", f"ruta crítica: {path}")
         elif _matches(ctx.standard.sensitive_patterns, path) or (old and _matches(ctx.standard.sensitive_patterns, old)):
@@ -76,7 +79,8 @@ def compute(ctx: Context, base: str) -> Riesgo:
             r.subir("medio", f"prueba renombrada: {old} → {path}")
 
     before = load_at_ref(ctx, base)
-    for t in load_worktree(ctx):
+    after = list(load_at_ref(ctx, head).values()) if head else load_worktree(ctx)
+    for t in after:
         if not t.id or t.errors or t.status != "done":
             continue
         old = before.get(t.id)

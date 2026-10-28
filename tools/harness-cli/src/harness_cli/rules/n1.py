@@ -331,3 +331,31 @@ def plans_structure(ctx: Context):
         if not (ctx.root / path).is_dir():
             yield Finding("core.plans.structure", "HS-STA-001", f"No existe el directorio {path}/ (rol `{role}`).",
                           "Copia template/niveles/n1/docs/plans/ (con .gitkeep en active/ y completed/).", path)
+
+
+RUNBOOK_ANCHORS = ["cuando", "pasos", "verificacion", "escalado"]
+
+
+@rule("core.runbooks.rollback", ["HS-CI-009"])
+def runbook_rollback(ctx: Context):
+    """Si la instancia despliega (`plataforma.entorno_despliegue`), hay un runbook de rollback con sus anclas."""
+    plat = (ctx.manifest or {}).get("plataforma") or {}
+    if not plat.get("entorno_despliegue"):
+        return
+    d = ctx.role_path("runbooks.dir").rstrip("/")
+    base = ctx.root / d
+    found = sorted(p for p in base.glob("rollback*.md")) if base.is_dir() else []
+    if not found:
+        yield Finding("core.runbooks.rollback", "HS-CI-009",
+                      f"El manifiesto declara el entorno de despliegue `{plat['entorno_despliegue']}`, pero no hay `{d}/rollback*.md`.",
+                      "Crea el runbook (plantilla: catalog/workflow/despliegue-pages/src/RUNBOOK-rollback.md, o "
+                      "`harness components add despliegue-pages`).", d)
+        return
+    for p in found:
+        rel = f"{d}/{p.name}"
+        secs = sections(ctx.read(rel) or "")
+        falta = [a for a in RUNBOOK_ANCHORS if not secs.get(a)]
+        if falta:
+            yield Finding("core.runbooks.rollback", "HS-CI-009", f"{rel}: faltan o están vacías las secciones "
+                          + ", ".join(f"`harness:{a}`" for a in falta) + ".",
+                          "Añade cada sección con su ancla <!-- harness:… --> (ficha runbooks.dir).", rel)

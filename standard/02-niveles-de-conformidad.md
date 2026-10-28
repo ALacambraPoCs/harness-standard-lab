@@ -162,6 +162,12 @@ Solo aplican a instancias que declaran `standard.version` ≥ 0.5.0 (regla 7, D-
 |---|---|---|---|---|
 | HS-SEC-013 | DEBERÍA | N1,N2,N3 | `settings.json` activa el sandbox sin vía de escape; los comandos de red con GitHub, en `excludedCommands` | automática |
 
+## 3i. Requisitos añadidos en 0.9.0 (F5.6) — estado: propuesto (pendiente de aprobación con el PR de F5.6)
+
+| ID | Nivel | Niveles | Requisito (resumen) | Verificación |
+|---|---|---|---|---|
+| HS-CI-009 | DEBERÍA | N1,N2,N3 | Si el manifiesto declara `plataforma.entorno_despliegue`, hay un runbook `rollback*.md` en `runbooks.dir` con las secciones `cuando`, `pasos`, `verificacion` y `escalado` | automática (forma); ensayo manual |
+
 ## 4. Waivers
 
 1. Un waiver DEBE declararse en `waivers` del manifiesto con los campos `requirement`, `reason`, `approved_by`, `approved_on` y `expires` (HS-GOV-003).

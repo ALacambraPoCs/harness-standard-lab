@@ -73,7 +73,7 @@ Leyenda: **O** obligatorio · **C** condicional · **R** recomendado · **P** op
 | `decisions.dir` | `docs/decisions` | directorio | O | N0 | nucleo | sí | — | [ficha](04-archivos/decisions.dir.md) |
 | `security.policy` | `docs/security/SECURITY.md` | archivo | O | N0 | nucleo | sí | — | [ficha](04-archivos/security.policy.md) |
 | `quality.doc` | `docs/quality/QUALITY.md` | archivo | R | N1 | nucleo | sí | — | pendiente:F6 |
-| `runbooks.dir` | `docs/runbooks` | directorio | C | N1 | nucleo | sí | El repositorio se despliega o se opera en un entorno compartido. | pendiente:F5 |
+| `runbooks.dir` | `docs/runbooks` | directorio | C | N1 | nucleo | sí | El repositorio se despliega o se opera en un entorno compartido. | [ficha](04-archivos/runbooks.dir.md) |
 | `references.dir` | `docs/references` | directorio | P | N0 | nucleo | sí | — | [ficha](04-archivos/references.dir.md) |
 | `plans.dir` | `docs/plans` | directorio | O | N1 | nucleo | sí | — | [ficha](04-archivos/plans.dir.md) |
 | `plans.active` | `{plans.dir}/active` | directorio | O | N1 | nucleo | no | — | [ficha](04-archivos/plans.dir.md) |

@@ -31,6 +31,8 @@ Concentrar la **autoridad L4** del harness: los checks que deciden si un PR se p
 | Ídem, job `puerta-riesgo-alto` | N1 | Solo si la clase es `alto`: espera la aprobación en el environment `aprobacion-riesgo-alto`. Si no, se salta y cuenta como éxito | `tasks / puerta riesgo alto` | ADR-010 rev. 2 |
 | `harness-platform.yml` → `harness-platform.yml` | N1 (0.7.0+) | `harness platform check` semanal y en cada push a la rama por defecto; si falla, abre o comenta una issue. **No es check de PR** | — (programado) | HS-CI-006 |
 
+Opcional: el componente de catálogo `despliegue-pages` (F5.6) despliega en GitHub Pages desde la rama por defecto, verifica el SHA servido, revierte solo si falla y publica `harness audit` en el resumen. Solo sus jobs de despliegue tienen `pages: write` e `id-token: write`.
+
 Opcional: el componente de catálogo `revisor-informativo` (F5.4) añade una revisión de PR con agente, **informativa** (nunca check requerido), con el modelo en solo lectura y la publicación en un job sin credenciales del modelo.
 
 Reglas de forma para cualquier workflow de la instancia:

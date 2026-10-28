@@ -7,6 +7,8 @@ CLI de conformidad del Estándar de Harness (producto B). Python ≥ 3.11; depen
 | Comando | Qué hace |
 |---|---|
 | `harness check [--path DIR] [--run-commands] [--strict] [--format text\|json] [--json-out FILE]` | Valida una instancia contra los requisitos aplicables a su nivel y adaptadores. Código de salida 1 si hay errores (o avisos con `--strict`). |
+| `harness platform check [--repo O/R] [--branch B]` | Compara el ruleset y los environments reales de GitHub con lo que exige el nivel (HS-CI-006). Solo lee; sin token en repos públicos. |
+| `harness audit <sha\|#PR> [--repo O/R] [--format md\|json] [--no-platform] [--strict]` | Rastro de auditoría de un cambio fusionado: commit, PR, tarea, origen, riesgo declarado frente al recalculado, checks, aprobaciones de la puerta, despliegues y estado de la plataforma, con alertas. Solo lee. Sale con 1 si hay alertas y `--strict`; con 2 si no puede resolver la referencia o contactar con la API. |
 | `harness explain <HS-…\|regla>` | Muestra un requisito o una regla. |
 | `harness matrix [--strict] [--output FILE]` | (Solo en el repo central) Genera la matriz requisito → regla → fixture. Con `--strict` ejecuta los fixtures y falla ante huecos de trazabilidad. |
 

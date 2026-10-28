@@ -1,0 +1,86 @@
+# Workflow reutilizable de autoridad comprobable (F5.3-A, HS-CI-006). Lo llaman las instancias desde
+# .github/workflows/harness-platform.yml (plantilla: template/niveles/n1/) de forma programada y en cada
+# push a la rama por defecto. NO es un check de PR: el estado de la plataforma no lo cambia un PR.
+#
+#  - platform: `harness platform check` (solo lee la API; sin token en repos públicos).
+#  - informe (si falla): abre o comenta una issue «harness platform check falla» con el resultado, para
+#    que el fallo no pase desapercibido. Sin credenciales del modelo; solo `issues: write`.
+name: harness-platform
+
+on:
+  workflow_call:
+    inputs:
+      standard-repository:
+        type: string
+        default: ""
+      cli-ref:
+        type: string
+        default: cli-v0.7.0-rc.1
+      python-version:
+        type: string
+        default: "3.12"
+    secrets:
+      standard-token:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  platform:
+    name: harness platform check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read       # leer environments en repos privados
+    outputs:
+      report: ${{ steps.check.outputs.report }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Checkout estándar
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ inputs.standard-repository != '' && inputs.standard-repository || format('{0}/harness-standard', github.repository_owner) }}
+          ref: ${{ inputs.cli-ref }}
+          path: .harness-standard
+          token: ${{ secrets.standard-token || github.token }}
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ inputs.python-version }}
+      - run: python -m pip install --disable-pip-version-check ./.harness-standard
+      - name: harness platform check
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          harness platform check --path . | tee platform-report.txt
+          code=${PIPESTATUS[0]}
+          set -e
+          { echo 'report<<HARNESS_EOF'; head -c 60000 platform-report.txt; echo; echo 'HARNESS_EOF'; } >> "$GITHUB_OUTPUT"
+          { echo '## harness platform check'; echo '```'; cat platform-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $code
+
+  informe:
+    name: informe de plataforma
+    needs: platform
+    if: failure()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Abrir o actualizar la issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REPORT: ${{ needs.platform.outputs.report }}
+        run: |
+          { echo "La configuración de la plataforma no cumple el estándar (HS-CI-006). Ejecución: $RUN_URL"; echo; echo '```'; printf '%s\n' "$REPORT"; echo '```'; } > body.md
+          n=$(gh issue list --state open --search 'in:title "harness platform check falla"' --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then gh issue comment "$n" --body-file body.md; else gh issue create --title "harness platform check falla" --body-file body.md; fi

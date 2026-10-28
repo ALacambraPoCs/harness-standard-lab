@@ -16,8 +16,8 @@ def build(standard: Standard, fixtures_dir: Path) -> tuple[list[dict], list[str]
         for r in c.get("expect_fail", []):
             by_rule.setdefault(r, []).append(c["id"])
     # Las reglas que no ejecuta `harness check` se prueban en su propio archivo de tests:
-    # contexto PR (base o cuerpo del PR) en test_tasks.py y catálogo central en test_catalog.py.
-    for context, fname in (("pr", "test_tasks.py"), ("catalog", "test_catalog.py")):
+    # contexto PR en test_tasks.py, catálogo central en test_catalog.py y plataforma en test_platform.py.
+    for context, fname in (("pr", "test_tasks.py"), ("catalog", "test_catalog.py"), ("platform", "test_platform.py")):
         f = fixtures_dir.parent / fname
         text = f.read_text(encoding="utf-8") if f.is_file() else ""
         for rid, rule in registry.items():

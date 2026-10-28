@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-26 (F5.1 y F5.2: D-053…D-060)
+actualizado: 2026-10-28 (F5.3: D-061…D-063)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -92,13 +92,16 @@ actualizado: 2026-10-26 (F5.1 y F5.2: D-053…D-060)
 | D-058 | **R1 aprobada:** clase de riesgo mínima calculada por `harness pr risk` (rutas críticas → alto; configuración de agentes, pruebas borradas o criterios cambiados → medio); declarar solo puede subirla. HS-CI-005 (DEBE, N1, desde 0.6.0). | 2026-10-26 | Usuario |
 | D-059 | **R2 aprobada:** matriz de escalado por clase (fusión) y disparadores de parada del agente (`fase-5/03-riesgo-y-escalado.md` §2). | 2026-10-26 | Usuario |
 | D-060 | **ADR-010 rev. 2 aprobado:** revisión de agentes informativa, autorización por ruleset y puerta explícita de riesgo alto con un environment con revisores. | 2026-10-26 | Usuario |
+| D-061 | **F5.2 aprobada** e implementada (estándar 0.6.0; PR #18, `cli-v0.6.0-rc.1`). | 2026-10-28 | Usuario |
+| D-062 | **F5.3-A aprobada:** `harness platform check` (solo lectura, programado y en push a `main`, issue si falla) y HS-CI-006. Sin `platform apply`. | 2026-10-28 | Usuario |
+| D-063 | **F5.3-B aprobada:** reglas de seguridad de workflows en `harness check`: HS-CI-007 (DEBE) y HS-CI-008 (DEBERÍA). | 2026-10-28 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F5.2** (D-058…D-060; estándar 0.6.0, CLI 0.6.0rc1): pendiente de revisión y fusión.
-- **F5.3** (autoridad comprobable: `harness platform check`): siguiente.
+- **F5.3** (D-062, D-063; estándar 0.7.0, CLI 0.7.0rc1): pendiente de revisión y fusión.
+- **F5.4** (agente revisor informativo en CI con simulador, D-055): siguiente.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -142,7 +145,7 @@ actualizado: 2026-10-26 (F5.1 y F5.2: D-053…D-060)
 
 ## Próximos pasos
 
-1. **Usuario:** fusionar la F5.2 (`f5.2.patch`) y publicar `cli-v0.6.0-rc.1` (falta también `cli-v0.5.1-rc.1` de la F3.8).
+1. **Usuario:** fusionar la F5.3 (`f5.3.patch`) y publicar `cli-v0.7.0-rc.1`. Crear en el ejemplo el environment `aprobacion-riesgo-alto` antes de adoptar 0.6.0+ (F5.7).
 2. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 3. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

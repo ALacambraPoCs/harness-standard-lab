@@ -191,6 +191,22 @@ def _cmd_pr(args) -> int:
     return _print_findings(T.check_pr(ctx, body, args.base, title=title), "harness pr check", args.format)
 
 
+def _cmd_platform(args) -> int:
+    import os
+    from . import platform as P
+    ctx = _ctx(args)
+    repo = args.repo or os.environ.get("GITHUB_REPOSITORY") or P.repo_from_git(ctx)
+    if not repo:
+        print("No se pudo deducir el repositorio: usa --repo dueño/repo.", file=sys.stderr)
+        return 2
+    try:
+        findings = P.check(ctx, repo, args.branch, P.http_fetch(P.resolve_token()))
+    except P.Inaccesible as exc:
+        print(f"No se puede contactar con la API de GitHub: {exc}", file=sys.stderr)
+        return 2
+    return _print_findings(findings, f"harness platform check · {repo} · {ctx.level}", args.format)
+
+
 def _cmd_catalog(args) -> int:
     from .catalog import render_index, update_readme, validate
     std = load_standard(Path(args.standard_root) if args.standard_root else None)
@@ -313,6 +329,15 @@ def build_parser() -> argparse.ArgumentParser:
     prr.add_argument("--format", choices=["text", "json"], default="text")
     prr.add_argument("--github-output", action="store_true", help="Escribe `clase=<clase>` en $GITHUB_OUTPUT.")
     prr.set_defaults(func=_cmd_pr)
+
+    pl = sub.add_parser("platform", help="Autoridad comprobable: ruleset y environments reales en GitHub (F5.3-A).")
+    plsub = pl.add_subparsers(dest="platform_cmd", required=True)
+    plc = plsub.add_parser("check", help="Compara el ruleset y los environments con lo que exige el nivel. Solo lee.")
+    plc.add_argument("--path", default=".")
+    plc.add_argument("--repo", help="dueño/repo (por defecto, GITHUB_REPOSITORY o el remoto origin).")
+    plc.add_argument("--branch", help="Rama a comprobar (por defecto, la rama por defecto del repositorio).")
+    plc.add_argument("--format", choices=["text", "json"], default="text")
+    plc.set_defaults(func=_cmd_platform)
 
     cg = sub.add_parser("catalog", help="Catálogo de componentes del repositorio central (F3).")
     cgsub = cg.add_subparsers(dest="catalog_cmd", required=True)

@@ -614,3 +614,56 @@ casos:
       - replace: {path: .claude/settings.json, old: "      \"Bash(git add -f*)\",\n", new: ""}
       - replace: {path: .claude/settings.json, old: "      \"Bash(git commit --no-verify*)\",\n", new: ""}
     expect_fail: [adapter.claude.settings-allow-broad]
+
+  # ─────────────── Estándar 0.7.0 · seguridad de los workflows (F5.3-B, D-063) ───────────────
+  - id: c-n1-workflows-0.7
+    base: conforming/n1-endurecido
+    conforming: true
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.7.0"}
+    expect_effective_level: N1
+
+  - id: nc-pull-request-target
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.7.0"}
+      - replace: {path: .github/workflows/harness.yml, old: "  merge_group:\n", new: "  merge_group:\n  pull_request_target:\n"}
+    expect_fail: [ci.no-pr-target]
+    expect_effective_level: N0
+
+  - id: nc-interpolacion-no-confiable
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.7.0"}
+      - write:
+          path: .github/workflows/saludo.yml
+          content: "name: saludo\non:\n  pull_request:\n  merge_group:\npermissions:\n  contents: read\njobs:\n  s:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: echo \"${{ github.event.pull_request.title }}\"\n"
+    expect_fail: [ci.no-untrusted-interpolation]
+    expect_effective_level: N0
+
+  - id: nc-workflow-sin-permissions
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.7.0"}
+      - replace: {path: .github/workflows/harness.yml, old: "permissions:\n  contents: read\n", new: ""}
+    expect_fail: [ci.permissions]
+    expect_effective_level: N0
+
+  - id: nc-modelo-con-escritura
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.7.0"}
+      - write:
+          path: .github/workflows/revision.yml
+          content: "name: revision\non:\n  pull_request:\n  merge_group:\npermissions:\n  contents: read\njobs:\n  r:\n    runs-on: ubuntu-24.04\n    permissions:\n      contents: write\n      id-token: write\n    env:\n      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}\n    steps:\n      - run: claude -p \"revisa\" --bare --setting-sources user\n"
+    expect_fail: [ci.model-readonly]
+    expect_effective_level: N0
+
+  - id: nc-action-sin-sha-y-sin-merge-group
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.7.0"}
+      - write:
+          path: .github/workflows/lint.yml
+          content: "name: lint\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  l:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@v4\n"
+    expect_fail: [ci.pinned, ci.merge-group]

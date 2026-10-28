@@ -34,7 +34,7 @@ casos:
   - id: nc-version-no-soportada
     base: conforming/n0-basico
     mutations:
-      - replace: {path: .harness/manifest.yaml, old: "version: 0.1.0", new: "version: 0.9.0"}
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.1.0", new: "version: 9.9.0"}
     expect_fail: [core.manifest.standard-version]
 
   - id: nc-nivel-no-definido
@@ -703,3 +703,21 @@ casos:
       - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.8.0"}
       - replace: {path: .claude/settings.json, old: "  \"enableAllProjectMcpServers\": false,", new: "  \"enableAllProjectMcpServers\": false,\n  \"sandbox\": {\"enabled\": true, \"allowUnsandboxedCommands\": false},"}
     expect_effective_level: N1
+
+  # ─────────────── Estándar 0.9.0 · runbook de rollback (F5.6, HS-CI-009) ───────────────
+  - id: nc-despliega-sin-runbook
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.9.0"}
+      - replace: {path: .harness/manifest.yaml, old: "commands:", new: "plataforma:\n  entorno_despliegue: github-pages\ncommands:"}
+      - replace: {path: .claude/settings.json, old: "  \"enableAllProjectMcpServers\": false,", new: "  \"enableAllProjectMcpServers\": false,\n  \"sandbox\": {\"enabled\": true, \"allowUnsandboxedCommands\": false},"}
+    expect_fail: [core.runbooks.rollback]
+
+  - id: nc-runbook-sin-secciones
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.9.0"}
+      - replace: {path: .harness/manifest.yaml, old: "commands:", new: "plataforma:\n  entorno_despliegue: github-pages\ncommands:"}
+      - replace: {path: .claude/settings.json, old: "  \"enableAllProjectMcpServers\": false,", new: "  \"enableAllProjectMcpServers\": false,\n  \"sandbox\": {\"enabled\": true, \"allowUnsandboxedCommands\": false},"}
+      - write: {path: docs/runbooks/rollback.md, content: "# Rollback\n\n<!-- harness:pasos -->\n1. Lanzar el workflow.\n"}
+    expect_fail: [core.runbooks.rollback]

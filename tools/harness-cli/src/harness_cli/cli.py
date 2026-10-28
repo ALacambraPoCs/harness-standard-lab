@@ -207,6 +207,25 @@ def _cmd_platform(args) -> int:
     return _print_findings(findings, f"harness platform check · {repo} · {ctx.level}", args.format)
 
 
+def _cmd_audit(args) -> int:
+    import json
+    import os
+    from . import platform as P
+    from .audit import AuditError, audit, to_markdown
+    ctx = _ctx(args)
+    repo = args.repo or os.environ.get("GITHUB_REPOSITORY") or P.repo_from_git(ctx)
+    if not repo:
+        print("No se pudo deducir el repositorio: usa --repo dueño/repo.", file=sys.stderr)
+        return 2
+    try:
+        a = audit(ctx, args.ref, repo, P.http_fetch(P.resolve_token()), platform=not args.no_platform)
+    except (AuditError, P.Inaccesible) as exc:
+        print(f"harness audit: {exc}", file=sys.stderr)
+        return 2
+    print(json.dumps(a.as_dict(), ensure_ascii=False, indent=2) if args.format == "json" else to_markdown(a))
+    return 1 if args.strict and a.alertas else 0
+
+
 def _cmd_catalog(args) -> int:
     from .catalog import render_index, update_readme, validate
     std = load_standard(Path(args.standard_root) if args.standard_root else None)
@@ -338,6 +357,16 @@ def build_parser() -> argparse.ArgumentParser:
     plc.add_argument("--branch", help="Rama a comprobar (por defecto, la rama por defecto del repositorio).")
     plc.add_argument("--format", choices=["text", "json"], default="text")
     plc.set_defaults(func=_cmd_platform)
+
+    au = sub.add_parser("audit", help="Rastro de auditoría de un commit o PR fusionado: PR, tarea, origen, riesgo, "
+                                      "checks, aprobaciones y despliegues (F5.6-B). Solo lee.")
+    au.add_argument("ref", help="SHA o referencia git (p. ej. HEAD) de la rama por defecto, o #N / pr:N.")
+    au.add_argument("--path", default=".")
+    au.add_argument("--repo", help="dueño/repo (por defecto, GITHUB_REPOSITORY o el remoto origin).")
+    au.add_argument("--format", choices=["md", "json"], default="md")
+    au.add_argument("--no-platform", action="store_true", help="No incluye `harness platform check`.")
+    au.add_argument("--strict", action="store_true", help="Sale con 1 si hay alertas.")
+    au.set_defaults(func=_cmd_audit)
 
     cg = sub.add_parser("catalog", help="Catálogo de componentes del repositorio central (F3).")
     cgsub = cg.add_subparsers(dest="catalog_cmd", required=True)

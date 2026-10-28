@@ -4,6 +4,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 5
 
+### Añadido (F5.6, 2026-10-28) — estándar 0.9.0, CLI 0.9.0rc1
+- Componente de catálogo **`workflow/despliegue-pages`** 0.1.0 (`experimental`, D-072): despliegue en GitHub Pages desde la rama por defecto, **verificación** de que la URL sirve el SHA (`version.txt`), **rollback automático** a la versión que se servía antes e issue, y rollback manual por SHA (solo de la historia de la rama por defecto). Solo los jobs `desplegar` y `revertir` tienen `pages: write` e `id-token: write`; el sitio se construye sin ejecutar código del commit. Incluye el runbook de rollback.
+- **`harness audit <sha|#PR>`** (`audit.py`, D-073): rastro de auditoría de solo lectura (commit, PR, tarea, origen declarado y coautores, riesgo declarado frente al recalculado, checks, aprobaciones de la puerta, despliegues y `platform check`) con alertas; `--format json`, `--strict`. El workflow de despliegue lo publica en el resumen del run.
+- `risk.compute(..., head=)`: recalcula la clase sobre commits ya fusionados.
+- Ficha **`runbooks.dir`** (aplazada desde F2) y requisito **HS-CI-009** (DEBERÍA, propuesto) con la regla `core.runbooks.rollback`.
+- Ejemplo greenfield: `site/` generado por `scripts/generar_sitio.py` y prueba de que está al día.
+
 ### Añadido (F5.5, 2026-10-28) — estándar 0.8.0, CLI 0.8.0rc1
 - Plantilla `settings.json` con **sandbox** (D-067): sin reintento fuera del sandbox, sin red y con `git push|fetch|pull`, `gh` y `harness platform` en `excludedCommands`; lectura denegada de `~/.ssh`, `~/.aws`, `~/.config/gh` y `~/.config/harness`. Requisito **HS-SEC-013** (DEBERÍA) y regla `adapter.claude.settings-sandbox`.
 - `standard/plataforma/managed-settings.json` (D-068) y `token-agente.md` (D-069).

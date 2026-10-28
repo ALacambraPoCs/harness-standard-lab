@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>harness-example-greenfield</title>
+</head>
+<body>
+  <h1>harness-example-greenfield</h1>
+  <p>Ejemplo de <code>total()</code> con descuento del 10 %:</p>
+  <table>
+    <thead><tr><th>Cantidad</th><th>Precio</th></tr></thead>
+    <tbody>
+      <tr><td>2</td><td>1.50</td></tr>
+      <tr><td>1</td><td>3.00</td></tr>
+    </tbody>
+  </table>
+  <p>Total: <strong id="total">5.40</strong></p>
+  <p>Versión desplegada: <code id="version">(cargando)</code></p>
+  <script>
+    fetch("version.txt", {cache: "no-store"}).then(r => r.text())
+      .then(t => { document.getElementById("version").textContent = t.trim().slice(0, 12); })
+      .catch(() => { document.getElementById("version").textContent = "desconocida"; });
+  </script>
+</body>
+</html>

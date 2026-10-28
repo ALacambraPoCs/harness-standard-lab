@@ -1,0 +1,223 @@
+# Despliegue en GitHub Pages con verificación y rollback (componente del catálogo `despliegue-pages`;
+# F5.6-A, D-072; auditoría F5.6-B, D-073).
+#
+#  - preparar: decide el objetivo (HEAD de la rama por defecto, o un SHA de su historia en el rollback
+#    manual), lee el SHA que sirve hoy el sitio (anterior) y construye el sitio SIN ejecutar su código.
+#  - desplegar: único job con `pages: write` + `id-token: write`, en el environment `github-pages`.
+#  - verificar: la URL debe servir version.txt == objetivo. Si no, el run falla y se revierte.
+#  - revertir: reconstruye `anterior` y lo despliega; verificar-reversion lo comprueba.
+#  - avisar: abre una issue si hubo que revertir (solo `issues: write`).
+#  - auditar: `harness audit <objetivo>` en el resumen del run (solo lectura).
+#
+# La autoridad es la plataforma: el environment `github-pages` solo admite la rama por defecto y la rama
+# solo cambia por PR con checks requeridos (ruleset). Este workflow no tiene credenciales del modelo.
+name: despliegue-pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Rollback manual: SHA completo de la rama por defecto que se quiere volver a servir (vacío = HEAD)."
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: despliegue-pages
+  cancel-in-progress: false
+
+env:
+  ORIGEN_SITIO: site                                   # directorio del sitio estático en la instancia
+  STANDARD_REPOSITORY: ALacambraPoCs/harness-standard-lab
+  CLI_REF: cli-v0.9.0-rc.1
+
+jobs:
+  preparar:
+    name: preparar
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      objetivo: ${{ steps.plan.outputs.objetivo }}
+      anterior: ${{ steps.plan.outputs.anterior }}
+      url: ${{ steps.plan.outputs.url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          path: base
+          persist-credentials: false
+      - name: Objetivo y versión que se sirve hoy
+        id: plan
+        env:
+          SHA_MANUAL: ${{ inputs.sha }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref }}
+          URL_SITIO: ${{ vars.HARNESS_PAGES_URL }}
+        run: python3 -I base/.harness/despliegue/despliegue.py preparar --repo-dir base --repo "$REPO" --sha "$SHA_MANUAL" --ref "$REF" --url "$URL_SITIO" | tee -a "$GITHUB_OUTPUT"
+      - name: Construir el sitio del objetivo
+        env:
+          OBJETIVO: ${{ steps.plan.outputs.objetivo }}
+        run: python3 -I base/.harness/despliegue/despliegue.py construir --repo-dir base --sha "$OBJETIVO" --origen "$ORIGEN_SITIO" --out _site
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  desplegar:
+    name: desplegar
+    needs: preparar
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+
+  verificar:
+    name: verificar
+    needs: [preparar, desplegar]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: base
+          persist-credentials: false
+      - name: La URL sirve el objetivo
+        env:
+          URL_SITIO: ${{ needs.preparar.outputs.url }}
+          OBJETIVO: ${{ needs.preparar.outputs.objetivo }}
+        run: python3 -I base/.harness/despliegue/despliegue.py verificar --url "$URL_SITIO" --sha "$OBJETIVO" --timeout 600
+
+  construir-reversion:
+    name: construir reversión
+    needs: [preparar, verificar]
+    if: failure() && needs.verificar.result == 'failure' && needs.preparar.outputs.anterior != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          path: base
+          persist-credentials: false
+      - name: Construir la versión anterior
+        env:
+          ANTERIOR: ${{ needs.preparar.outputs.anterior }}
+        run: python3 -I base/.harness/despliegue/despliegue.py construir --repo-dir base --sha "$ANTERIOR" --origen "$ORIGEN_SITIO" --out _site
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+          name: github-pages-reversion
+
+  revertir:
+    name: revertir
+    needs: construir-reversion
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        with:
+          artifact_name: github-pages-reversion
+
+  verificar-reversion:
+    name: verificar reversión
+    needs: [preparar, revertir]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: base
+          persist-credentials: false
+      - name: La URL vuelve a servir la versión anterior
+        env:
+          URL_SITIO: ${{ needs.preparar.outputs.url }}
+          ANTERIOR: ${{ needs.preparar.outputs.anterior }}
+        run: python3 -I base/.harness/despliegue/despliegue.py verificar --url "$URL_SITIO" --sha "$ANTERIOR" --timeout 600
+
+  avisar:
+    name: avisar
+    needs: [preparar, verificar, verificar-reversion]
+    if: always() && needs.verificar.result == 'failure'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: base
+          persist-credentials: false
+      - name: Abrir la issue de despliegue fallido
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          OBJETIVO: ${{ needs.preparar.outputs.objetivo }}
+          ANTERIOR: ${{ needs.preparar.outputs.anterior }}
+          REVERTIDO: ${{ needs.verificar-reversion.result }}
+        run: |
+          python3 -I base/.harness/despliegue/despliegue.py aviso --repo "$GH_REPO" --run-url "$RUN_URL" \
+            --objetivo "$OBJETIVO" --anterior "$ANTERIOR" --revertido "$REVERTIDO" > aviso.md
+          gh issue create --title "Despliegue fallido de ${OBJETIVO:0:12} (rollback: ${REVERTIDO:-no})" --body-file aviso.md
+
+  auditar:
+    name: auditar
+    needs: [preparar, verificar]
+    if: always() && needs.preparar.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+      checks: read
+      actions: read
+      deployments: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Checkout estándar
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.STANDARD_REPOSITORY }}
+          ref: ${{ env.CLI_REF }}
+          path: .harness-standard
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check ./.harness-standard
+      - name: harness audit (informativo)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OBJETIVO: ${{ needs.preparar.outputs.objetivo }}
+        run: |
+          harness audit "$OBJETIVO" --path . >> "$GITHUB_STEP_SUMMARY" \
+            || echo "::warning::harness audit no pudo completarse (informativo: no cambia el resultado del despliegue)."

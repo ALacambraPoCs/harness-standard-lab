@@ -1,7 +1,7 @@
 # Registro de requisitos del Estándar de Harness.
 # Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
 # Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
-version_estandar: 0.8.0
+version_estandar: 0.9.0
 # Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
 niveles_definidos: [N0, N1]
 # Versión del estándar desde la que existe cada nivel (D-029). N1 exige declarar `standard.version` ≥ 0.2.0.
@@ -1089,6 +1089,21 @@ requisitos:
     estado: aprobado
     desde: 0.8.0
     retirada: Si el aislamiento se hace con contenedores o devcontainers obligatorios.
+  - id: HS-CI-009
+    titulo: Una instancia que despliega tiene un runbook de rollback
+    texto: Si el manifiesto declara `plataforma.entorno_despliegue`, el directorio `runbooks.dir` DEBERÍA contener un `rollback*.md` con las secciones `harness:cuando`, `harness:pasos`, `harness:verificacion` y `harness:escalado`.
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [core.runbooks.rollback]
+    fuentes: [D-054, D-072, F5-01]
+    nota: La regla comprueba que el procedimiento existe y tiene forma, no que funcione; el ensayo es manual (F5.7) y se anota en `revisado`. El rollback automático lo hace el componente `despliegue-pages`.
+    estado: propuesto
+    desde: 0.9.0
+    retirada: Si el rollback se automatiza por completo y se ensaya en cada despliegue.
   - id: HS-CI-004
     titulo: El agente en CI no carga la configuración del repositorio
     texto: Un paso de workflow que ejecute `claude -p` DEBE usar `--bare` y `--setting-sources user`, con su configuración tomada de fuera del PR.

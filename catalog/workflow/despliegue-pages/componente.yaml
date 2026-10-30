@@ -1,6 +1,6 @@
 id: despliegue-pages
 tipo: workflow
-version: 0.1.0
+version: 0.2.0
 estado: experimental
 titulo: Despliegue en GitHub Pages con verificación, rollback y auditoría
 proposito: >-
@@ -14,13 +14,13 @@ compatibilidad:
   niveles: [N1, N2, N3]
 contrato:
   entradas:
-    - "Push a la rama por defecto, o workflow_dispatch desde ella con `sha` (rollback manual)"
+    - "Push a la rama por defecto, o workflow_dispatch desde ella con `sha` (rollback manual) y `ensayo_rollback` (simulacro)"
     - "Directorio del sitio estático ya generado y versionado (ORIGEN_SITIO, por defecto site/); no se ejecuta código del commit"
     - "Variable de repositorio opcional HARNESS_PAGES_URL (por defecto https://<dueño>.github.io/<repo>/)"
   salidas:
     - "Sitio publicado con version.txt = SHA desplegado"
     - "Run en verde solo si la URL sirve el SHA objetivo; en rojo si hubo que revertir"
-    - "Issue «Despliegue fallido …» si la verificación falla, con el resultado del rollback"
+    - "Issue «Despliegue fallido …» si la verificación falla (o «Ensayo de rollback …» en un simulacro), con el resultado del rollback"
     - "Resumen del run con `harness audit <sha>` (PR, tarea, origen, riesgo, checks, aprobaciones, despliegues)"
   efectos:
     - "Despliega en el environment github-pages (jobs desplegar y revertir: pages y id-token en escritura)"
@@ -39,15 +39,13 @@ archivos:
     destino: .github/workflows/despliegue-pages.yml
   - origen: src/despliegue.py
     destino: .harness/despliegue/despliegue.py
-  - origen: src/RUNBOOK-rollback.md
-    destino: docs/runbooks/rollback-pages.md
 dependencias: []
 pruebas:
   - tipo: unitaria
     descripcion: "construir no ejecuta código, rechaza enlaces, rutas fuera del sitio y version.txt propio; preparar solo acepta la rama por defecto y SHA de su historia; verificar reintenta y falla al agotar el tiempo; el workflow cumple HS-CI-007/008 y solo desplegar/revertir pueden desplegar"
     comando: "python -m pytest catalog/workflow/despliegue-pages/tests"
   - tipo: integracion
-    descripcion: "F5.7 en harness-example-greenfield: despliegue verificado; despliegue roto (verificación fallida) con rollback automático e issue; rollback manual por SHA; despliegue desde otra rama bloqueado por el environment"
+    descripcion: "F5.7 en harness-example-greenfield: despliegue verificado; ensayo de rollback (verificación forzada a fallar) con rollback automático e issue; rollback manual por SHA; despliegue desde otra rama bloqueado"
 metricas:
   - "Despliegues verificados / despliegues (objetivo: 100 % salvo fallos reales)"
   - "Tiempo de merge a sitio verificado (p50, p95)"
@@ -63,5 +61,5 @@ riesgos:
   - "Un administrador puede saltarse la política de ramas del environment: se comprueba con harness platform check"
 retirada:
   condicion: "Si el equipo pasa a otra plataforma de despliegue o a un workflow de despliegue propio con verificación y rollback equivalentes"
-  procedimiento: "harness components remove despliegue-pages (borra el workflow, .harness/despliegue/ y el runbook) y desactiva Pages"
+  procedimiento: "harness components remove despliegue-pages (borra el workflow y .harness/despliegue/), retira el runbook de la instancia y desactiva Pages"
 ficha: FICHA.md

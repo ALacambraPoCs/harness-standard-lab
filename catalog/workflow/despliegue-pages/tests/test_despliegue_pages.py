@@ -161,3 +161,19 @@ def test_runbook_cumple_hs_ci_009(tmp_path):
     shutil.copy(SRC / "RUNBOOK-rollback.md", root / "docs/runbooks/rollback-pages.md")
     res = run_check(root, standard=load_standard(), today=dt.date(2026, 10, 28), only_rules=regla)
     assert [f for f in res.findings if f.status == "fail"] == []
+
+
+def test_ensayo_falla_tras_comprobar(capsys):
+    assert not D.verificar("u", "b" * 40, 100, 0, fetch=lambda u: "b" * 40, sleep=lambda s: None, ensayo=True)
+    out = capsys.readouterr().out
+    assert "OK:" in out and "Ensayo de rollback" in out            # comprueba de verdad y luego falla
+    assert D.main(["verificar", "--url", "u", "--sha", "b" * 40, "--timeout", "0", "--ensayo", "false"]) == 1  # sin red: no ve nada
+    assert "Ensayo de rollback" in D.aviso("o/r", "run", "b" * 40, "a" * 40, "success", ensayo=True)
+
+
+def test_ensayo_solo_en_dispatch():
+    texto = (SRC / "despliegue-pages.yml").read_text(encoding="utf-8")
+    wf = yaml.safe_load(texto)
+    on = wf.get("on", wf.get(True))
+    assert on["workflow_dispatch"]["inputs"]["ensayo_rollback"]["type"] == "boolean"
+    assert texto.count("github.event_name == 'workflow_dispatch' && inputs.ensayo_rollback") == 2

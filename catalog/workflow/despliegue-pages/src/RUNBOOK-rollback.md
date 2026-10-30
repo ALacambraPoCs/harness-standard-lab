@@ -11,6 +11,7 @@ revisado: AAAA-MM-DD
 ## Cuándo usarlo
 - Hay una issue «Despliegue fallido …» que dice que el rollback **no** se completó, o que no había versión anterior.
 - El sitio sirve una versión verificada pero **funcionalmente rota** (el despliegue automático no lo detecta: solo comprueba qué SHA se sirve).
+- **Ensayo periódico** (recomendado trimestral y tras cambiar el workflow): *Run workflow* con `sha` = una versión anterior y `ensayo_rollback` marcado. Debe acabar con la issue «Ensayo de rollback … (rollback: success)» y el sitio sirviendo de nuevo HEAD. Anota la fecha en `revisado`.
 
 <!-- harness:pasos -->
 ## Pasos

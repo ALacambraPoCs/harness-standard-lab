@@ -48,7 +48,7 @@ Aplica si la instancia despliega (declara `plataforma.entorno_despliegue` en el 
 Markdown, un procedimiento por archivo, pasos imperativos y comprobables. Idioma libre (D-020).
 
 ## Ejemplo canónico
-`catalog/workflow/despliegue-pages/src/RUNBOOK-rollback.md`, que instala `harness components add despliegue-pages` en `docs/runbooks/rollback-pages.md`.
+`catalog/workflow/despliegue-pages/src/RUNBOOK-rollback.md`. Se copia a `docs/runbooks/rollback-pages.md` y se completa; no lo instala el componente, porque es contenido de la instancia (H-22).
 
 ## Validaciones
 | Validación | Capa | Estado |

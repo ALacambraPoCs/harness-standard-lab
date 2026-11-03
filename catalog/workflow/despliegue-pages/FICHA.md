@@ -14,6 +14,7 @@ Vector **V10** del modelo de amenazas: un despliegue no autorizado o imposible d
 - Run en verde ⇔ la URL sirve el SHA fusionado. Lo comprueba el sistema, no lo afirma un agente.
 - Rollback automático y comprobado, sin intervención humana, cuando la verificación falla.
 - Rollback manual a un SHA concreto, solo de la historia de la rama por defecto.
+- **Ensayo de rollback** (simulacro, D-076): al lanzarlo a mano con `ensayo_rollback`, despliega, comprueba y fuerza el fallo de la verificación para ejercitar la reversión, su verificación y el aviso.
 - Rastro de auditoría del cambio desplegado (`harness audit`) en cada run.
 
 ## 4. Principios y conceptos fundamentales
@@ -46,10 +47,12 @@ flowchart LR
 - `concurrency` con un grupo fijo y sin cancelar: los despliegues se ejecutan en serie.
 - La URL es `vars.HARNESS_PAGES_URL` o, por defecto, `https://<dueño>.github.io/<repo>/`.
 - La verificación reintenta hasta 10 minutos (caché de Pages), con parámetro anticaché y `Cache-Control: no-cache`.
+- **Ensayo:** `workflow_dispatch` con `sha` = una versión anterior y `ensayo_rollback: true`. El sitio pasa a servir esa versión, la verificación la comprueba y falla a propósito, y el rollback devuelve la que se servía (HEAD). Así el ensayo cambia de verdad lo que se sirve y vuelve. Sin `sha`, objetivo y anterior suelen coincidir y el ensayo no demuestra nada.
 
 ## 7. Implementación paso a paso
 1. Generar y versionar el sitio en `site/` (o cambiar `ORIGEN_SITIO`). Si se genera con un script, añadir una prueba de que está al día (ejemplo: `scripts/generar_sitio.py` y `tests/test_sitio.py` del ejemplo greenfield).
-2. `harness components add despliegue-pages`: copia el workflow, `.harness/despliegue/despliegue.py` y `docs/runbooks/rollback-pages.md`.
+2. `harness components add despliegue-pages`: copia el workflow y `.harness/despliegue/despliegue.py`.
+   El runbook **no** lo gestiona el componente, porque la instancia lo rellena (propietario, fecha de ensayo, URL) y eso sería deriva (H-22). Se copia de `src/RUNBOOK-rollback.md` del catálogo a `docs/runbooks/rollback-pages.md` y se completa.
 3. Declarar `plataforma.entorno_despliegue: github-pages` en el manifiesto. Así `harness platform check` comprueba el environment y `core.runbooks.rollback` (HS-CI-009), el runbook.
 4. *Settings → Pages → Source: GitHub Actions*. En *Settings → Environments → github-pages → Deployment branches*, solo la rama por defecto.
 5. Ajustar `CLI_REF` al tag de la CLI que use la instancia.
@@ -94,7 +97,7 @@ Si `verificar` falla: `construir reversión` → `revertir` → `verificar rever
   - que el parámetro anticaché evita la caché de Pages.
 
 ## 12. Estrategia de pruebas y verificación
-- **Unitarias** (11):
+- **Unitarias** (13):
   - `construir` extrae el commit y no el árbol de trabajo;
   - rechaza `version.txt` propio e ignora enlaces;
   - `preparar` exige la rama por defecto y un SHA de su historia;
@@ -102,10 +105,11 @@ Si `verificar` falla: `construir reversión` → `revertir` → `verificar rever
   - el aviso cubre los tres casos;
   - permisos por job;
   - reglas `ci.*`;
-  - runbook conforme a HS-CI-009.
+  - runbook conforme a HS-CI-009;
+  - el ensayo comprueba antes de fallar y solo existe en `workflow_dispatch`.
 - **Integración (F5.7)** en `harness-example-greenfield`:
   1. despliegue verificado;
-  2. despliegue con verificación forzada a fallar → rollback automático e issue;
+  2. ensayo de rollback (`sha` anterior + `ensayo_rollback`) → reversión verificada e issue «Ensayo de rollback…»;
   3. rollback manual por SHA;
   4. dispatch desde otra rama → bloqueado.
 

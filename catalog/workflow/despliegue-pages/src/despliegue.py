@@ -6,7 +6,8 @@ nunca desde el contenido que se despliega.
 
   preparar   → objetivo (SHA que se despliega), anterior (SHA que sirve hoy el sitio) y url, para $GITHUB_OUTPUT
   construir  → copia el sitio del objetivo (git archive, sin ejecutar su código) y escribe version.txt
-  verificar  → espera a que la URL sirva version.txt == SHA (reintentos: caché de Pages)
+  verificar  → espera a que la URL sirva version.txt == SHA (reintentos: caché de Pages); con --ensayo,
+               tras comprobarlo, falla a propósito para ejercitar el rollback (D-076)
   aviso      → cuerpo de la issue cuando se ha revertido o no se ha podido revertir
 """
 from __future__ import annotations
@@ -47,11 +48,11 @@ def default_url(repo: str) -> str:
 def fetch_version(url: str, timeout: float = 15) -> str | None:
     """SHA publicado en <url>/version.txt, o None. Evita la caché con un parámetro y `no-cache` (NV: F5.7)."""
     full = url.rstrip("/") + f"/{VERSION_FILE}?harness={time.time_ns()}"
-    req = urllib.request.Request(full, headers={"Cache-Control": "no-cache", "User-Agent": "harness-despliegue"})
     try:
+        req = urllib.request.Request(full, headers={"Cache-Control": "no-cache", "User-Agent": "harness-despliegue"})
         with urllib.request.urlopen(req, timeout=timeout) as r:  # noqa: S310 (URL del propio sitio)
             text = r.read(200).decode("utf-8", "replace").strip()
-    except (urllib.error.URLError, TimeoutError, OSError):
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError):
         return None
     return text if SHA.match(text) else None
 
@@ -112,12 +113,17 @@ def construir(repo_dir: str, sha: str, origen: str, out: str) -> int:
     return n
 
 
-def verificar(url: str, sha: str, timeout: float, intervalo: float, fetch=fetch_version, sleep=time.sleep) -> bool:
+def verificar(url: str, sha: str, timeout: float, intervalo: float, fetch=fetch_version, sleep=time.sleep,
+              ensayo: bool = False) -> bool:
     fin = time.monotonic() + timeout
     while True:
         visto = fetch(url)
         if visto == sha:
             print(f"OK: {url} sirve {sha[:12]}.")
+            if ensayo:
+                print("::warning::Ensayo de rollback (workflow_dispatch con ensayo_rollback): la verificación falla a "
+                      "propósito para ejercitar el rollback, su verificación y el aviso.")
+                return False
             return True
         if time.monotonic() >= fin:
             print(f"::error::{url} sirve {visto or 'nada legible'} en lugar de {sha[:12]} tras {int(timeout)} s.")
@@ -125,7 +131,10 @@ def verificar(url: str, sha: str, timeout: float, intervalo: float, fetch=fetch_
         sleep(intervalo)
 
 
-def aviso(repo: str, run_url: str, objetivo: str, anterior: str, revertido: str) -> str:
+def aviso(repo: str, run_url: str, objetivo: str, anterior: str, revertido: str, ensayo: bool = False) -> str:
+    if ensayo:
+        cabecera = "**Ensayo de rollback** (lanzado a mano): la verificación se forzó a fallar a propósito.\n\n"
+        return cabecera + aviso(repo, run_url, objetivo, anterior, revertido)
     if not anterior:
         estado = "**No había versión anterior verificable: no se ha revertido.** El sitio puede estar sirviendo una versión rota."
     elif revertido == "success":
@@ -159,11 +168,13 @@ def main(argv=None) -> int:
     c.add_argument("--sha", required=True)
     c.add_argument("--timeout", type=float, default=600)
     c.add_argument("--intervalo", type=float, default=15)
+    c.add_argument("--ensayo", default="false", help="`true`: ensayo de rollback (solo workflow_dispatch).")
     d = sub.add_parser("aviso")
     for x in ("--repo", "--run-url", "--objetivo"):
         d.add_argument(x, required=True)
     d.add_argument("--anterior", default="")
     d.add_argument("--revertido", default="")
+    d.add_argument("--ensayo", default="false")
     args = p.parse_args(argv)
     try:
         if args.cmd == "preparar":
@@ -176,8 +187,8 @@ def main(argv=None) -> int:
             print(f"Sitio de {args.sha[:12]}: {n} archivos + {VERSION_FILE}.", file=sys.stderr)
             return 0
         if args.cmd == "verificar":
-            return 0 if verificar(args.url, args.sha, args.timeout, args.intervalo) else 1
-        print(aviso(args.repo, args.run_url, args.objetivo, args.anterior, args.revertido))
+            return 0 if verificar(args.url, args.sha, args.timeout, args.intervalo, ensayo=args.ensayo == "true") else 1
+        print(aviso(args.repo, args.run_url, args.objetivo, args.anterior, args.revertido, args.ensayo == "true"))
         return 0
     except Error as exc:
         print(f"::error::{exc}", file=sys.stderr)

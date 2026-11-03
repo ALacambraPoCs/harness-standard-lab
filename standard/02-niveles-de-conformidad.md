@@ -162,7 +162,7 @@ Solo aplican a instancias que declaran `standard.version` ≥ 0.5.0 (regla 7, D-
 |---|---|---|---|---|
 | HS-SEC-013 | DEBERÍA | N1,N2,N3 | `settings.json` activa el sandbox sin vía de escape; los comandos de red con GitHub, en `excludedCommands` | automática |
 
-## 3i. Requisitos añadidos en 0.9.0 (F5.6) — estado: propuesto (pendiente de aprobación con el PR de F5.6)
+## 3i. Requisitos añadidos en 0.9.0 (F5.6) — estado: aprobados (D-074)
 
 | ID | Nivel | Niveles | Requisito (resumen) | Verificación |
 |---|---|---|---|---|

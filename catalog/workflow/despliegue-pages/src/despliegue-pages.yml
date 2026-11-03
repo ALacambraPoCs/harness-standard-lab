@@ -1,5 +1,5 @@
 # Despliegue en GitHub Pages con verificación y rollback (componente del catálogo `despliegue-pages`;
-# F5.6-A, D-072; auditoría F5.6-B, D-073).
+# F5.6-A, D-072; auditoría F5.6-B, D-073; ensayo de rollback D-076).
 #
 #  - preparar: decide el objetivo (HEAD de la rama por defecto, o un SHA de su historia en el rollback
 #    manual), lee el SHA que sirve hoy el sitio (anterior) y construye el sitio SIN ejecutar su código.
@@ -22,6 +22,11 @@ on:
         description: "Rollback manual: SHA completo de la rama por defecto que se quiere volver a servir (vacío = HEAD)."
         required: false
         type: string
+      ensayo_rollback:
+        description: "Ensayo de rollback: despliega, comprueba y fuerza el fallo de la verificación para ejercitar la reversión (D-076)."
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -33,7 +38,7 @@ concurrency:
 env:
   ORIGEN_SITIO: site                                   # directorio del sitio estático en la instancia
   STANDARD_REPOSITORY: ALacambraPoCs/harness-standard-lab
-  CLI_REF: cli-v0.9.0-rc.1
+  CLI_REF: cli-v0.9.1-rc.1
 
 jobs:
   preparar:
@@ -99,7 +104,8 @@ jobs:
         env:
           URL_SITIO: ${{ needs.preparar.outputs.url }}
           OBJETIVO: ${{ needs.preparar.outputs.objetivo }}
-        run: python3 -I base/.harness/despliegue/despliegue.py verificar --url "$URL_SITIO" --sha "$OBJETIVO" --timeout 600
+          ENSAYO: ${{ github.event_name == 'workflow_dispatch' && inputs.ensayo_rollback && 'true' || 'false' }}
+        run: python3 -I base/.harness/despliegue/despliegue.py verificar --url "$URL_SITIO" --sha "$OBJETIVO" --timeout 600 --ensayo "$ENSAYO"
 
   construir-reversion:
     name: construir reversión
@@ -181,10 +187,12 @@ jobs:
           OBJETIVO: ${{ needs.preparar.outputs.objetivo }}
           ANTERIOR: ${{ needs.preparar.outputs.anterior }}
           REVERTIDO: ${{ needs.verificar-reversion.result }}
+          ENSAYO: ${{ github.event_name == 'workflow_dispatch' && inputs.ensayo_rollback && 'true' || 'false' }}
         run: |
           python3 -I base/.harness/despliegue/despliegue.py aviso --repo "$GH_REPO" --run-url "$RUN_URL" \
-            --objetivo "$OBJETIVO" --anterior "$ANTERIOR" --revertido "$REVERTIDO" > aviso.md
-          gh issue create --title "Despliegue fallido de ${OBJETIVO:0:12} (rollback: ${REVERTIDO:-no})" --body-file aviso.md
+            --objetivo "$OBJETIVO" --anterior "$ANTERIOR" --revertido "$REVERTIDO" --ensayo "$ENSAYO" > aviso.md
+          prefijo=$([ "$ENSAYO" = true ] && echo "Ensayo de rollback" || echo "Despliegue fallido")
+          gh issue create --title "$prefijo de ${OBJETIVO:0:12} (rollback: ${REVERTIDO:-no})" --body-file aviso.md
 
   auditar:
     name: auditar

@@ -348,8 +348,8 @@ def runbook_rollback(ctx: Context):
     if not found:
         yield Finding("core.runbooks.rollback", "HS-CI-009",
                       f"El manifiesto declara el entorno de despliegue `{plat['entorno_despliegue']}`, pero no hay `{d}/rollback*.md`.",
-                      "Crea el runbook (plantilla: catalog/workflow/despliegue-pages/src/RUNBOOK-rollback.md, o "
-                      "`harness components add despliegue-pages`).", d)
+                      "Crea el runbook a partir de la plantilla catalog/workflow/despliegue-pages/src/RUNBOOK-rollback.md "
+                      "y complétalo (propietario, fecha de ensayo).", d)
         return
     for p in found:
         rel = f"{d}/{p.name}"

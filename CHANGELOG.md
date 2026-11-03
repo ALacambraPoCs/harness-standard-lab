@@ -4,6 +4,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 5
 
+### Añadido (F5.7-B, 2026-10-30) — estándar 0.9.1, CLI 0.9.1rc1
+- `despliegue-pages` 0.2.0: **ensayo de rollback** (`workflow_dispatch` con `ensayo_rollback`, D-076): despliega, comprueba el SHA servido y fuerza el fallo de la verificación para ejercitar la reversión, su verificación y la issue. El runbook recomienda un ensayo trimestral.
+- HS-CI-009 aprobado (D-074).
+- El runbook de rollback deja de ser un archivo gestionado del componente: es contenido de la instancia y rellenarlo daba deriva (H-22). Se copia de la plantilla del catálogo.
+
+### Corregido (F5.7-B)
+- `despliegue.py`: una `HARNESS_PAGES_URL` mal formada ya no rompe el job con una excepción; se trata como «no se sirve nada».
+
 ### Añadido (F5.6, 2026-10-28) — estándar 0.9.0, CLI 0.9.0rc1
 - Componente de catálogo **`workflow/despliegue-pages`** 0.1.0 (`experimental`, D-072): despliegue en GitHub Pages desde la rama por defecto, **verificación** de que la URL sirve el SHA (`version.txt`), **rollback automático** a la versión que se servía antes e issue, y rollback manual por SHA (solo de la historia de la rama por defecto). Solo los jobs `desplegar` y `revertir` tienen `pages: write` e `id-token: write`; el sitio se construye sin ejecutar código del commit. Incluye el runbook de rollback.
 - **`harness audit <sha|#PR>`** (`audit.py`, D-073): rastro de auditoría de solo lectura (commit, PR, tarea, origen declarado y coautores, riesgo declarado frente al recalculado, checks, aprobaciones de la puerta, despliegues y `platform check`) con alertas; `--format json`, `--strict`. El workflow de despliegue lo publica en el resumen del run.

@@ -177,3 +177,17 @@ def test_ensayo_solo_en_dispatch():
     on = wf.get("on", wf.get(True))
     assert on["workflow_dispatch"]["inputs"]["ensayo_rollback"]["type"] == "boolean"
     assert texto.count("github.event_name == 'workflow_dispatch' && inputs.ensayo_rollback") == 2
+
+
+def test_la_cadena_de_reversion_no_se_salta_tras_el_fallo():
+    """H-30: un fallo se propaga a todos los descendientes salvo que el job use un condicional.
+    Cada job que debe ejecutarse después de `verificar` fallido declara `always()` y comprueba su predecesor."""
+    wf = yaml.safe_load((SRC / "despliegue-pages.yml").read_text(encoding="utf-8"))
+    jobs = wf["jobs"]
+    esperado = {"construir-reversion": "needs.verificar.result == 'failure'",
+                "revertir": "needs.construir-reversion.result == 'success'",
+                "verificar-reversion": "needs.revertir.result == 'success'",
+                "avisar": "needs.verificar.result == 'failure'"}
+    for job, cond in esperado.items():
+        c = jobs[job].get("if", "")
+        assert ("always()" in c or "failure()" in c) and cond in c, (job, c)

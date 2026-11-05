@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-10-30 (F5.7: D-074…D-076, H-22)
+actualizado: 2026-11-05 (F5.7 en curso: H-23…H-30)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -68,6 +68,14 @@ actualizado: 2026-10-30 (F5.7: D-074…D-076, H-22)
 | H-20 | **El tag `cli-v0.8.0-rc.1` apunta a `92a52eb` (merge de la F5.4), no a la F5.5:** la rama `f5.5` está subida pero no fusionada en `main`. Una instancia que fije `cli-v0.8.0-rc.1` obtiene la CLI 0.7.1rc1. Resuelto: la F5.5 se fusionó (PR #21) y `cli-v0.8.0-rc.2` apunta a ese merge; `rc.1` queda como tag defectuoso. | 2026-10-28 | Claude |
 | H-21 | **Ajuste de diseño en F5.6-A:** el destino del rollback automático no se toma de la API de deployments (último `success`), como se propuso, sino del `version.txt` que sirve el sitio antes de desplegar. Motivo: un despliegue que luego no se verifica también queda en `success`, y GitHub puede marcar como `inactive` los anteriores. **Pendiente de aprobación** junto con el PR. | 2026-10-28 | Claude |
 | H-22 | **El runbook de rollback como archivo gestionado del componente daba deriva** (HS-CMP-009) en cuanto la instancia lo rellenaba (propietario, fecha de ensayo). Pasa a ser plantilla del catálogo que la instancia copia (`despliegue-pages` 0.2.0). Lo detectó la preparación de la F5.7. | 2026-10-30 | Claude |
+| H-23 | Los environments `aprobacion-riesgo-alto` y `github-pages` se crean con «Allow administrators to bypass» marcado: un administrador se salta la puerta. Se desmarcó en el ejemplo; `harness platform check` aún no lo comprueba. | 2026-11-04 | Claude |
+| H-24 | Los checks requeridos del ruleset admiten «Any source»: cualquiera con escritura puede publicar un estado con ese nombre. Se fijó «GitHub Actions»; ni la plantilla `ruleset-n1.json` ni `platform check` lo exigen aún. | 2026-11-04 | Claude |
+| H-25 | `harness audit` muestra el código de firma de git en bruto (`E` = no verificable sin la clave). Menor. | 2026-11-04 | Claude |
+| H-26 | **El sandbox estaba desactivado en silencio** (faltaban `bubblewrap` y `socat` en WSL); `harness check` lo daba por conforme porque comprueba la configuración, no el efecto. La documentación confirma el respaldo silencioso y ofrece `sandbox.failIfUnavailable`. Con el sandbox activo, el `curl` a un dominio no permitido se detuvo y, al denegarlo, el proxy devolvió 403. | 2026-11-04 | Usuario |
+| H-27 | La regla de transiciones no permite `ready → done` en un PR: una tarea que se empieza y termina en un solo PR exige un PR previo que la pase a `in_progress` en `main`. El agente se detuvo correctamente; se resolvió con un PR extra (#19). | 2026-11-04 | Usuario |
+| H-28 | Con el sandbox: (a) no se puede escribir `.git/config` (falla `git checkout -b … origin/main` con seguimiento); (b) un `git push` encadenado con `&&` se ejecuta dentro del sandbox y falla al no poder usar el socket de credenciales; suelto, sale del sandbox por `excludedCommands`. (Inferido del comportamiento.) | 2026-11-04 | Usuario |
+| H-29 | En el PR adversarial, la puerta de riesgo alto salió **saltada**: la clase se calcula después de `pr check`, que falló, así que la salida quedó vacía. No permitió fusionar (el check de tareas es requerido y falló), pero la puerta debe fallar cerrada. | 2026-11-05 | Usuario |
+| H-30 | **El rollback automático no se ejecutaba:** en el ensayo, `revertir` y `verificar reversión` se saltaron porque el fallo de `verificar` se propaga a toda la cadena `needs` salvo con un condicional (docs.github.com). La issue avisó de que el rollback no se completó. Corregido en `despliegue-pages` 0.2.1. | 2026-11-05 | Usuario |
 | H-19 | `harness platform check` ejecutado fuera de una instancia asumía N0 en silencio y daba 0 errores. Corregido con `platform.manifest` (0.8.0). | 2026-10-28 | Usuario |
 | D-031 | **Fase 2 cerrada** con el criterio 1 parcial: 5 fichas aplazadas a la fase dueña de su subsistema (`adapter.claude.settings` → F3, `project.rules` → F4, `ci.workflows` y `runbooks.dir` → F5, `quality.doc` → F6). `fase-2/INFORME.md`. | 2026-10-22 | Usuario |
 | D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |

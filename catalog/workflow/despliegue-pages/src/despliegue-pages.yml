@@ -38,7 +38,7 @@ concurrency:
 env:
   ORIGEN_SITIO: site                                   # directorio del sitio estático en la instancia
   STANDARD_REPOSITORY: ALacambraPoCs/harness-standard-lab
-  CLI_REF: cli-v0.9.1-rc.1
+  CLI_REF: cli-v0.9.2-rc.1
 
 jobs:
   preparar:
@@ -133,6 +133,9 @@ jobs:
   revertir:
     name: revertir
     needs: construir-reversion
+    # Sin `always()`, el fallo de `verificar` se propaga por la cadena y el job se salta aunque
+    # `construir reversión` haya ido bien (docs.github.com, jobs.<id>.needs; H-30).
+    if: always() && needs.construir-reversion.result == 'success'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -150,6 +153,7 @@ jobs:
   verificar-reversion:
     name: verificar reversión
     needs: [preparar, revertir]
+    if: always() && needs.revertir.result == 'success'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:

@@ -4,6 +4,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 5
 
+### Corregido (F5.7, 2026-11-05) — CLI 0.9.2rc1 (estándar 0.9.1 sin cambios)
+- **`despliegue-pages` 0.2.1 — el rollback automático no se ejecutaba (H-30).** Con `verificar` en fallo, GitHub propaga el fallo a todos los descendientes de la cadena `needs` salvo que el job use un condicional; `revertir` y `verificar reversión` se saltaban aunque `construir reversión` fuera bien. Ahora declaran `always()` y comprueban el resultado de su predecesor. Lo detectó el **ensayo de rollback** de la F5.7 (la issue informó correctamente de que el rollback no se completó). Prueba de regresión sobre las condiciones de la cadena.
+
 ### Añadido (F5.7-B, 2026-10-30) — estándar 0.9.1, CLI 0.9.1rc1
 - `despliegue-pages` 0.2.0: **ensayo de rollback** (`workflow_dispatch` con `ensayo_rollback`, D-076): despliega, comprueba el SHA servido y fuerza el fallo de la verificación para ejercitar la reversión, su verificación y la issue. El runbook recomienda un ensayo trimestral.
 - HS-CI-009 aprobado (D-074).

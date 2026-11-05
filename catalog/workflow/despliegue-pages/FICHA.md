@@ -124,6 +124,8 @@ Ver `metricas` y `coste` en `componente.yaml`.
 | Compilar el sitio en CI | Ejecuta código del commit en un job previo al despliegue. Se podrá añadir con un ADR y un job de construcción sin permisos de escritura |
 | Branch `gh-pages` | Requiere `contents: write` y mezcla artefactos con el código |
 
+**Lección (H-30, F5.7):** en GitHub Actions, un fallo se propaga a todos los jobs de la cadena `needs`, incluidos los indirectos, salvo que el job declare un condicional. Todo job de recuperación (reversión, aviso) necesita `always()` y comprobar explícitamente el resultado de su predecesor. Las pruebas unitarias no lo detectaron porque no ejecutan el grafo de jobs; lo detectó el ensayo.
+
 ## 15. Dependencias, madurez y portabilidad
 - `experimental`. GitHub Actions y Pages (fuente «GitHub Actions»).
 - `actions/upload-pages-artifact` v5.0.0 y `actions/deploy-pages` v5.0.0, fijadas a SHA y verificadas en sus releases el 2026-10-28.

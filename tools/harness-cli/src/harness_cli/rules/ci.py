@@ -176,3 +176,33 @@ def merge_group(ctx: Context):
         if "pull_request" in t and "merge_group" not in t:
             yield Finding("ci.merge-group", "HS-CI-008", f"{rel} se dispara con `pull_request` pero no con `merge_group`.",
                           "Añade `merge_group:`: con merge queue, sin él no se ejecutan sus checks (G5).", rel)
+
+
+PIPE_TEE = re.compile(r"\|\s*tee\b")
+
+
+def _shell_pipefail(shell) -> bool:
+    return isinstance(shell, str) and (shell.strip() == "bash" or "pipefail" in shell)
+
+
+@rule("ci.pipe-status", ["HS-CI-010"], platform="github")
+def pipe_status(ctx: Context):
+    """Un `run:` que pasa la salida por `| tee` no oculta el código de salida del comando (C-6, H-31)."""
+    for rel, doc, _ in _workflows(ctx):
+        wf_shell = ((doc.get("defaults") or {}).get("run") or {}).get("shell")
+        for jname, job in _jobs(doc):
+            job_shell = ((job.get("defaults") or {}).get("run") or {}).get("shell")
+            for step in job.get("steps") or []:
+                if not isinstance(step, dict) or not isinstance(step.get("run"), str):
+                    continue
+                run = step["run"]
+                if not PIPE_TEE.search(run) or "pipefail" in run or "PIPESTATUS" in run:
+                    continue
+                if _shell_pipefail(step.get("shell") or job_shell or wf_shell):
+                    continue
+                nombre = step.get("name") or run.strip().splitlines()[0][:60]
+                yield Finding("ci.pipe-status", "HS-CI-010",
+                              f"{rel} (job `{jname}`, paso «{nombre}»): `| tee` sin `pipefail` ni `PIPESTATUS`; "
+                              "si el comando falla, el paso termina en verde.",
+                              "Declara `shell: bash` (ejecuta `bash -eo pipefail`) en el paso, el job o `defaults.run`, "
+                              "o añade `exit \"${PIPESTATUS[0]}\"` tras la tubería (docs.github.com, workflow syntax: shell).", rel)

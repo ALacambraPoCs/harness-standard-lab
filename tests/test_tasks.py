@@ -146,6 +146,19 @@ def test_transicion_ilegal(repo):
     assert "tasks.transition" in rules(T.validate(ctx(repo), base=base, pr_number=7, run_acceptance=True)[0])
 
 
+def test_ready_a_done_en_un_pr(repo):
+    """C-4 (H-27): una tarea de un solo PR pasa de ready a done; la CI sigue ejecutando sus criterios."""
+    base = _start(repo, status="ready")
+    _to_done(repo)
+    assert rules(T.validate(ctx(repo), base=base, pr_number=7, run_acceptance=True)[0]) == []
+
+
+def test_ready_a_done_sigue_ejecutando_criterios(repo):
+    base = _start(repo, status="ready")
+    _to_done(repo, check="false")
+    assert "tasks.acceptance" in rules(T.validate(ctx(repo), base=base, pr_number=7, run_acceptance=True)[0])
+
+
 def test_borrar_tarea_prohibido(repo):
     base = _start(repo)
     (repo / "docs/plans/active/T-0001-ejemplo.md").unlink()
@@ -340,7 +353,7 @@ def test_close_es_idempotente_con_el_mismo_pr_y_rechaza_otro(repo):
 
 
 @pytest.mark.parametrize("status,kwargs,match", [
-    ("ready", {"resultado": "x"}, "solo se cierra desde"),
+    ("proposed", {"resultado": "x"}, "solo se cierra desde"),
     ("in_progress", {}, "Resultado está vacía"),
     ("in_progress", {"resultado": "x", "pr": 0}, "entero positivo"),
 ])

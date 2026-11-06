@@ -1,7 +1,7 @@
 # Registro de requisitos del Estándar de Harness.
 # Fuente de verdad normativa (ADR-002). Validado por schemas/requirement.schema.json.
 # Si la prosa de standard/*.md discrepa de este archivo, prevalece este archivo.
-version_estandar: 0.9.1
+version_estandar: 0.10.0
 # Niveles con requisitos especificados en esta versión. Declarar otro nivel es un error (HS-GOV-002).
 niveles_definidos: [N0, N1]
 # Versión del estándar desde la que existe cada nivel (D-029). N1 exige declarar `standard.version` ≥ 0.2.0.
@@ -1085,7 +1085,7 @@ requisitos:
     exentable: true
     reglas: [adapter.claude.settings-sandbox]
     fuentes: [S-CC-SET, D-067, F5-01]
-    nota: El sandbox existe en macOS, Linux y WSL2, no en Windows nativo (por eso DEBERÍA). Con él, `check` y `test` se ejecutan sin confirmación dentro de límites de escritura y red (cierra D-043). No es una frontera de aislamiento completa.
+    nota: 'El sandbox existe en macOS, Linux y WSL2, no en Windows nativo (por eso DEBERÍA). Con él, `check` y `test` se ejecutan sin confirmación dentro de límites de escritura y red (cierra D-043). No es una frontera de aislamiento completa. Si faltan sus dependencias (`bubblewrap` y `socat` en Linux y WSL2), Claude Code ejecuta sin sandbox en silencio (H-26); por eso la configuración gestionada de la organización fija `sandbox.failIfUnavailable: true` (C-2).'
     estado: aprobado
     desde: 0.8.0
     retirada: Si el aislamiento se hace con contenedores o devcontainers obligatorios.
@@ -1104,6 +1104,21 @@ requisitos:
     estado: aprobado
     desde: 0.9.0
     retirada: Si el rollback se automatiza por completo y se ensaya en cada despliegue.
+  - id: HS-CI-010
+    titulo: Los pasos de CI no ocultan el código de salida en una tubería
+    texto: 'Un paso `run:` que pasa la salida de un comando por `| tee` DEBERÍA ejecutarse con `shell: bash` (que GitHub ejecuta como `bash -eo pipefail`) o comprobar `PIPESTATUS`: con el shell por defecto (`bash -e`) el paso termina con el código de `tee` y un fallo pasa por éxito.'
+    nivel: DEBERÍA
+    ambito: instancia
+    conformidad: [N1, N2, N3]
+    naturaleza: guidance
+    verificacion: automatica
+    exentable: true
+    reglas: [ci.pipe-status]
+    fuentes: [S-GH, H-31, D-078]
+    nota: Detectado en la F5.7 en el workflow de despliegue (H-31). La regla solo mira `| tee`, el patrón habitual para publicar la salida en el resumen.
+    estado: aprobado
+    desde: 0.10.0
+    retirada: Si GitHub cambia el shell por defecto a `pipefail`.
   - id: HS-CI-004
     titulo: El agente en CI no carga la configuración del repositorio
     texto: Un paso de workflow que ejecute `claude -p` DEBE usar `--bare` y `--setting-sources user`, con su configuración tomada de fuera del PR.
@@ -1139,7 +1154,7 @@ requisitos:
 
   - id: HS-CI-006
     titulo: La configuración real de la plataforma se comprueba de forma periódica
-    texto: 'La instancia DEBE ejecutar `harness platform check` al menos semanalmente y en cada push a la rama por defecto, y DEBE corregir los fallos: PR obligatorio (N1+), checks requeridos del nivel, sin force push ni borrado, environment de la puerta de riesgo alto con revisores (0.6.0+) y, en N2+, aprobaciones, Code Owners y aprobación del último push por otra persona.'
+    texto: 'La instancia DEBE ejecutar `harness platform check` al menos semanalmente y en cada push a la rama por defecto, y DEBE corregir los fallos: PR obligatorio (N1+), checks requeridos del nivel, sin force push ni borrado, environment de la puerta de riesgo alto con revisores (0.6.0+), checks requeridos con origen fijado y environments sin bypass de administradores (0.10.0+) y, en N2+, aprobaciones, Code Owners y aprobación del último push por otra persona.'
     nivel: DEBE
     ambito: instancia
     conformidad: [N1, N2, N3]
@@ -1147,7 +1162,7 @@ requisitos:
     verificacion: semiautomatica
     verificacion_manual: Que el workflow programado `harness-platform.yml` está activo y que sus fallos se corrigen (la issue «harness platform check falla» no queda abierta).
     exentable: false
-    reglas: [platform.manifest, platform.reachable, platform.pull-request, platform.required-checks, platform.no-force-push, platform.no-deletion, platform.approvals, platform.gate-environment, platform.deploy-environment]
+    reglas: [platform.manifest, platform.reachable, platform.pull-request, platform.required-checks, platform.no-force-push, platform.no-deletion, platform.approvals, platform.gate-environment, platform.deploy-environment, platform.check-source, platform.admin-bypass]
     fuentes: [ADR-010, D-062, F5-01]
     nota: Solo lee la API de GitHub (sin token en repositorios públicos). No se ejecuta en los PR. La plantilla N1 incluye el workflow programado `harness-platform.yml`.
     estado: aprobado

@@ -4,6 +4,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 5
 
+### Cierre de la Fase 5 (2026-11-06) — estándar 0.10.0, CLI 0.10.0rc1 (D-077, D-078: C-1…C-7)
+- **C-1 (H-23, H-24):** `harness platform check` (0.10.0+) añade `platform.check-source` (los checks requeridos con origen fijado, no «Any source») y `platform.admin-bypass` (los environments de la puerta y del despliegue sin bypass de administradores; aviso si la API no lo informa). Rulesets de referencia con `integration_id`.
+- **C-2 (H-26):** `managed-settings.json` con `sandbox.failIfUnavailable: true`; guía de dependencias del sandbox en el adaptador.
+- **C-3 (H-28):** plantilla `settings.json`: `git -C * push *` en `excludedCommands` y `ask`; `allow` para `git fetch` (formas exactas, sin `--upload-pack`), `git switch -c` y `gh issue view`. Skill `cerrar-tarea` 0.3.1: push suelto sin `-C` y motivo del riesgo copiado de `harness pr risk`.
+- **C-4 (H-27):** transición `ready → done` permitida en un PR (HS-STA-004); la CI sigue ejecutando los criterios.
+- **C-5 (H-29):** la clase de riesgo se calcula siempre y la puerta **falla cerrada** (espera si la clase es `alto` o está vacía).
+- **C-6 (H-31):** `despliegue-pages` 0.2.2 con `defaults.run.shell: bash`; requisito **HS-CI-010** (DEBERÍA) y regla `ci.pipe-status`.
+- **C-7 (H-25, H-32):** `harness audit` con firma legible; hook `verificar-al-terminar` 0.3.2 con la prueba que falla en el `systemMessage`.
+
 ### Corregido (F5.7, 2026-11-05) — CLI 0.9.2rc1 (estándar 0.9.1 sin cambios)
 - **`despliegue-pages` 0.2.1 — el rollback automático no se ejecutaba (H-30).** Con `verificar` en fallo, GitHub propaga el fallo a todos los descendientes de la cadena `needs` salvo que el job use un condicional; `revertir` y `verificar reversión` se saltaban aunque `construir reversión` fuera bien. Ahora declaran `always()` y comprueban el resultado de su predecesor. Lo detectó el **ensayo de rollback** de la F5.7 (la issue informó correctamente de que el rollback no se completó). Prueba de regresión sobre las condiciones de la cadena.
 

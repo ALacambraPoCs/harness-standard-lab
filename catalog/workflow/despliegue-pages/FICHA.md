@@ -126,6 +126,8 @@ Ver `metricas` y `coste` en `componente.yaml`.
 
 **Lección (H-30, F5.7):** en GitHub Actions, un fallo se propaga a todos los jobs de la cadena `needs`, incluidos los indirectos, salvo que el job declare un condicional. Todo job de recuperación (reversión, aviso) necesita `always()` y comprobar explícitamente el resultado de su predecesor. Las pruebas unitarias no lo detectaron porque no ejecutan el grafo de jobs; lo detectó el ensayo.
 
+**Lección (H-31, F5.7):** sin `shell: bash`, GitHub ejecuta `run:` con `bash -e`, sin `pipefail`, y un paso que termina en `| tee` da por bueno un comando que falló. Desde 0.2.2, el workflow fija `defaults.run.shell: bash`. La regla `ci.pipe-status` (HS-CI-010) lo comprueba en las instancias.
+
 ## 15. Dependencias, madurez y portabilidad
 - `experimental`. GitHub Actions y Pages (fuente «GitHub Actions»).
 - `actions/upload-pages-artifact` v5.0.0 y `actions/deploy-pages` v5.0.0, fijadas a SHA y verificadas en sus releases el 2026-10-28.

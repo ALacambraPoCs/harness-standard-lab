@@ -721,3 +721,25 @@ casos:
       - replace: {path: .claude/settings.json, old: "  \"enableAllProjectMcpServers\": false,", new: "  \"enableAllProjectMcpServers\": false,\n  \"sandbox\": {\"enabled\": true, \"allowUnsandboxedCommands\": false},"}
       - write: {path: docs/runbooks/rollback.md, content: "# Rollback\n\n<!-- harness:pasos -->\n1. Lanzar el workflow.\n"}
     expect_fail: [core.runbooks.rollback]
+
+  # ─────────────── Estándar 0.10.0 · código de salida en tuberías (C-6, H-31, HS-CI-010) ───────────────
+  - id: nc-tee-sin-pipefail
+    base: conforming/n1-endurecido
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.10.0"}
+      - replace: {path: .claude/settings.json, old: "  \"enableAllProjectMcpServers\": false,", new: "  \"enableAllProjectMcpServers\": false,\n  \"sandbox\": {\"enabled\": true, \"allowUnsandboxedCommands\": false},"}
+      - write:
+          path: .github/workflows/informe.yml
+          content: "name: informe\non:\n  push:\npermissions:\n  contents: read\njobs:\n  i:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: python3 informe.py | tee -a \"$GITHUB_STEP_SUMMARY\"\n"
+    expect_fail: [ci.pipe-status]
+
+  - id: c-tee-con-shell-bash
+    base: conforming/n1-endurecido
+    conforming: true
+    mutations:
+      - replace: {path: .harness/manifest.yaml, old: "version: 0.5.0", new: "version: 0.10.0"}
+      - replace: {path: .claude/settings.json, old: "  \"enableAllProjectMcpServers\": false,", new: "  \"enableAllProjectMcpServers\": false,\n  \"sandbox\": {\"enabled\": true, \"allowUnsandboxedCommands\": false},"}
+      - write:
+          path: .github/workflows/informe.yml
+          content: "name: informe\non:\n  push:\npermissions:\n  contents: read\ndefaults:\n  run:\n    shell: bash\njobs:\n  i:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: python3 informe.py | tee -a \"$GITHUB_STEP_SUMMARY\"\n"
+    expect_effective_level: N1

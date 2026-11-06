@@ -24,7 +24,7 @@ TERMINAL = {"done", "cancelled"}
 ALLOWED = {
     None: {"proposed", "ready", "in_progress"},           # creación
     "proposed": {"ready", "cancelled"},
-    "ready": {"in_progress", "cancelled"},
+    "ready": {"in_progress", "done", "cancelled"},    # done: tarea de un solo PR (C-4, H-27); la CI ejecuta sus criterios
     "in_progress": {"blocked", "in_review", "done", "cancelled"},
     "blocked": {"in_progress", "cancelled"},
     "in_review": {"in_progress", "done"},

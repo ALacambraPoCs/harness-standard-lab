@@ -85,7 +85,7 @@ Verificado a mano (code.claude.com/sandboxing, 2026-10-28): macOS, Linux y WSL2,
 "sandbox": {
   "enabled": true,
   "allowUnsandboxedCommands": false,
-  "excludedCommands": ["git push *", "git fetch *", "git pull *", "gh *", "harness platform *"],
+  "excludedCommands": ["git push *", "git -C * push *", "git fetch *", "git pull *", "gh *", "harness platform *"],
   "network": { "allowedDomains": [] },
   "filesystem": { "denyRead": ["~/.ssh", "~/.aws", "~/.config/gh", "~/.config/harness"] }
 }
@@ -96,6 +96,12 @@ Verificado a mano (code.claude.com/sandboxing, 2026-10-28): macOS, Linux y WSL2,
 - Con el sandbox, `check` y `test` de la instancia ya no piden confirmación (cierra la salvedad de D-043).
 - **Windows nativo:** sin sandbox; el estándar recomienda trabajar en WSL2 (por eso HS-SEC-013 es DEBERÍA).
 - Límite: no es una frontera de aislamiento completa (según la documentación, verificado por subagente).
+- **Dependencias (H-26, F5.7).** En Linux y WSL2 el sandbox necesita `bubblewrap` y `socat` (`sudo apt-get install bubblewrap socat`). **Si faltan, Claude Code ejecuta los comandos sin sandbox** (code.claude.com/docs/en/sandboxing). `harness check` comprueba la configuración, no el efecto.
+  - Comprobación de la persona: `/sandbox` muestra el modo (p. ej. «Sandbox commands, with auto-allow»), no «sandbox disabled».
+  - Frontera: `sandbox.failIfUnavailable: true` hace que Claude Code no arranque sin sandbox. Va en la **configuración gestionada** (C-2), no en el proyecto: en Windows nativo impediría trabajar.
+- **Comportamientos observados en la F5.7 (H-28, inferidos):**
+  - el sandbox no deja escribir `.git/config`, así que `git checkout -b x origin/main` con seguimiento falla a medias;
+  - `excludedCommands` se compara con el comando tal cual, de modo que `git -C <ruta> push` o un `git push` encadenado con `&&` se ejecutan **dentro** del sandbox, sin credenciales. Por eso la plantilla excluye también `git -C * push *` y la skill hace los push sueltos.
 
 ### 3.6 Configuración gestionada y modo automático (F5.5-B y D, D-068, D-070)
 

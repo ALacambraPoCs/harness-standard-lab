@@ -338,6 +338,8 @@ BROAD_SAMPLES = [
     # F3.8 (D-052): si se permite git add/commit, sus formas que fuerzan o se saltan controles siguen en ask.
     "git add -f .env", "git add . --force", "git commit -m x --no-verify", "git commit -n -m x",
     "gh pr edit 1 --body x",
+    # Cierre F5 (C-3, H-28): push con -C y fetch que ejecuta un programa local.
+    "git -C /tmp/x push origin main", "git fetch --upload-pack=x origin",
 ]
 
 

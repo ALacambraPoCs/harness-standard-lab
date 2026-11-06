@@ -124,3 +124,32 @@ def test_sin_manifiesto_no_pasa_en_silencio(tmp_path):
     ctx = Context.build(tmp_path, STD, dt.date(2026, 10, 28))
     f = P.check(ctx, "o/r", None, fake())
     assert [x.rule for x in f] == ["platform.manifest"]
+
+
+# ─────────────── 0.10.0: origen de los checks y bypass de administradores (C-1; H-23, H-24) ───────────────
+RULES_CON_ORIGEN = [r if r["type"] != "required_status_checks" else
+                    {"type": "required_status_checks", "parameters": {"required_status_checks": [
+                        dict(c, integration_id=15368) for c in r["parameters"]["required_status_checks"]]}}
+                    for r in RULES_OK]
+GATE_SIN_BYPASS = dict(GATE_OK, can_admins_bypass=False)
+
+
+def test_0_10_conforme_con_origen_y_sin_bypass(tmp_path):
+    assert P.check(instancia(tmp_path, version="0.10.0"), "o/r", "main", fake(RULES_CON_ORIGEN, GATE_SIN_BYPASS)) == []
+
+
+def test_0_10_checks_sin_origen(tmp_path):
+    f = P.check(instancia(tmp_path, version="0.10.0"), "o/r", "main", fake(RULES_OK, GATE_SIN_BYPASS))
+    assert ids(f) == ["platform.check-source"] and "Any source" in f[0].message
+
+
+def test_0_10_bypass_de_administradores(tmp_path):
+    f = P.check(instancia(tmp_path, version="0.10.0"), "o/r", "main",
+                fake(RULES_CON_ORIGEN, dict(GATE_OK, can_admins_bypass=True)))
+    assert ids(f) == ["platform.admin-bypass"] and f[0].severity == "error"
+    f = P.check(instancia(tmp_path / "b", version="0.10.0"), "o/r", "main", fake(RULES_CON_ORIGEN, GATE_OK))
+    assert ids(f) == ["platform.admin-bypass"] and f[0].severity == "warning"      # la API no lo informa
+
+
+def test_0_9_no_exige_origen_ni_bypass(tmp_path):
+    assert P.check(instancia(tmp_path, version="0.9.1"), "o/r", "main", fake()) == []

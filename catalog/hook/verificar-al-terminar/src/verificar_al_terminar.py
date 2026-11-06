@@ -49,9 +49,20 @@ def avisar(titulo: str, fallos: list[str]) -> None:
     `systemMessage` en stdout es el mecanismo documentado para mostrar un aviso al usuario.
     El detalle completo se deja también en stderr para `claude --debug`.
     """
-    resumen = "; ".join(f.splitlines()[0] for f in fallos)
+    resumen = "; ".join(_resumen(f) for f in fallos)
     print(json.dumps({"systemMessage": f"{titulo}: {resumen}"[:1000]}, ensure_ascii=False))
     print(titulo + ".\n\n" + "\n\n".join(fallos), file=sys.stderr)
+
+
+CLAVE = re.compile(r"^(FAIL|ERROR|FAILED|AssertionError|Error|E\s|✗|\S+Error\b)")
+
+
+def _resumen(fallo: str) -> str:
+    """Primera línea del fallo y la línea que dice qué falla (C-7, H-32), p. ej. «FAIL: test_total (…)»."""
+    lineas = [l.strip() for l in fallo.splitlines() if l.strip()]
+    cabecera = lineas[0].rstrip(":") if lineas else ""
+    clave = next((l for l in lineas[1:] if CLAVE.match(l)), lineas[-1] if len(lineas) > 1 else "")
+    return f"{cabecera} → {clave[:200]}" if clave else cabecera
 
 
 def comando_check(manifest: Path) -> str | None:

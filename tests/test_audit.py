@@ -136,3 +136,18 @@ def test_cli_json_y_strict(repo, monkeypatch, capsys):
 
 def test_ref_inexistente(repo, capsys):
     assert cli.main(["audit", "noexiste", "--path", str(repo), "--repo", "o/r", "--no-platform"]) == 2
+
+
+def test_firma_legible():
+    """C-7 (H-25): los códigos de %G? se muestran en texto."""
+    assert A.FIRMAS["E"].startswith("firmado; no verificable") and "incorrecta" in A.FIRMAS["B"]
+
+
+def test_puerta_falla_cerrada_en_el_workflow():
+    """C-5 (H-29): la clase se calcula siempre y la puerta espera si es `alto` o si no se pudo calcular."""
+    import yaml
+    wf = yaml.safe_load((ROOT / ".github/workflows/harness-tasks-lifecycle.yml").read_text(encoding="utf-8"))
+    paso = next(s for s in wf["jobs"]["verify"]["steps"] if s.get("id") == "riesgo")
+    assert paso["if"].startswith("always()")
+    cond = wf["jobs"]["puerta-riesgo-alto"]["if"]
+    assert "always()" in cond and "!= 'bajo'" in cond and "!= 'medio'" in cond and "== 'alto'" not in cond

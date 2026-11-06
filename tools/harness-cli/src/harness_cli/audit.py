@@ -28,6 +28,11 @@ from .risk import rank
 
 AGENTE = re.compile(r"(noreply@anthropic\.com|\bclaude\b|\bcodex\b|\bcopilot\b|\bagente?\b)", re.I)
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
+# Códigos de `git log --format=%G?` (git-log, «placeholders»), en texto legible (C-7, H-25).
+FIRMAS = {"G": "válida", "U": "válida (confianza desconocida)", "X": "válida, firma caducada",
+          "Y": "válida, clave caducada", "R": "válida, clave revocada",
+          "E": "firmado; no verificable aquí (falta la clave pública, p. ej. la de GitHub en un merge)",
+          "B": "**firma incorrecta**", "N": "sin firma"}
 
 
 class AuditError(Exception):
@@ -79,7 +84,7 @@ def _commit(ctx: Context, sha: str) -> dict:
     parts = _git(ctx, "log", "-1", f"--format={fmt}", sha).rstrip("\n").split("\x00")
     parts += [""] * (8 - len(parts))
     return {"sha": parts[0], "autor": parts[1], "committer": parts[2], "fecha": parts[3],
-            "firma": {"G": "válida", "U": "válida (confianza desconocida)", "N": "sin firma"}.get(parts[4], parts[4] or "sin firma"),
+            "firma": FIRMAS.get(parts[4], parts[4] or "sin firma"),
             "padres": parts[5].split(), "asunto": parts[6],
             "coautores": [x.strip() for x in parts[7].split("\x1f") if x.strip()]}
 

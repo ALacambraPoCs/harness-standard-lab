@@ -20,7 +20,7 @@ Configuración de GitHub y de Claude Code a nivel de organización que exige cad
 
 ## Lo verificado y lo pendiente
 
-- **Por confirmar en el laboratorio (cierre de la F5):** que `15368` es el `integration_id` de GitHub Actions. Es el valor que citan repositorios públicos, pero no se ha encontrado en la documentación oficial. Se comprueba con `gh api repos/<o>/<r>/rules/branches/main`. También que la API de environments devuelve `can_admins_bypass`, que la referencia de «Get an environment» no documenta.
+- **Verificado en el laboratorio (E-039, 2026-11-06):** `15368` es el `integration_id` que GitHub guarda al elegir el origen «GitHub Actions» (`gh api repos/<o>/<r>/rules/branches/main`). La API de environments devuelve `can_admins_bypass`, también sin autenticación en repos públicos, aunque la referencia de «Get an environment» no lo documente.
 - Verificado (docs.github.com, 2026-10-28): los nombres de los parámetros de `pull_request` y `required_status_checks` y los tipos de regla `deletion` y `non_fast_forward` (REST, «Create a repository ruleset»; «Available rules for rulesets»).
 - **No verificado:** que GitHub acepte estos archivos en «Import a ruleset», el valor especial `~DEFAULT_BRANCH` y el tipo `update` para tags. Se comprueba en F5.7.
 - **Verificado en el laboratorio (E-025, 2026-10-28):** el `context` de un check de workflow reutilizable es `<job que llama> / <job llamado>` (`conformance / harness check`, `tasks / harness tasks`), como en `ruleset-n1.json`; `harness platform check` en N1 da 0 errores contra `harness-example-greenfield`.

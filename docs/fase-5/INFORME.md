@@ -1,7 +1,7 @@
 ---
 documento: F5-INFORME
 titulo: Informe de cierre de la Fase 5 — Verificación, CI/CD, seguridad, despliegue y auditoría
-estado: propuesta (pendiente de aprobación)
+estado: aprobado (D-079)
 fecha: 2026-11-06
 depende_de: [D-053…D-078]
 ---

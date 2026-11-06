@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-11-06 (informe de la F5: E-038…E-043, H-33…H-36)
+actualizado: 2026-11-06 (F5 aprobada; plan de la F4 propuesto)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -133,12 +133,14 @@ actualizado: 2026-11-06 (informe de la F5: E-038…E-043, H-33…H-36)
 | D-076 | **F5.7-B aprobada:** `despliegue-pages` 0.2.0 con **ensayo de rollback** (`workflow_dispatch` con `ensayo_rollback`): despliega, comprueba y fuerza el fallo de la verificación para ejercitar la reversión. | 2026-10-30 | Usuario |
 | D-077 | **Validación de la F5.7 aceptada** (`fase-5/VALIDACION-F5.7.md`, E-026…E-037). | 2026-11-06 | Usuario |
 | D-078 | **Propuestas de cierre de la F5 C-1…C-8 aprobadas** con las recomendaciones (estándar 0.10.0). | 2026-11-06 | Usuario |
+| D-079 | **Fase 5 aprobada y cerrada** (`fase-5/INFORME.md`); H-33…H-36 al parche 0.10.1. | 2026-11-06 | Usuario |
+| D-080 | **Siguiente fase: F4** (segmentación y concurrencia). | 2026-11-06 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **Informe de la F5** (`fase-5/INFORME.md`): cierre de la fase, parche 0.10.1 para H-33…H-36 y elección de la siguiente fase (recomendada F4).
+- **Plan de la F4** (`fase-4/PLAN.md`): pendiente de aprobación; decisiones posteriores 1–5 (brownfield, ADR-014, archivos de estado, ADR-011, merge queue).
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -182,8 +184,8 @@ actualizado: 2026-11-06 (informe de la F5: E-038…E-043, H-33…H-36)
 
 ## Próximos pasos
 
-1. **Usuario:** aprobar el cierre de la F5 y elegir la siguiente fase; pedir lo externo de la ruta crítica (Q-09, R-10, Q-01, credencial de modelo).
-2. **Claude:** parche 0.10.1 (H-33…H-36) y plan de la fase elegida.
+1. **Usuario:** aprobar el plan de la F4; pedir lo externo de la ruta crítica (Q-09, R-10, Q-01, credencial de modelo).
+2. **Claude:** F4.0 (parche 0.10.1) y F4.1 (fuentes y propuesta de brownfield).
 4. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 5. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

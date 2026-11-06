@@ -14,9 +14,13 @@ Configuración de GitHub y de Claude Code a nivel de organización que exige cad
 - *Required reviewers*: al menos una persona. En el laboratorio, el mantenedor con *Prevent self-review* desactivado; en equipos, plataforma o seguridad con *Prevent self-review* activado (N2+).
 - *Deployment branches and tags*: sin restricción (el job se ejecuta desde ramas de PR).
 - Crearlo **antes** de usar el estándar 0.6.0+: si un workflow lo referencia y no existe, GitHub lo crea sin protección.
+- **Desmarcar «Allow administrators to bypass configured protection rules»** en este environment y en el de despliegue (`github-pages`). GitHub lo marca por defecto, y con él un administrador se salta la puerta (H-23; `platform.admin-bypass`, 0.10.0+).
+
+**Origen de los checks requeridos:** en el ruleset, cada check requerido con origen **GitHub Actions**, no «Any source». Con «Any source», cualquiera con escritura puede publicar un estado con ese nombre (H-24; `platform.check-source`, 0.10.0+). En los JSON va como `"integration_id": 15368`.
 
 ## Lo verificado y lo pendiente
 
+- **Por confirmar en el laboratorio (cierre de la F5):** que `15368` es el `integration_id` de GitHub Actions. Es el valor que citan repositorios públicos, pero no se ha encontrado en la documentación oficial. Se comprueba con `gh api repos/<o>/<r>/rules/branches/main`. También que la API de environments devuelve `can_admins_bypass`, que la referencia de «Get an environment» no documenta.
 - Verificado (docs.github.com, 2026-10-28): los nombres de los parámetros de `pull_request` y `required_status_checks` y los tipos de regla `deletion` y `non_fast_forward` (REST, «Create a repository ruleset»; «Available rules for rulesets»).
 - **No verificado:** que GitHub acepte estos archivos en «Import a ruleset», el valor especial `~DEFAULT_BRANCH` y el tipo `update` para tags. Se comprueba en F5.7.
 - **Verificado en el laboratorio (E-025, 2026-10-28):** el `context` de un check de workflow reutilizable es `<job que llama> / <job llamado>` (`conformance / harness check`, `tasks / harness tasks`), como en `ruleset-n1.json`; `harness platform check` en N1 da 0 errores contra `harness-example-greenfield`.

@@ -1,7 +1,7 @@
 ---
 documento: F5-VALIDACION-F5.7
 titulo: Validación de la F5.7 en el laboratorio
-estado: propuesta (pendiente de aceptación)
+estado: aceptada (D-077); propuestas C-1…C-8 aprobadas (D-078)
 fecha: 2026-11-05
 guia: GUIA-F5.7.md
 depende_de: [D-053, D-072…D-076]

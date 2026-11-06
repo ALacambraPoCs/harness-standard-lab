@@ -70,9 +70,10 @@ Generada por `harness matrix`. No editar a mano.
 | HS-SEC-012 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-allow-broad` | nc-allow-amplio<br>nc-allow-ejecuta-contrato<br>nc-allow-git-sin-ask-especifico |
 | HS-SEC-013 | DEBERÍA | N1,N2,N3 | guidance | automatica | `adapter.claude.settings-sandbox` | nc-sin-sandbox |
 | HS-CI-009 | DEBERÍA | N1,N2,N3 | guidance | automatica | `core.runbooks.rollback` | nc-despliega-sin-runbook<br>nc-runbook-sin-secciones |
+| HS-CI-010 | DEBERÍA | N1,N2,N3 | guidance | automatica | `ci.pipe-status` | nc-tee-sin-pipefail |
 | HS-CI-004 | DEBE | N1,N2,N3 | enforcement | automatica | `core.ci.agent-bare` | nc-agente-ci-sin-bare |
 | HS-CI-005 | DEBE | N1,N2,N3 | enforcement | automatica | `pr.risk-min` | test_tasks.py |
-| HS-CI-006 | DEBE | N1,N2,N3 | enforcement | semiautomatica | `platform.manifest`<br>`platform.reachable`<br>`platform.pull-request`<br>`platform.required-checks`<br>`platform.no-force-push`<br>`platform.no-deletion`<br>`platform.approvals`<br>`platform.gate-environment`<br>`platform.deploy-environment` | test_platform.py |
+| HS-CI-006 | DEBE | N1,N2,N3 | enforcement | semiautomatica | `platform.manifest`<br>`platform.reachable`<br>`platform.pull-request`<br>`platform.required-checks`<br>`platform.no-force-push`<br>`platform.no-deletion`<br>`platform.approvals`<br>`platform.gate-environment`<br>`platform.deploy-environment`<br>`platform.check-source`<br>`platform.admin-bypass` | test_platform.py |
 | HS-CI-007 | DEBE | N1,N2,N3 | enforcement | automatica | `ci.parseable`<br>`ci.no-pr-target`<br>`ci.no-untrusted-interpolation`<br>`ci.permissions`<br>`ci.model-readonly` | nc-interpolacion-no-confiable<br>nc-modelo-con-escritura<br>nc-pull-request-target<br>nc-workflow-no-analizable<br>nc-workflow-sin-permissions |
 | HS-CI-008 | DEBERÍA | N1,N2,N3 | guidance | automatica | `ci.pinned`<br>`ci.merge-group` | nc-action-sin-sha-y-sin-merge-group |
 | HS-CMP-010 | DEBE | — | enforcement | automatica | `catalog.entry` | test_catalog.py |
@@ -184,6 +185,8 @@ Generada por `harness matrix`. No editar a mano.
 | c-n1-sandbox-0.8 | ✅ | conforme |
 | nc-despliega-sin-runbook | ✅ | ok |
 | nc-runbook-sin-secciones | ✅ | ok |
+| nc-tee-sin-pipefail | ✅ | ok |
+| c-tee-con-shell-bash | ✅ | conforme |
 
 ## Incidencias
 

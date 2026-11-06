@@ -25,7 +25,13 @@
       "allowManagedDomainsOnly": true
     },
     "filesystem": {
-      "denyRead": ["~/.ssh", "~/.aws", "~/.config/gh", "~/.config/harness"]
-    }
+      "denyRead": [
+        "~/.ssh",
+        "~/.aws",
+        "~/.config/gh",
+        "~/.config/harness"
+      ]
+    },
+    "failIfUnavailable": true
   }
 }

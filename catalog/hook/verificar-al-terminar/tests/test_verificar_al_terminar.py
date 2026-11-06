@@ -124,3 +124,15 @@ def test_tareas_invalidas_bloquean(tmp_path, sesion):
     fake.chmod(0o755)
     code, err = run(root, sesion, {"PATH": f"{bin_dir}:/usr/bin:/bin"})
     assert code == 2 and "harness tasks validate" in err and "T-0001 inválida" in err
+
+
+def test_resumen_dice_que_falla():
+    """C-7 (H-32): el systemMessage nombra la prueba que falla, no solo «terminó con código 1:»."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("hook", HOOK)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    fallo = ("`check` (python3 -m unittest) terminó con código 1:\n.F..\n======\n"
+             "FAIL: test_total (test_app.TotalTest.test_total)\n----\nAssertionError: 6.0 != 7.0\n\nFAILED (failures=1)")
+    assert mod._resumen(fallo) == "`check` (python3 -m unittest) terminó con código 1 → FAIL: test_total (test_app.TotalTest.test_total)"
+    assert mod._resumen("solo una línea") == "solo una línea"

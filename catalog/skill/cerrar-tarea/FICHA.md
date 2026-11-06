@@ -57,6 +57,8 @@ El agente carga la skill por su descripción cuando la tarea está lista. La ski
 - X-01 (`Closes #n`).
 - Componentes `verificador` (dependencia) y `verificar-al-terminar`.
 - Las reglas `ask` de `git push` (HS-SEC-008) siguen pidiendo confirmación; la skill no añade otra (H-6).
+- Con sandbox, el push se hace **suelto y sin `-C`**: así coincide con `excludedCommands` y sale del sandbox con las credenciales de git (H-28, 0.3.1).
+- El motivo del riesgo en el cuerpo del PR se **copia** de `harness pr risk`. En la F5.7, el agente lo redactó y lo atribuyó mal dos veces (0.3.1).
 - `harness tasks close` está en las reglas `allow` de la base (P-3); `--run-acceptance` sigue en `ask`.
 
 ## 10. Responsabilidades

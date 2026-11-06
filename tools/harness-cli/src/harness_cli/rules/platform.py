@@ -14,6 +14,8 @@ _DOCS = {
     "platform.approvals": "N2+: ≥ 1 aprobación, Code Owners y aprobación del último push por otra persona.",
     "platform.gate-environment": "El environment de la puerta de riesgo alto existe y tiene revisores (0.6.0+).",
     "platform.deploy-environment": "El environment de despliegue declarado existe y está limitado a ramas concretas.",
+    "platform.check-source": "0.10.0+: los checks requeridos tienen origen fijado (GitHub Actions), no «Any source».",
+    "platform.admin-bypass": "0.10.0+: los administradores no pueden saltarse los environments de la puerta y del despliegue.",
 }
 
 

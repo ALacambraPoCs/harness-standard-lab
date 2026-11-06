@@ -24,6 +24,7 @@
       "Edit(/.github/workflows/**)",
       "Edit(/.github/CODEOWNERS)",
       "Bash(git push *)",
+      "Bash(git -C * push*)",
       "Bash(git add -f*)",
       "Bash(git add * -f*)",
       "Bash(git add --force*)",
@@ -52,7 +53,13 @@
       "Bash(git commit *)",
       "Bash(gh pr view *)",
       "Bash(gh pr create *)",
-      "Bash(gh pr ready *)"
+      "Bash(gh pr ready *)",
+      "Bash(git fetch)",
+      "Bash(git fetch origin)",
+      "Bash(git fetch -q origin)",
+      "Bash(git fetch origin main)",
+      "Bash(git switch -c *)",
+      "Bash(gh issue view *)"
     ],
     "disableBypassPermissionsMode": "disable",
     "disableAutoMode": "disable"
@@ -63,6 +70,7 @@
     "allowUnsandboxedCommands": false,
     "excludedCommands": [
       "git push *",
+      "git -C * push *",
       "git fetch *",
       "git pull *",
       "gh *",

@@ -168,6 +168,13 @@ Solo aplican a instancias que declaran `standard.version` ≥ 0.5.0 (regla 7, D-
 |---|---|---|---|---|
 | HS-CI-009 | DEBERÍA | N1,N2,N3 | Si el manifiesto declara `plataforma.entorno_despliegue`, hay un runbook `rollback*.md` en `runbooks.dir` con las secciones `cuando`, `pasos`, `verificacion` y `escalado` | automática (forma); ensayo manual |
 
+## 3j. Requisitos añadidos o ampliados en 0.10.0 (cierre de la F5) — estado: aprobados (D-078)
+
+| ID | Nivel | Niveles | Requisito (resumen) | Verificación |
+|---|---|---|---|---|
+| HS-CI-006 (ampliado) | DEBE | N1,N2,N3 | Además: checks requeridos con origen fijado y environments de puerta y despliegue sin bypass de administradores | semiautomática (plataforma) |
+| HS-CI-010 | DEBERÍA | N1,N2,N3 | Un paso con `\| tee` usa `shell: bash` (`pipefail`) o `PIPESTATUS` | automática |
+
 ## 4. Waivers
 
 1. Un waiver DEBE declararse en `waivers` del manifiesto con los campos `requirement`, `reason`, `approved_by`, `approved_on` y `expires` (HS-GOV-003).

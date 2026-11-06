@@ -33,6 +33,8 @@ RULE_REQ = {
     "platform.approvals": "HS-CI-006",
     "platform.gate-environment": "HS-CI-006",
     "platform.deploy-environment": "HS-CI-006",
+    "platform.check-source": "HS-CI-006",
+    "platform.admin-bypass": "HS-CI-006",
 }
 
 Fetch = Callable[[str], tuple[int, object]]
@@ -129,12 +131,20 @@ def check(ctx: Context, repo: str, branch: str | None, fetch: Fetch) -> list[Fin
     if level in ("N1", "N2", "N3") and "pull_request" not in by_type:
         f("platform.pull-request", f"La rama `{branch}` no exige PR para cambiar.",
           "Añade al ruleset la regla «Require a pull request before merging» (plantilla standard/plataforma/).")
-    contexts = [c.get("context", "") for p in by_type.get("required_status_checks", [])
-                for c in (p.get("required_status_checks") or []) if isinstance(c, dict)]
+    checks = [c for p in by_type.get("required_status_checks", [])
+              for c in (p.get("required_status_checks") or []) if isinstance(c, dict)]
+    contexts = [c.get("context", "") for c in checks]
     faltan = [e for e in expected_checks(ctx) if not any(_check_matches(e, a) for a in contexts)]
     if faltan:
         f("platform.required-checks", f"Checks no requeridos en `{branch}`: {', '.join(faltan)} (requeridos hoy: {', '.join(contexts) or 'ninguno'}).",
           "Añádelos en «Require status checks to pass» del ruleset con el nombre exacto que muestra el PR.")
+    if _since(ctx, "0.10.0"):
+        sin_origen = [c.get("context", "") for c in checks
+                      if any(_check_matches(e, c.get("context", "")) for e in expected_checks(ctx)) and not c.get("integration_id")]
+        if sin_origen:
+            f("platform.check-source", f"Checks requeridos sin origen fijado («Any source»): {', '.join(sin_origen)}. "
+              "Cualquiera con escritura podría publicar ese estado sin ejecutar el job (H-24).",
+              "En el ruleset, elige «GitHub Actions» como origen de cada check requerido (parámetro `integration_id`).")
     if "non_fast_forward" not in by_type:
         f("platform.no-force-push", f"La rama `{branch}` admite force push.", "Activa «Block force pushes» en el ruleset.")
     if "deletion" not in by_type:
@@ -172,6 +182,8 @@ def check(ctx: Context, repo: str, branch: str | None, fetch: Fetch) -> list[Fin
         elif level in ("N2", "N3") and not prevent:
             f("platform.gate-environment", f"El environment `{gate}` permite que quien lanza el job lo apruebe (N2+).",
               "Activa «Prevent self-review».")
+        if st == 200 and isinstance(env, dict):
+            _bypass(f, ctx, gate, env)
 
     deploy = plat.get("entorno_despliegue")
     if deploy:
@@ -182,7 +194,25 @@ def check(ctx: Context, repo: str, branch: str | None, fetch: Fetch) -> list[Fin
         elif not env.get("deployment_branch_policy"):
             f("platform.deploy-environment", f"El environment `{deploy}` admite despliegues desde cualquier rama.",
               "En «Deployment branches and tags», limítalo a la rama por defecto.")
+        if st == 200 and isinstance(env, dict):
+            _bypass(f, ctx, deploy, env)
     return findings
+
+
+def _bypass(f, ctx: Context, name: str, env: dict) -> None:
+    """H-23: «Allow administrators to bypass configured protection rules» anula la puerta para un administrador.
+
+    `can_admins_bypass` aparece en las respuestas de la API, pero la referencia de «Get an environment»
+    consultada (2026-11-06) no lo documenta: si falta, se avisa en lugar de dar el control por bueno."""
+    if not _since(ctx, "0.10.0"):
+        return
+    if "can_admins_bypass" not in env:
+        f("platform.admin-bypass", f"La API no informa si los administradores pueden saltarse `{name}`.",
+          "Comprueba a mano que «Allow administrators to bypass configured protection rules» está desmarcado.",
+          severity="warning")
+    elif env.get("can_admins_bypass"):
+        f("platform.admin-bypass", f"Los administradores pueden saltarse las reglas del environment `{name}` (H-23).",
+          "Desmarca «Allow administrators to bypass configured protection rules» y guarda.")
 
 
 def resolve_token() -> str | None:

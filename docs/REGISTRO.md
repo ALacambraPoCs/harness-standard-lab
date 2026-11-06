@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-11-05 (F5.7 ejecutada: E-026…E-037, H-23…H-32; propuestas C-1…C-8)
+actualizado: 2026-11-06 (cierre de la F5: D-077, D-078)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -126,13 +126,14 @@ actualizado: 2026-11-05 (F5.7 ejecutada: E-026…E-037, H-23…H-32; propuestas 
 | D-074 | **F5.6 aprobada** e implementada (estándar 0.9.0; PR #22, `cli-v0.9.0-rc.1`), con el ajuste H-21 y **HS-CI-009** aprobado. | 2026-10-30 | Usuario |
 | D-075 | **F5.7-A aprobada:** el ejemplo greenfield adopta el estándar 0.9.1 (puerta, plataforma, sandbox, `despliegue-pages`, `revisor-informativo` en simulador, `site/`) en un PR de riesgo alto, tras preparar Pages y los environments. | 2026-10-30 | Usuario |
 | D-076 | **F5.7-B aprobada:** `despliegue-pages` 0.2.0 con **ensayo de rollback** (`workflow_dispatch` con `ensayo_rollback`): despliega, comprueba y fuerza el fallo de la verificación para ejercitar la reversión. | 2026-10-30 | Usuario |
+| D-077 | **Validación de la F5.7 aceptada** (`fase-5/VALIDACION-F5.7.md`, E-026…E-037). | 2026-11-06 | Usuario |
+| D-078 | **Propuestas de cierre de la F5 C-1…C-8 aprobadas** con las recomendaciones (estándar 0.10.0). | 2026-11-06 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **Validación de la F5.7** (`fase-5/VALIDACION-F5.7.md`): pendiente de aceptación.
-- **Propuestas de cierre de la Fase 5 C-1…C-8** (`VALIDACION-F5.7.md` §4): pendientes de aprobación una a una.
+- **Cierre de la F5** (C-1…C-7 implementadas; estándar 0.10.0, CLI 0.10.0rc1, `f5-cierre.patch`): pendiente de fusión y de la medición C-8 (`fase-5/GUIA-CIERRE-F5.md`).
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -176,8 +177,8 @@ actualizado: 2026-11-05 (F5.7 ejecutada: E-026…E-037, H-23…H-32; propuestas 
 
 ## Próximos pasos
 
-1. **Usuario:** aceptar (o corregir) `VALIDACION-F5.7.md` y decidir C-1…C-8.
-2. **Claude:** implementar las propuestas aprobadas (cierre de la Fase 5), medición completa de confirmaciones con escenario `medio` (C-8) e informe de la Fase 5.
+1. **Usuario:** fusionar `f5-cierre`, publicar `cli-v0.10.0-rc.1` y seguir `fase-5/GUIA-CIERRE-F5.md` (adopción 0.10.0 en el ejemplo, comprobaciones de C-1 y medición C-8).
+2. **Claude:** informe de la Fase 5 con la medición y plan de la Fase 6.
 4. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 5. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

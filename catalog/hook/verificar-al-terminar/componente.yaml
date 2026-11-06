@@ -1,6 +1,6 @@
 id: verificar-al-terminar
 tipo: hook
-version: 0.3.1
+version: 0.3.2
 estado: experimental
 titulo: No dar el trabajo por terminado si check o las tareas fallan
 proposito: >-

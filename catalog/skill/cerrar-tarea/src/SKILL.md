@@ -30,11 +30,12 @@ Una tarea solo llega a `done` en el PR que la completa. La CI vuelve a ejecutar 
 1. **Escribe el cuerpo del PR** en un archivo temporal, a partir de `.github/pull_request_template.md`:
    - conserva las anclas `<!-- harness:… -->` **y las etiquetas** («Tarea:», «Riesgo:», «Evidencia:»…); rellena solo los valores;
    - `harness:tarea`: `T-NNNN` y, si la tarea tiene `issue: <n>`, `Closes #<n>`;
+   - `harness:riesgo`: la clase y **las señales que imprime `harness pr risk --base origin/main`, copiadas**; no redactes tú el motivo (en la F5.7 se atribuyó mal);
    - `harness:evidencia`: el informe del verificador **copiado literal**, de `<!-- verificador:inicio -->` a `<!-- verificador:fin -->`. Sin verificador, los comandos ejecutados con su código de salida.
 2. **Valida el cuerpo:** `harness pr check --base origin/main --body-file <archivo>`.
 3. **Sube la rama y abre el PR ya con su cuerpo:**
    - Si la rama no tiene commits respecto a `origin/main` (`git rev-list --count origin/main..HEAD` da 0, porque la tarea ya estaba hecha), crea uno vacío: `git commit --allow-empty -m "T-NNNN: abrir el PR de cierre"`.
-   - `git push -u origin <rama>` (Claude Code te pedirá confirmación: **no pidas otra tú**).
+   - `git push -u origin <rama>`, **desde la raíz del repositorio y sin `-C <ruta>`** ni encadenarlo: así sale del sandbox con las credenciales de git (H-28). Claude Code te pedirá confirmación: **no pidas otra tú**.
    - `gh pr create --draft --title "T-NNNN: <título de la tarea>" --body-file <archivo>`. El número del PR aparece en la URL que devuelve.
    - Sin `gh`, o si falla: pide a la persona que abra el PR en borrador con ese cuerpo y te diga su número. No uses `gh api` para rodearlo.
 4. **Cierra la tarea con la CLI** (no edites el archivo a mano):
@@ -47,7 +48,7 @@ Una tarea solo llega a `done` en el PR que la completa. La CI vuelve a ejecutar 
    - `harness tasks validate --base origin/main --pr-number <número> --run-acceptance`
    - `harness pr check --base origin/main --body-file <archivo>`
    - `harness tasks index --check`
-6. **Sube y deja el PR listo para revisión:** `git push` y `gh pr ready <número>` (o pide a la persona que lo marque como listo). **No fusiones:** la CI decide y una persona fusiona.
+6. **Sube y deja el PR listo para revisión:** `git push` (suelto, sin `-C`) y `gh pr ready <número>` (o pide a la persona que lo marque como listo). **No fusiones:** la CI decide y una persona fusiona.
 
 **No uses `gh pr edit`.** Si el cuerpo tiene que cambiar después de abrir el PR, pide a la persona que lo edite en GitHub y dile la ruta del archivo con el cuerpo.
 
@@ -55,7 +56,7 @@ Una tarea solo llega a `done` en el PR que la completa. La CI vuelve a ejecutar 
 | Error de la CI | Causa | Arreglo |
 |---|---|---|
 | `tasks.done-pr` | `done_pr` no es el número de este PR | Paso 3 antes del 4 |
-| `tasks.transition` | La tarea pasa de `ready` a `done` | Primero `in_progress`, en otro PR |
+| `tasks.transition` | Transición no permitida (p. ej. `proposed` → `done`) | Sigue el ciclo de vida; `ready` → `done` en un solo PR sí está permitido (0.10.0+) |
 | `tasks.acceptance` | Un criterio falla en la CI o un `manual` sin aprobador | Corrige el código o consigue la aprobación; no el criterio |
 | `pr.issue` | La tarea tiene `issue` y falta `Closes #n` | Paso 1 |
 | `pr.anchors` o `pr.task` | El cuerpo del PR no sigue la plantilla | Paso 1; no lo cambies con `gh pr edit` |

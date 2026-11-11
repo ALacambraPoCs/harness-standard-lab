@@ -485,7 +485,7 @@ def test_pr_risk_task_antes_del_cierre(repo, capsys):
     from harness_cli.cli import main
     write(repo, ACTIVE, task_text(status="in_progress").replace("risk: bajo", "risk: alto"))
     commit(repo, "tarea")
-    git(repo, "commit", "--allow-empty", "-qm", "abrir el PR de cierre")
+    git(repo, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "--allow-empty", "-qm", "abrir el PR de cierre")
     assert main(["pr", "risk", "--base", "HEAD~1", "--path", str(repo)]) == 0
     assert "Riesgo calculado: bajo" in capsys.readouterr().out
     assert main(["pr", "risk", "--base", "HEAD~1", "--path", str(repo), "--task", "T-0001"]) == 0

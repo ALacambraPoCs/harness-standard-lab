@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-11-06 (cierre de la F5: D-077, D-078)
+actualizado: 2026-11-11 (F4 aprobada; F4.0 parche 0.10.1)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -79,6 +79,11 @@ actualizado: 2026-11-06 (cierre de la F5: D-077, D-078)
 | H-31 | `despliegue-pages`: el paso `preparar` termina en `\| tee` sin `pipefail`; un error de `despliegue.py` no paraba el paso y el bloqueo ocurrió en el siguiente (falla cerrado por accidente). | 2026-11-05 | Usuario |
 | H-32 | El `systemMessage` del hook `Stop` solo muestra la primera línea de cada fallo (sin la prueba que falla). | 2026-11-05 | Usuario |
 | E-026…E-037 | **Validación de la F5.7** en el laboratorio: puerta, despliegue y auditoría, revisor 7/7, PR adversarial bloqueado, ensayo de rollback (fallo H-30 y corrección), rama no permitida, sandbox, confirmaciones, `systemMessage`, token del agente, escalado del agente. Detalle en `fase-5/VALIDACION-F5.7.md`. | 2026-11-05 | Usuario |
+| E-038…E-043 | **Cierre de la F5 en el laboratorio:** adopción de 0.10.0 con `pipefail` (C-6); C-1 verificado contra GitHub (`can_admins_bypass: false`, `integration_id: 15368`); la puerta espera con `pr check` en rojo (C-5, PR #26); escenario `medio` y `ready → done` (PR #27); cierre con **4 diálogos, 3 deliberados** (sesión E); firma legible (C-7). Detalle en `fase-5/INFORME.md`. | 2026-11-06 | Usuario |
+| H-33 | La skill `cerrar-tarea` no se actualizó con C-4 (`ready → done`): el agente cambió el estado a mano. | 2026-11-06 | Usuario |
+| H-34 | El agente encadenó `; git push` pese a la skill; solo lo evitó cuando el prompt lo repetía. Las instrucciones no bastan: propuesta de hook `PreToolUse`. | 2026-11-06 | Usuario |
+| H-35 | La skill escribe el cuerpo del PR antes del cierre; con la rama vacía el riesgo calculado es `bajo` y la CI falla por `pr.risk-min` (PR #28). | 2026-11-06 | Usuario |
+| H-36 | Editar el cuerpo del PR lanza un run nuevo, pero el anterior queda esperando en el environment de la puerta. | 2026-11-06 | Usuario |
 | H-19 | `harness platform check` ejecutado fuera de una instancia asumía N0 en silencio y daba 0 errores. Corregido con `platform.manifest` (0.8.0). | 2026-10-28 | Usuario |
 | D-031 | **Fase 2 cerrada** con el criterio 1 parcial: 5 fichas aplazadas a la fase dueña de su subsistema (`adapter.claude.settings` → F3, `project.rules` → F4, `ci.workflows` y `runbooks.dir` → F5, `quality.doc` → F6). `fase-2/INFORME.md`. | 2026-10-22 | Usuario |
 | D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |
@@ -128,12 +133,15 @@ actualizado: 2026-11-06 (cierre de la F5: D-077, D-078)
 | D-076 | **F5.7-B aprobada:** `despliegue-pages` 0.2.0 con **ensayo de rollback** (`workflow_dispatch` con `ensayo_rollback`): despliega, comprueba y fuerza el fallo de la verificación para ejercitar la reversión. | 2026-10-30 | Usuario |
 | D-077 | **Validación de la F5.7 aceptada** (`fase-5/VALIDACION-F5.7.md`, E-026…E-037). | 2026-11-06 | Usuario |
 | D-078 | **Propuestas de cierre de la F5 C-1…C-8 aprobadas** con las recomendaciones (estándar 0.10.0). | 2026-11-06 | Usuario |
+| D-079 | **Fase 5 aprobada y cerrada** (`fase-5/INFORME.md`); H-33…H-36 al parche 0.10.1. | 2026-11-06 | Usuario |
+| D-080 | **Siguiente fase: F4** (segmentación y concurrencia). | 2026-11-06 | Usuario |
+| D-081 | **Plan de la F4 aprobado** (`fase-4/PLAN.md`). | 2026-11-11 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **Cierre de la F5** (C-1…C-7 implementadas; estándar 0.10.0, CLI 0.10.0rc1, `f5-cierre.patch`): pendiente de fusión y de la medición C-8 (`fase-5/GUIA-CIERRE-F5.md`).
+- **F4.0** (parche 0.10.1, H-33…H-36): pendiente de fusión. Siguiente: F4.1 (fuentes y decisión 1, ejemplo brownfield).
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -177,8 +185,8 @@ actualizado: 2026-11-06 (cierre de la F5: D-077, D-078)
 
 ## Próximos pasos
 
-1. **Usuario:** fusionar `f5-cierre`, publicar `cli-v0.10.0-rc.1` y seguir `fase-5/GUIA-CIERRE-F5.md` (adopción 0.10.0 en el ejemplo, comprobaciones de C-1 y medición C-8).
-2. **Claude:** informe de la Fase 5 con la medición y plan de la Fase 6.
+1. **Usuario:** fusionar F4.0 y publicar `cli-v0.10.1-rc.1`; pedir lo externo de la ruta crítica (Q-09, R-10, Q-01, credencial de modelo).
+2. **Claude:** F4.1 (verificación de fuentes y propuesta de brownfield).
 4. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 5. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

@@ -10,10 +10,11 @@ Estructura: `catalog/<tipo>/<id>/{componente.yaml, FICHA.md, src/, tests/}`.
 <!-- generado:catalogo:inicio (harness catalog index --write) -->
 | Id | Tipo | Estado | Versión | Control | Título |
 |---|---|---|---|---|---|
+| [push-suelto](hook/push-suelto/FICHA.md) | hook | experimental | 0.1.0 | no | Un git push solo se ejecuta como comando suelto |
 | [verificar-al-terminar](hook/verificar-al-terminar/FICHA.md) | hook | experimental | 0.3.2 | no | No dar el trabajo por terminado si check o las tareas fallan |
-| [cerrar-tarea](skill/cerrar-tarea/FICHA.md) | skill | experimental | 0.3.1 | no | Cerrar una tarea en el PR que la completa (ADR-016) |
+| [cerrar-tarea](skill/cerrar-tarea/FICHA.md) | skill | experimental | 0.3.2 | no | Cerrar una tarea en el PR que la completa (ADR-016) |
 | [verificador](subagente/verificador/FICHA.md) | subagente | experimental | 0.3.0 | no | Verificación independiente de la tarea en curso |
-| [despliegue-pages](workflow/despliegue-pages/FICHA.md) | workflow | experimental | 0.2.2 | sí (L4) | Despliegue en GitHub Pages con verificación, rollback y auditoría |
+| [despliegue-pages](workflow/despliegue-pages/FICHA.md) | workflow | experimental | 0.2.3 | sí (L4) | Despliegue en GitHub Pages con verificación, rollback y auditoría |
 | [revisor-informativo](workflow/revisor-informativo/FICHA.md) | workflow | experimental | 0.1.0 | no | Revisor informativo de PR con agente, en jaula de solo lectura |
 <!-- generado:catalogo:fin -->
 

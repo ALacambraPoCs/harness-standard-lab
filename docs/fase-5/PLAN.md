@@ -1,7 +1,7 @@
 ---
 documento: F5-PLAN
 titulo: Plan de la Fase 5 — Verificación, CI/CD, seguridad y escalado
-estado: aprobado (D-053)
+estado: aprobado (D-053); ejecutado — ver INFORME.md
 fecha: 2026-10-26
 depende_de: [D-040, D-047, ADR-009, ADR-010, ADR-013, ADR-016]
 ---

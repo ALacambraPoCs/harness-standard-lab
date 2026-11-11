@@ -4,6 +4,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). H
 
 ## [Sin publicar] — Fase 5
 
+### F4.0 · parche 0.10.1 (2026-11-11) — estándar 0.10.1, CLI 0.10.1rc1 (D-081)
+- **H-33:** la skill `cerrar-tarea` 0.3.2 admite cerrar desde `ready` (C-4) y prohíbe cambiar el estado a mano.
+- **H-34:** componente nuevo **`hook/push-suelto`** 0.1.0 (`PreToolUse`): rechaza `git push` encadenado, en subshell o con opciones antes del subcomando, y le da al agente la forma correcta.
+- **H-35:** `harness pr risk --task T-NNNN` suma el `risk:` de la tarea que el PR va a cerrar; la skill lo usa al escribir el cuerpo del PR.
+- `despliegue-pages` 0.2.3: `CLI_REF` a `cli-v0.10.1-rc.1` (sin otros cambios).
+- **H-36:** plantilla N1 `harness-tasks.yml` con `concurrency` por PR (cancela el run anterior, también si esperaba en la puerta).
+
 ### Cierre de la Fase 5 (2026-11-06) — estándar 0.10.0, CLI 0.10.0rc1 (D-077, D-078: C-1…C-7)
 - **C-1 (H-23, H-24):** `harness platform check` (0.10.0+) añade `platform.check-source` (los checks requeridos con origen fijado, no «Any source») y `platform.admin-bypass` (los environments de la puerta y del despliegue sin bypass de administradores; aviso si la API no lo informa). Rulesets de referencia con `integration_id`.
 - **C-2 (H-26):** `managed-settings.json` con `sandbox.failIfUnavailable: true`; guía de dependencias del sandbox en el adaptador.

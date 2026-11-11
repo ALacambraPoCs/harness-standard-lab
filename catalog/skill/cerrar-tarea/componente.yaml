@@ -1,6 +1,6 @@
 id: cerrar-tarea
 tipo: skill
-version: 0.3.1
+version: 0.3.2
 estado: experimental
 titulo: Cerrar una tarea en el PR que la completa (ADR-016)
 proposito: >-

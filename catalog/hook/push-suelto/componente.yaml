@@ -1,0 +1,66 @@
+id: push-suelto
+tipo: hook
+version: 0.1.0
+estado: experimental
+titulo: Un git push solo se ejecuta como comando suelto
+proposito: >-
+  Hook PreToolUse de Claude Code que rechaza un `git push` encadenado con otros comandos, metido en una
+  subshell o con opciones antes del subcomando (`git -C`). Con el sandbox, esas formas no encajan con
+  `excludedCommands` y se ejecutan dentro del sandbox, sin credenciales (H-28). La skill ya lo pedía y el
+  agente no lo cumplió (H-34): el hook lo impone y le dice la forma correcta.
+propietario: "@AlbertoLacambra"
+compatibilidad:
+  adaptadores: [claude-code]
+  agente_min: {claude-code: 2.1.277}
+  niveles: [N1, N2, N3]
+contrato:
+  entradas:
+    - "Evento PreToolUse de Claude Code (JSON por stdin: tool_name, tool_input.command)"
+  salidas:
+    - "Exit 0: la llamada sigue el flujo normal de permisos (el hook no aprueba nada)"
+    - "Exit 2 con el motivo en stderr: la llamada se bloquea y el agente recibe la forma correcta"
+  efectos:
+    - "Ninguno: no escribe ni ejecuta nada"
+permisos:
+  herramientas: []
+  escritura: []
+  red: ninguna
+  secretos: false
+control:
+  es_control: false   # reduce fricción y errores; la frontera sigue siendo el sandbox y el token (V5, V11)
+  capa: L3
+  determinista: true
+  hook_tipo: command
+archivos:
+  - origen: src/push_suelto.py
+    destino: .claude/hooks/push_suelto.py
+dependencias: []
+configuracion:
+  claude_settings:
+    hooks:
+      PreToolUse:
+        - matcher: Bash
+          hooks:
+            - type: command
+              command: python3 "${CLAUDE_PROJECT_DIR}/.claude/hooks/push_suelto.py"
+              timeout: 10
+pruebas:
+  - tipo: unitaria
+    descripcion: "Push suelto permitido; compuesto (;, &&, |, salto de línea, $()), con -C/-c o con prefijo rechazado; otras herramientas y entrada no válida no bloquean. Incluye los dos casos reales de la F5 (sesiones C y D)"
+    comando: "python -m pytest catalog/hook/push-suelto/tests"
+  - tipo: integracion
+    descripcion: "F4.6: en una sesión con sandbox, el agente intenta un push encadenado, recibe el motivo y repite con un push suelto que funciona"
+metricas:
+  - "Bloqueos por sesión y porcentaje de reintentos correctos al primer intento"
+  - "Push fallidos por credenciales en sesiones con sandbox (objetivo: 0)"
+coste:
+  contexto: "Nulo si no hay push; el mensaje (≈ 60 palabras) si bloquea"
+  latencia: "Milisegundos por cada llamada a Bash"
+riesgos:
+  - "Falsos positivos: un comando que menciona `git push` en texto (echo, comentarios) se bloquea; el agente lo reformula"
+  - "No cubre todas las formas de invocar git (rutas absolutas, alias): no es frontera, como las reglas Bash (V5)"
+  - "Que la entrada del evento cambie de formato: falla en abierto (no bloquea) y la prueba de integración lo detectaría"
+retirada:
+  condicion: "Si Claude Code aplica excludedCommands a cada parte de un comando compuesto, o si el agente cumple la instrucción de forma sostenida (0 bloqueos en 4 semanas)"
+  procedimiento: "Pasar a deprecado, quitar el bloque PreToolUse de .claude/settings.json y el script de .claude/hooks/"
+ficha: FICHA.md

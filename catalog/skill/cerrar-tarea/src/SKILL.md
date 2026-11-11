@@ -14,7 +14,7 @@ metadata:
 Una tarea solo llega a `done` en el PR que la completa. La CI vuelve a ejecutar sus criterios de aceptación y bloquea el merge si alguno falla. Esta skill prepara ese PR **sin errores de forma**. Que el trabajo sea correcto lo decide la CI, no esta skill.
 
 ## Antes de empezar (si algo no se cumple, para y avisa a la persona)
-- La tarea está en `docs/plans/active/` con `status: in_progress` o `in_review`.
+- La tarea está en `docs/plans/active/` con `status: ready`, `in_progress` o `in_review`. Desde `ready` se cierra en el mismo PR que la implementa (estándar 0.10.0+); **no cambies el estado a mano**: lo hace el comando de cierre del paso 4.
 - Todos los criterios ejecutables pasan en local. Usa el subagente `verificador` si está instalado; si no, ejecuta cada `acceptance[].check`.
 - Estás en la rama de la tarea, no en `main`.
 - **No cambies los criterios de aceptación para que pasen.** Si un criterio es incorrecto, para y pídeselo a la persona responsable. Ese cambio va en su propio commit y se explica en el PR.
@@ -30,7 +30,7 @@ Una tarea solo llega a `done` en el PR que la completa. La CI vuelve a ejecutar 
 1. **Escribe el cuerpo del PR** en un archivo temporal, a partir de `.github/pull_request_template.md`:
    - conserva las anclas `<!-- harness:… -->` **y las etiquetas** («Tarea:», «Riesgo:», «Evidencia:»…); rellena solo los valores;
    - `harness:tarea`: `T-NNNN` y, si la tarea tiene `issue: <n>`, `Closes #<n>`;
-   - `harness:riesgo`: la clase y **las señales que imprime `harness pr risk --base origin/main`, copiadas**; no redactes tú el motivo (en la F5.7 se atribuyó mal);
+   - `harness:riesgo`: la clase y **las señales que imprime `harness pr risk --base origin/main --task T-NNNN`, copiadas**; no redactes tú el motivo (en la F5.7 se atribuyó mal). `--task` suma el `risk:` de la tarea, que el diff aún no muestra hasta el cierre (H-35);
    - `harness:evidencia`: el informe del verificador **copiado literal**, de `<!-- verificador:inicio -->` a `<!-- verificador:fin -->`. Sin verificador, los comandos ejecutados con su código de salida.
 2. **Valida el cuerpo:** `harness pr check --base origin/main --body-file <archivo>`.
 3. **Sube la rama y abre el PR ya con su cuerpo:**

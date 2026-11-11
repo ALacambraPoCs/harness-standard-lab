@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-11-06 (F5 aprobada; plan de la F4 propuesto)
+actualizado: 2026-11-11 (F4 aprobada; F4.0 parche 0.10.1)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -135,12 +135,13 @@ actualizado: 2026-11-06 (F5 aprobada; plan de la F4 propuesto)
 | D-078 | **Propuestas de cierre de la F5 C-1…C-8 aprobadas** con las recomendaciones (estándar 0.10.0). | 2026-11-06 | Usuario |
 | D-079 | **Fase 5 aprobada y cerrada** (`fase-5/INFORME.md`); H-33…H-36 al parche 0.10.1. | 2026-11-06 | Usuario |
 | D-080 | **Siguiente fase: F4** (segmentación y concurrencia). | 2026-11-06 | Usuario |
+| D-081 | **Plan de la F4 aprobado** (`fase-4/PLAN.md`). | 2026-11-11 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **Plan de la F4** (`fase-4/PLAN.md`): pendiente de aprobación; decisiones posteriores 1–5 (brownfield, ADR-014, archivos de estado, ADR-011, merge queue).
+- **F4.0** (parche 0.10.1, H-33…H-36): pendiente de fusión. Siguiente: F4.1 (fuentes y decisión 1, ejemplo brownfield).
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -184,8 +185,8 @@ actualizado: 2026-11-06 (F5 aprobada; plan de la F4 propuesto)
 
 ## Próximos pasos
 
-1. **Usuario:** aprobar el plan de la F4; pedir lo externo de la ruta crítica (Q-09, R-10, Q-01, credencial de modelo).
-2. **Claude:** F4.0 (parche 0.10.1) y F4.1 (fuentes y propuesta de brownfield).
+1. **Usuario:** fusionar F4.0 y publicar `cli-v0.10.1-rc.1`; pedir lo externo de la ruta crítica (Q-09, R-10, Q-01, credencial de modelo).
+2. **Claude:** F4.1 (verificación de fuentes y propuesta de brownfield).
 4. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 5. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

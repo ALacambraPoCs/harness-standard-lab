@@ -10,6 +10,10 @@ on:
     branches: [main]
 permissions:
   contents: read
+# Un run por PR: editar el cuerpo o subir otro commit cancela el anterior, también si esperaba en la puerta (H-36).
+concurrency:
+  group: harness-tasks-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   tasks:
     uses: {{STANDARD_REPO}}/.github/workflows/harness-tasks-lifecycle.yml@{{CLI_REF}}

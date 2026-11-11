@@ -478,3 +478,17 @@ def test_pr_risk_cli(repo, capsys, monkeypatch, tmp_path):
     assert main(["pr", "risk", "--base", "HEAD~1", "--path", str(repo), "--github-output"]) == 0
     assert "Riesgo calculado: alto" in capsys.readouterr().out
     assert out.read_text() == "clase=alto\n"
+
+
+def test_pr_risk_task_antes_del_cierre(repo, capsys):
+    """H-35: con la rama aún sin el cierre, `--task` suma el `risk:` declarado (mismo texto que la CI después)."""
+    from harness_cli.cli import main
+    write(repo, ACTIVE, task_text(status="in_progress").replace("risk: bajo", "risk: alto"))
+    commit(repo, "tarea")
+    git(repo, "commit", "--allow-empty", "-qm", "abrir el PR de cierre")
+    assert main(["pr", "risk", "--base", "HEAD~1", "--path", str(repo)]) == 0
+    assert "Riesgo calculado: bajo" in capsys.readouterr().out
+    assert main(["pr", "risk", "--base", "HEAD~1", "--path", str(repo), "--task", "T-0001"]) == 0
+    out = capsys.readouterr().out
+    assert "Riesgo calculado: alto" in out and "T-0001 declara risk: alto" in out and "sin señales" not in out
+    assert main(["pr", "risk", "--base", "HEAD~1", "--path", str(repo), "--task", "T-0099"]) == 2

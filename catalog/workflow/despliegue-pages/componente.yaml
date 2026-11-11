@@ -1,6 +1,6 @@
 id: despliegue-pages
 tipo: workflow
-version: 0.2.2
+version: 0.2.3
 estado: experimental
 titulo: Despliegue en GitHub Pages con verificación, rollback y auditoría
 proposito: >-

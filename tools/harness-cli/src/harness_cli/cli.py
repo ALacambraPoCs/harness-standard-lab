@@ -173,6 +173,18 @@ def _cmd_pr(args) -> int:
         import json
         from .risk import compute
         r = compute(ctx, args.base)
+        if args.task:
+            from .tasks import load_worktree
+            tareas = {t.id: t for t in load_worktree(ctx) if t.id}
+            for tid in args.task:
+                t = tareas.get(tid)
+                if t is None:
+                    print(f"harness pr risk: la tarea {tid} no existe.", file=sys.stderr)
+                    return 2
+                motivo = f"{tid} declara risk: {t.meta.get('risk')}"
+                if t.meta.get("risk") in ("bajo", "medio", "alto") and all(m != motivo for _, m in r.senales):
+                    r.subir(t.meta["risk"], motivo)
+            r.senales = [s for s in r.senales if s != ("bajo", "sin señales de riesgo en el diff")] or r.senales
         if args.format == "json":
             print(json.dumps(r.as_dict(), ensure_ascii=False, indent=2))
         else:
@@ -347,6 +359,8 @@ def build_parser() -> argparse.ArgumentParser:
     prr.add_argument("--base", required=True, help="Referencia git base del PR (p. ej. origin/main).")
     prr.add_argument("--format", choices=["text", "json"], default="text")
     prr.add_argument("--github-output", action="store_true", help="Escribe `clase=<clase>` en $GITHUB_OUTPUT.")
+    prr.add_argument("--task", action="append", metavar="T-NNNN",
+                     help="Suma el `risk:` declarado de la tarea que el PR va a cerrar (antes de que el cierre aparezca en el diff; H-35).")
     prr.set_defaults(func=_cmd_pr)
 
     pl = sub.add_parser("platform", help="Autoridad comprobable: ruleset y environments reales en GitHub (F5.3-A).")

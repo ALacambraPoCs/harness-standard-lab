@@ -42,7 +42,7 @@ concurrency:
 env:
   ORIGEN_SITIO: site                                   # directorio del sitio estático en la instancia
   STANDARD_REPOSITORY: ALacambraPoCs/harness-standard-lab
-  CLI_REF: cli-v0.10.0-rc.1
+  CLI_REF: cli-v0.10.1-rc.1
 
 jobs:
   preparar:

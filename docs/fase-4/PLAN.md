@@ -1,7 +1,7 @@
 ---
 documento: F4-PLAN
 titulo: Plan de la Fase 4 — Segmentación de la codebase y concurrencia
-estado: propuesta (pendiente de aprobación)
+estado: aprobado (D-081)
 fecha: 2026-11-06
 depende_de: [D-079, D-080, ADR-011, ADR-014, F2 (fichas), F5 (riesgo, CI)]
 ---
@@ -32,7 +32,7 @@ Criterios del plan de fases (F0-04):
 
 | # | Entregable | Contenido | Depende de |
 |---|---|---|---|
-| **F4.0** | Parche 0.10.1 | H-33 (skill: `ready → done`). H-34 (hook `PreToolUse` que rechaza `git push` compuesto). H-35 (`pr risk` incluye el `risk:` de las tareas que el PR referencia). H-36 (`concurrency` en el workflow de tareas) | — |
+| **F4.0** 🔶 (pendiente de fusión) | Parche 0.10.1 | H-33 (skill: `ready → done`). H-34 (hook `PreToolUse` que rechaza `git push` compuesto). H-35 (`pr risk` incluye el `risk:` de las tareas que el PR referencia). H-36 (`concurrency` en el workflow de tareas) | — |
 | **F4.1** | Fuentes y caso brownfield | Verificación en fuentes oficiales: `git worktree` (S-GIT); Claude Code: `--worktree`, aislamiento de subagentes por worktree y *agent teams*; merge queue en el plan Free (G5); `.gitattributes` y *merge drivers*. Elegir y preparar el **ejemplo brownfield** (decisión 1) | — |
 | **F4.2** | Mapa de segmentos (ADR-014) | Esquema de `segments.yaml`: rutas, propósito, propietario, dependencias permitidas, contrato público, comandos propios, clase de riesgo y política de paralelización. **Método de análisis** (inventario, grafo de dependencias, propiedad, *hotspots* por historial de git) y `harness segments propose`: propone, una persona revisa y versiona | F4.1 |
 | **F4.3** | Derivados y validadores | `segments check`: cobertura de rutas, CODEOWNERS coherente con los propietarios, `AGENTS.md` de segmento existentes y dependencias reales (imports en Python) contra las permitidas. `pr risk` usa el riesgo del segmento. Requisitos `HS-ARC-*` / `HS-CON-*` candidatos | F4.2 |

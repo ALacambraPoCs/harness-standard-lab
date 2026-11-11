@@ -1,4 +1,5 @@
 """La plantilla instanciada supera su propio validador (criterio de aceptación del producto B), en N0 y N1."""
+import re
 import datetime as dt
 import shutil
 from pathlib import Path
@@ -16,7 +17,7 @@ VALUES = {
     "{{OWNER}}": "@org/demo", "{{KIND}}": "service", "{{DOCS_LANGUAGE}}": "es", "{{DATE}}": "2026-10-21",
     "{{SETUP}}": "python3 -c pass", "{{CHECK}}": "python3 -c pass", "{{TEST}}": "python3 -c pass",
     "{{HARNESS_OWNERS}}": "@org/harness-owners", "{{SECURITY_OWNERS}}": "@org/security",
-    "{{PLATFORM_OWNERS}}": "@org/platform", "{{CLI_REF}}": "cli-v0.10.0-rc.1", "{{STANDARD_REPO}}": "org/harness-standard",
+    "{{PLATFORM_OWNERS}}": "@org/platform", "{{CLI_REF}}": "cli-v0.10.1-rc.1", "{{STANDARD_REPO}}": "org/harness-standard",
 }
 
 
@@ -32,7 +33,7 @@ def render(dst: Path, level: str = "N0") -> None:
             text = p.read_text(encoding="utf-8")
             for k, v in {**VALUES, "{{LEVEL}}": level}.items():
                 text = text.replace(k, v)
-            assert "{{" not in text, f"marcador sin sustituir en {p}"
+            assert not re.search(r"\{\{[A-Z_]+\}\}", text), f"marcador sin sustituir en {p}"
             p.write_text(text, encoding="utf-8")
 
 
@@ -97,7 +98,7 @@ REVISADAS = {
     ("tasks", "close"): {"--pr", "--resultado", "--verified-by", "--autor", "--path"},
     ("tasks", "index"): {"--path", "--write", "--check"},
     ("pr", "check"): {"--path", "--base", "--body-file", "--body-env", "--title-env", "--format"},
-    ("pr", "risk"): {"--path", "--base", "--format", "--github-output"},
+    ("pr", "risk"): {"--path", "--base", "--format", "--github-output", "--task"},   # --task: solo lee la tarea (H-35)
     ("components", "list"): None,  # se compara abajo con lo que exista
 }
 EFECTOS = {

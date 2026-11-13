@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-11-11 (F4 aprobada; F4.0 parche 0.10.1)
+actualizado: 2026-11-13 (F4.1: fuentes y ejemplo brownfield)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -84,6 +84,10 @@ actualizado: 2026-11-11 (F4 aprobada; F4.0 parche 0.10.1)
 | H-34 | El agente encadenó `; git push` pese a la skill; solo lo evitó cuando el prompt lo repetía. Las instrucciones no bastan: propuesta de hook `PreToolUse`. | 2026-11-06 | Usuario |
 | H-35 | La skill escribe el cuerpo del PR antes del cierre; con la rama vacía el riesgo calculado es `bajo` y la CI falla por `pr.risk-min` (PR #28). | 2026-11-06 | Usuario |
 | H-36 | Editar el cuerpo del PR lanza un run nuevo, pero el anterior queda esperando en el environment de la puerta. | 2026-11-06 | Usuario |
+| H-37 | La prueba `test_pr_risk_task_antes_del_cierre` fallaba en la CI por falta de identidad de git (en local la daba `~/.gitconfig`). Corregido con `-c user.email/user.name` (F4.0). Lección: ejecutar las pruebas con `HOME` vacío antes de entregar. | 2026-11-11 | Usuario |
+| H-38 | Tras `EnterWorktree`, `CLAUDE_PROJECT_DIR` sigue en el checkout principal (F4.1, W9): el hook `verificar-al-terminar` verificaría el checkout equivocado. Corrección en la F4.4: usar el `cwd` del evento. | 2026-11-11 | Claude |
+| H-39 | El tag `cli-v0.10.1-rc.1` se creó antes de fusionar el PR #26 y hubo que borrarlo y recrearlo en `a2c36b2`. Fue posible porque el ruleset de tags no está aplicado en el laboratorio (V12). | 2026-11-11 | Usuario |
+| E-044 | **Ejemplo brownfield verificado:** FastAPI 0.115, SQLModel, SQLAlchemy 2, Alembic, ARQ, Next.js 15.5, React 19 y TypeScript 5.7; `ee/LICENSE` prohíbe redistribuir; tras `filter-repo`, la historia no tiene `ee/` (2.975 commits); Actions desactivado antes del push; `isFork: false`; tag `base-f4`. | 2026-11-12 | Usuario |
 | H-19 | `harness platform check` ejecutado fuera de una instancia asumía N0 en silencio y daba 0 errores. Corregido con `platform.manifest` (0.8.0). | 2026-10-28 | Usuario |
 | D-031 | **Fase 2 cerrada** con el criterio 1 parcial: 5 fichas aplazadas a la fase dueña de su subsistema (`adapter.claude.settings` → F3, `project.rules` → F4, `ci.workflows` y `runbooks.dir` → F5, `quality.doc` → F6). `fase-2/INFORME.md`. | 2026-10-22 | Usuario |
 | D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |
@@ -136,12 +140,13 @@ actualizado: 2026-11-11 (F4 aprobada; F4.0 parche 0.10.1)
 | D-079 | **Fase 5 aprobada y cerrada** (`fase-5/INFORME.md`); H-33…H-36 al parche 0.10.1. | 2026-11-06 | Usuario |
 | D-080 | **Siguiente fase: F4** (segmentación y concurrencia). | 2026-11-06 | Usuario |
 | D-081 | **Plan de la F4 aprobado** (`fase-4/PLAN.md`). | 2026-11-11 | Usuario |
+| D-082 | **Ejemplo brownfield de la F4: copia de `keephq/keep` sin `ee/`** en `ALacambraPoCs/harness-example-brownfield` (público, no fork, Actions desactivado hasta que el harness lo active). Condición del usuario: **no modificar nunca un repositorio de terceros**. La licencia de `ee/` prohíbe redistribuirlo, así que se eliminó de toda la historia (`fase-4/01-verificacion-fuentes.md`). | 2026-11-13 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F4.0** (parche 0.10.1, H-33…H-36): pendiente de fusión. Siguiente: F4.1 (fuentes y decisión 1, ejemplo brownfield).
+- **F4.2:** decisión 2, el formato de `segments.yaml` (ADR-014 rev. 2). Pendiente de aprobación.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -185,8 +190,9 @@ actualizado: 2026-11-11 (F4 aprobada; F4.0 parche 0.10.1)
 
 ## Próximos pasos
 
-1. **Usuario:** fusionar F4.0 y publicar `cli-v0.10.1-rc.1`; pedir lo externo de la ruta crítica (Q-09, R-10, Q-01, credencial de modelo).
-2. **Claude:** F4.1 (verificación de fuentes y propuesta de brownfield).
+1. **Usuario:** fusionar la F4.1 (este registro y las fuentes); pedir lo externo de la ruta crítica (Q-09, R-10, Q-01, credencial de modelo).
+2. **Claude:** F4.2, `segments.yaml` y `harness segments propose` sobre el brownfield, tras aprobarse la decisión 2.
+3. **Pendiente:** aplicar el ruleset de tags del laboratorio (V12, H-39).
 4. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 5. **Pendientes heredados:**
    - Secret Protection y push protection en repos públicos;

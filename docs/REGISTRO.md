@@ -88,6 +88,7 @@ actualizado: 2026-11-13 (F4.1: fuentes y ejemplo brownfield)
 | H-38 | Tras `EnterWorktree`, `CLAUDE_PROJECT_DIR` sigue en el checkout principal (F4.1, W9): el hook `verificar-al-terminar` verificaría el checkout equivocado. Corrección en la F4.4: usar el `cwd` del evento. | 2026-11-11 | Claude |
 | H-39 | El tag `cli-v0.10.1-rc.1` se creó antes de fusionar el PR #26 y hubo que borrarlo y recrearlo en `a2c36b2`. Fue posible porque el ruleset de tags no está aplicado en el laboratorio (V12). | 2026-11-11 | Usuario |
 | E-044 | **Ejemplo brownfield verificado:** FastAPI 0.115, SQLModel, SQLAlchemy 2, Alembic, ARQ, Next.js 15.5, React 19 y TypeScript 5.7; `ee/LICENSE` prohíbe redistribuir; tras `filter-repo`, la historia no tiene `ee/` (2.975 commits); Actions desactivado antes del push; `isFork: false`; tag `base-f4`. | 2026-11-12 | Usuario |
+| E-045 | **Análisis del brownfield (Claude):** 8 pares de segmentos provisionales con dependencia mutua (21 entre paquetes); 93 migraciones de Alembic en cadena lineal (conflicto semántico sin conflicto textual); `tests/` plano. Detalle en `fase-4/02-segmentos.md`. | 2026-11-13 | Claude |
 | H-19 | `harness platform check` ejecutado fuera de una instancia asumía N0 en silencio y daba 0 errores. Corregido con `platform.manifest` (0.8.0). | 2026-10-28 | Usuario |
 | D-031 | **Fase 2 cerrada** con el criterio 1 parcial: 5 fichas aplazadas a la fase dueña de su subsistema (`adapter.claude.settings` → F3, `project.rules` → F4, `ci.workflows` y `runbooks.dir` → F5, `quality.doc` → F6). `fase-2/INFORME.md`. | 2026-10-22 | Usuario |
 | D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |
@@ -146,7 +147,7 @@ actualizado: 2026-11-13 (F4.1: fuentes y ejemplo brownfield)
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F4.2:** decisión 2, el formato de `segments.yaml` (ADR-014 rev. 2). Pendiente de aprobación.
+- **F4.2 · decisión 2:** ADR-014 rev. 2 (puntos 2a–2e y formato de `segments.yaml`, `fase-4/02-segmentos.md`). Pendiente de aprobación.
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas

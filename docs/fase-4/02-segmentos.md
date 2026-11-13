@@ -1,7 +1,7 @@
 ---
 documento: F4-02
 titulo: F4.2 · Mapa de segmentos — análisis del brownfield y propuesta de ADR-014 rev. 2
-estado: propuesta (decisión 2 pendiente de aprobación)
+estado: aprobado (decisión 2: D-083)
 fecha: 2026-11-13
 depende_de: [D-081, D-082]
 ---
@@ -69,29 +69,27 @@ version: 1
 segmentos:
   - id: modelo-datos
     proposito: Modelos SQLModel y migraciones Alembic.
-    rutas: ["keep/api/models/**"]
+    rutas: ["/keep/api/models/"]
     propietario: "@AlbertoLacambra"
     lenguaje: python
-    paquetes: ["keep.api.models"]          # para atribuir imports (2e)
     depende_de: []
-    contrato: ["keep/api/models/*.py"]     # interfaz pública que usan otros segmentos
+    contrato: ["/keep/api/models/*.py"]     # interfaz pública que usan otros segmentos
     comandos: { test: "pytest tests/test_alert_dto.py" }
     riesgo: medio                          # mínimo para un PR que lo toque (pr risk)
     paralelizacion: contrato               # libre | contrato | serializada
     puntos_calientes:
-      - rutas: ["keep/api/models/db/migrations/versions/**"]
+      - rutas: ["/keep/api/models/db/migrations/versions/"]
         paralelizacion: serializada
         motivo: Cadena lineal de Alembic; dos migraciones a la vez dejan dos heads.
   - id: providers
     proposito: Integraciones con sistemas externos (un subdirectorio por proveedor).
-    rutas: ["keep/providers/**"]
+    rutas: ["/keep/providers/"]
     propietario: "@AlbertoLacambra"
     lenguaje: python
-    paquetes: ["keep.providers"]
     depende_de: [motor, modelo-datos]
     paralelizacion: libre                  # proveedores independientes entre sí
 excluidos:                                 # cobertura explícita (criterio 1 del plan)
-  - rutas: ["docs/**", "examples/**", "assets/**"]
+  - rutas: ["/docs/", "/examples/", "/assets/"]
     motivo: Documentación y ejemplos; sin código de la aplicación.
 deuda:
   - de: providers
@@ -138,3 +136,16 @@ Es la entrada de `segments propose`, que hay que ajustar a mano.
 - Con la línea base, `segments check` da **0 errores** sobre `base-f4`.
 - Un import nuevo de `providers` hacia `identidad` no declarado (ni en `depende_de` ni en `deuda`), introducido a propósito, da **1 error**.
 - Dos tareas con una migración cada una sobre `modelo-datos` se **serializan** (F4.4) o se detectan antes de fusionar (F4.6).
+
+## 5. Ajustes al implementar (F4.2)
+
+- **Sin campo `paquetes`.** Los imports se atribuyen resolviendo el módulo al archivo y el archivo a su segmento por `rutas`. Para los diseños `src/`, `python.raices` indica desde dónde se nombran los módulos; por defecto, la raíz y `src/` si existe.
+- **Rutas siempre ancladas** (`/tests/`). Sin la barra inicial, `tests/` cubre también `keep-ui/shared/tests/`: así se detectó el único solape del primer mapa de Keep.
+- **El borrador de `propose` falla el esquema a propósito** (`proposito: TODO`), incluso cuando CODEOWNERS da propietarios. No se puede versionar sin revisarlo (2a).
+- **`segments graph` con el mapa provisional de Keep** (E-046):
+  - 23 aristas: 11 declaradas y 12 no declaradas;
+  - 8 dependencias mutuas;
+  - 0 archivos sin segmento y 0 solapes;
+  - `ui` sin verificar (TypeScript).
+
+  Con `--sugerir-deuda` salen las 12 entradas de deuda para revisarlas a mano.

@@ -283,6 +283,29 @@ def _cmd_components(args) -> int:
     return 0
 
 
+def _cmd_segments(args) -> int:
+    import json
+
+    from . import segments as S
+    root = Path(args.path)
+    try:
+        if args.segments_cmd == "propose":
+            p = S.propose(root, since=args.since, profundidad=args.profundidad, dividir=args.dividir or [])
+            print(json.dumps(p, ensure_ascii=False, indent=2) if args.format == "json"
+                  else S.propose_yaml(p) if args.format == "yaml" else S.propose_markdown(p))
+            return 0
+        std = load_standard(Path(args.standard_root) if args.standard_root else None)
+        g = S.graph(std, root, args.map, today=dt.date.fromisoformat(args.today) if args.today else None)
+    except S.MapaError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
+    if args.sugerir_deuda:
+        print(S.deuda_yaml(g, args.sugerir_deuda), end="")
+    else:
+        print(json.dumps(g, ensure_ascii=False, indent=2) if args.format == "json" else S.graph_markdown(g), end="")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="harness", description="CLI de conformidad del Estándar de Harness.")
     p.add_argument("--version", action="version",
@@ -381,6 +404,25 @@ def build_parser() -> argparse.ArgumentParser:
     au.add_argument("--no-platform", action="store_true", help="No incluye `harness platform check`.")
     au.add_argument("--strict", action="store_true", help="Sale con 1 si hay alertas.")
     au.set_defaults(func=_cmd_audit)
+
+    sg = sub.add_parser("segments", help="Mapa de segmentos (ADR-014 rev. 2): propuesta y dependencias reales. Solo lee.")
+    sgsub = sg.add_subparsers(dest="segments_cmd", required=True)
+    sgp = sgsub.add_parser("propose", help="Analiza el repositorio y propone un borrador de segments.yaml. No escribe nada.")
+    sgp.add_argument("--path", default=".")
+    sgp.add_argument("--since", default="12 months ago", help="Ventana del cambio en git (sintaxis de git log --since).")
+    sgp.add_argument("--profundidad", type=int, default=1, help="Nivel de directorio de los candidatos (por defecto 1).")
+    sgp.add_argument("--dividir", action="append", metavar="DIR",
+                     help="Divide este directorio en sus subdirectorios (repetible; p. ej. --dividir keep --dividir keep/api).")
+    sgp.add_argument("--format", choices=["md", "yaml", "json"], default="md")
+    sgp.set_defaults(func=_cmd_segments)
+    sgg = sgsub.add_parser("graph", help="Dependencias reales (imports de Python) entre los segmentos del mapa.")
+    sgg.add_argument("--path", default=".")
+    sgg.add_argument("--map", default=".harness/segments.yaml", help="Ruta del mapa, relativa a --path.")
+    sgg.add_argument("--format", choices=["md", "json"], default="md")
+    sgg.add_argument("--today", help="Fecha de referencia AAAA-MM-DD (caducidad de la deuda; útil en tests).")
+    sgg.add_argument("--sugerir-deuda", metavar="AAAA-MM-DD",
+                     help="Imprime entradas de `deuda` para las aristas no declaradas, con esa caducidad, para revisar a mano.")
+    sgg.set_defaults(func=_cmd_segments)
 
     cg = sub.add_parser("catalog", help="Catálogo de componentes del repositorio central (F3).")
     cgsub = cg.add_subparsers(dest="catalog_cmd", required=True)

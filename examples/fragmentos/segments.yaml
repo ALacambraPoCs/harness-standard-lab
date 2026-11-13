@@ -1,0 +1,58 @@
+# Ejemplo canónico de .harness/segments.yaml (ADR-014 rev. 2, D-083).
+# Repositorio ficticio: API Python, dominio, base de datos con migraciones y web en TypeScript.
+version: 1
+segmentos:
+  - id: api
+    proposito: Rutas HTTP; validación y traducción, sin reglas de negocio.
+    rutas: [/app/api/]
+    propietario: "@equipo/backend"
+    lenguaje: python
+    depende_de: [dominio]
+    contrato: [/app/api/esquemas.py]
+    comandos: { test: "pytest tests/api" }
+    riesgo: medio
+    paralelizacion: contrato
+  - id: dominio
+    proposito: Reglas de cálculo y liquidación; sin E/S.
+    rutas: [/app/dominio/]
+    propietario: "@equipo/backend"
+    lenguaje: python
+    depende_de: [db]
+    riesgo: medio
+    paralelizacion: contrato
+  - id: db
+    proposito: Modelos persistentes y migraciones.
+    rutas: [/app/db/]
+    propietario: "@equipo/backend"
+    lenguaje: python
+    riesgo: medio
+    paralelizacion: contrato
+    puntos_calientes:
+      - rutas: [/app/db/migrations/versions/]
+        paralelizacion: serializada
+        motivo: Cadena lineal de migraciones; dos a la vez dejan dos heads.
+  - id: web
+    proposito: Interfaz web (Next.js); habla con la API por su contrato HTTP.
+    rutas: [/web/]
+    propietario: "@equipo/frontend"
+    lenguaje: typescript
+    riesgo: bajo
+    paralelizacion: libre
+    puntos_calientes:
+      - rutas: [/web/package-lock.json]
+        paralelizacion: serializada
+        motivo: Archivo de bloqueo; dos cambios de dependencias chocan siempre.
+  - id: plataforma
+    proposito: CI, contenedores y configuración del harness y de los agentes.
+    rutas: [/.github/, /.harness/, /.claude/, /docker/, /AGENTS.md, /CLAUDE.md, /pyproject.toml]
+    propietario: "@equipo/plataforma"
+    riesgo: alto
+    paralelizacion: serializada
+excluidos:
+  - rutas: [/docs/, /README.md, /LICENSE]
+    motivo: Documentación y metadatos; sin código de la aplicación.
+deuda:
+  - de: db
+    a: api
+    motivo: modelos.py importa un esquema de la API; se moverá a dominio.
+    caduca: 2027-06-30

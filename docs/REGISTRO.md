@@ -1,7 +1,7 @@
 ---
 documento: REGISTRO
 titulo: Registro vivo — decisiones, cuestiones abiertas, riesgos y próximos pasos
-actualizado: 2026-11-13 (F4.1: fuentes y ejemplo brownfield)
+actualizado: 2026-11-13 (F4.2: mapa de segmentos)
 ---
 
 # Registro del proyecto «Estándar de Harness»
@@ -89,6 +89,7 @@ actualizado: 2026-11-13 (F4.1: fuentes y ejemplo brownfield)
 | H-39 | El tag `cli-v0.10.1-rc.1` se creó antes de fusionar el PR #26 y hubo que borrarlo y recrearlo en `a2c36b2`. Fue posible porque el ruleset de tags no está aplicado en el laboratorio (V12). | 2026-11-11 | Usuario |
 | E-044 | **Ejemplo brownfield verificado:** FastAPI 0.115, SQLModel, SQLAlchemy 2, Alembic, ARQ, Next.js 15.5, React 19 y TypeScript 5.7; `ee/LICENSE` prohíbe redistribuir; tras `filter-repo`, la historia no tiene `ee/` (2.975 commits); Actions desactivado antes del push; `isFork: false`; tag `base-f4`. | 2026-11-12 | Usuario |
 | E-045 | **Análisis del brownfield (Claude):** 8 pares de segmentos provisionales con dependencia mutua (21 entre paquetes); 93 migraciones de Alembic en cadena lineal (conflicto semántico sin conflicto textual); `tests/` plano. Detalle en `fase-4/02-segmentos.md`. | 2026-11-13 | Claude |
+| E-046 | **`segments graph` sobre Keep** con el mapa provisional de 8 segmentos: 23 aristas (11 declaradas, 12 no declaradas), 8 mutuas, 0 archivos sin segmento, 0 solapes (tras anclar `/tests/`), `ui` sin verificar. `propose` tarda unos 4 s en 2.739 archivos. | 2026-11-13 | Claude |
 | H-19 | `harness platform check` ejecutado fuera de una instancia asumía N0 en silencio y daba 0 errores. Corregido con `platform.manifest` (0.8.0). | 2026-10-28 | Usuario |
 | D-031 | **Fase 2 cerrada** con el criterio 1 parcial: 5 fichas aplazadas a la fase dueña de su subsistema (`adapter.claude.settings` → F3, `project.rules` → F4, `ci.workflows` y `runbooks.dir` → F5, `quality.doc` → F6). `fase-2/INFORME.md`. | 2026-10-22 | Usuario |
 | D-032 | **Siguiente fase: F3** (componentes, catálogo y adaptador de Claude Code): contratos por tipo de componente, `catalog-entry` y ciclo de vida, `settings.json` deny-first, ADR-012 y 2–3 componentes semilla. | 2026-10-22 | Usuario |
@@ -142,12 +143,13 @@ actualizado: 2026-11-13 (F4.1: fuentes y ejemplo brownfield)
 | D-080 | **Siguiente fase: F4** (segmentación y concurrencia). | 2026-11-06 | Usuario |
 | D-081 | **Plan de la F4 aprobado** (`fase-4/PLAN.md`). | 2026-11-11 | Usuario |
 | D-082 | **Ejemplo brownfield de la F4: copia de `keephq/keep` sin `ee/`** en `ALacambraPoCs/harness-example-brownfield` (público, no fork, Actions desactivado hasta que el harness lo active). Condición del usuario: **no modificar nunca un repositorio de terceros**. La licencia de `ee/` prohíbe redistribuirlo, así que se eliminó de toda la historia (`fase-4/01-verificacion-fuentes.md`). | 2026-11-13 | Usuario |
+| D-083 | **ADR-014 rev. 2 aprobado** (decisión 2 de la F4): el mapa lo propone la CLI y lo aprueba una persona; derivados validados, no regenerados; dependencias con línea base y trinquete (`deuda` con caducidad); segmento = unidad de propiedad y paralelización; solo Python verifica imports. DEBE en N2. | 2026-11-13 | Usuario |
 | E-008 | **Hallazgo (defecto de B corregido por el usuario):** con la CLI instalada por `pip`, `harness matrix` buscaba los fixtures en la copia empaquetada y fallaba en la CI central; el usuario lo corrigió (`--fixtures`, commit `1c27d0d`) y se generalizó a `--standard-root .` en F2.1. Lección: probar la CLI **instalada**, no solo desde el árbol de fuentes. | 2026-10-21 | Usuario |
 | D-016 | El repositorio central se publicará en una **organización nueva de GitHub.com** creada en la cuenta del usuario (`AlbertoLacambra`). | 2026-10-20 | Usuario |
 
 ## Decisiones propuestas pendientes de aprobación
 
-- **F4.2 · decisión 2:** ADR-014 rev. 2 (puntos 2a–2e y formato de `segments.yaml`, `fase-4/02-segmentos.md`). Pendiente de aprobación.
+- **F4.2** (esquema, ficha, `segments propose` y `segments graph`): pendiente de fusión. Siguiente: primer `segments.yaml` de Keep (PR en el ejemplo) y F4.3 (`segments check`).
 - ADR-008 (resto de la actualización de instancias) → F7. ADR-010 → F5. ADR-011 → F4. ADR-014 → F4. ADR-015 → F6.
 
 ## Cuestiones abiertas
@@ -192,7 +194,7 @@ actualizado: 2026-11-13 (F4.1: fuentes y ejemplo brownfield)
 ## Próximos pasos
 
 1. **Usuario:** fusionar la F4.1 (este registro y las fuentes); pedir lo externo de la ruta crítica (Q-09, R-10, Q-01, credencial de modelo).
-2. **Claude:** F4.2, `segments.yaml` y `harness segments propose` sobre el brownfield, tras aprobarse la decisión 2.
+2. **Usuario:** revisar el mapa provisional de Keep (`fase-4/02-segmentos.md`) y versionarlo en el ejemplo. **Claude:** F4.3, `segments check`.
 3. **Pendiente:** aplicar el ruleset de tags del laboratorio (V12, H-39).
 4. **X-01:** seguir midiendo (umbral: ≥ 4 semanas o ≥ 20 tareas; hoy 4 tareas, 0 desincronizaciones).
 5. **Pendientes heredados:**

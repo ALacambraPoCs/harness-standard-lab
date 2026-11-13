@@ -182,7 +182,7 @@ roles:
     obligatoriedad: obligatorio
     capa: nucleo
     nivel_minimo: N2
-    ficha: pendiente:F4
+    ficha: standard/04-archivos/segments.map.md
     descripcion: Mapa de segmentos (ADR-014).
 
   # ─────────────── Adaptador de agente: Claude Code ───────────────

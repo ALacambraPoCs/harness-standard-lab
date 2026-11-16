@@ -57,7 +57,7 @@ F4.3 y F4.4 pueden avanzar en paralelo.
 
 | Momento | Decisión | Propuesta provisional |
 |---|---|---|
-| F4.1 | **1. Ejemplo brownfield** | Un repositorio público mediano en Python con módulos claros, copiado a `ALacambraPoCs` (candidato: `httpie/cli`, licencia BSD; **por verificar**). Alternativas: uno sintético, controlado pero poco realista, o esperar a los repos del piloto (Q-09), que bloquea la fase |
+| F4.1 | **1. Ejemplo brownfield** | Un repositorio público mediano en Python con módulos claros, copiado a `ALacambraPoCs` (candidato: `httpie/cli`, licencia BSD; **por verificar**). Alternativas: uno sintético, controlado pero poco realista, o esperar a los repos del piloto (Q-09), que bloquea la fase. **Resuelta (D-082):** copia de `keephq/keep` sin `ee/` (`01-verificacion-fuentes.md`) |
 | F4.2 | **2. ADR-014** (mapa como artefacto pivote) | Aprobar con un alcance: el mapa lo **propone** la CLI y lo **aprueba** una persona. Los derivados se **validan** y no se regeneran a ciegas |
 | F4.4 | **3. Archivos de estado compartidos** (`INDEX.md`) | Dejar de versionar el índice, o regenerarlo con un *merge driver*. La CI lo valida igual |
 | F4.4 | **4. ADR-011** (lease) | Lease en el archivo de tarea (fuente de verdad única, ADR-005) con caducidad. La issue (X-01) solo refleja |

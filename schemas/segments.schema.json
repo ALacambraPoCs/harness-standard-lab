@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harness-standard.local/schemas/segments/0.1.0",
+  "title": "Mapa de segmentos (.harness/segments.yaml)",
+  "description": "ADR-014 rev. 2 (D-083). Lo propone `harness segments propose`, lo ajusta y aprueba una persona en un PR. Las referencias cruzadas (ids, dependencias, deuda) se validan en la CLI, no aquí.",
+  "type": "object",
+  "required": ["version", "segmentos"],
+  "additionalProperties": false,
+  "patternProperties": { "^x-": {} },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,39}$" },
+    "rutas": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 },
+      "description": "Patrones estilo CODEOWNERS/gitignore: con '/' se anclan a la raíz; '**' cruza directorios; una barra final cubre el contenido del directorio." },
+    "paralelizacion": { "enum": ["libre", "contrato", "serializada"] },
+    "owner": { "type": "string", "pattern": "^@[A-Za-z0-9][A-Za-z0-9-]*(/[A-Za-z0-9._-]+)?$" }
+  },
+  "properties": {
+    "version": { "const": 1 },
+    "python": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "raices": { "type": "array", "items": { "type": "string" },
+          "description": "Directorios desde los que se nombran los módulos (por defecto: la raíz y `src/` si existe)." }
+      }
+    },
+    "segmentos": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "proposito", "rutas", "propietario", "riesgo", "paralelizacion"],
+        "additionalProperties": false,
+        "patternProperties": { "^x-": {} },
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "proposito": { "type": "string", "minLength": 10, "maxLength": 300 },
+          "rutas": { "$ref": "#/$defs/rutas" },
+          "excluir": { "$ref": "#/$defs/rutas" },
+          "propietario": { "$ref": "#/$defs/owner" },
+          "lenguaje": { "type": "string", "minLength": 1, "description": "Informativo. Solo `python` activa la verificación de imports (2e)." },
+          "depende_de": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+          "contrato": { "$ref": "#/$defs/rutas" },
+          "comandos": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1 } },
+          "riesgo": { "enum": ["bajo", "medio", "alto"] },
+          "paralelizacion": { "$ref": "#/$defs/paralelizacion" },
+          "puntos_calientes": {
+            "type": "array",
+            "items": {
+              "type": "object", "required": ["rutas", "paralelizacion", "motivo"], "additionalProperties": false,
+              "properties": {
+                "rutas": { "$ref": "#/$defs/rutas" },
+                "paralelizacion": { "$ref": "#/$defs/paralelizacion" },
+                "motivo": { "type": "string", "minLength": 10 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "excluidos": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["rutas", "motivo"], "additionalProperties": false,
+        "properties": { "rutas": { "$ref": "#/$defs/rutas" }, "motivo": { "type": "string", "minLength": 10 } }
+      }
+    },
+    "deuda": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["de", "a", "motivo", "caduca"], "additionalProperties": false,
+        "properties": {
+          "de": { "$ref": "#/$defs/id" },
+          "a": { "$ref": "#/$defs/id" },
+          "motivo": { "type": "string", "minLength": 10 },
+          "caduca": { "type": "string", "format": "date" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,72 @@
+# Mapa PROVISIONAL de Keep (F4.2, E-046). Lo revisa y aprueba el usuario antes de versionarlo en
+# ALacambraPoCs/harness-example-brownfield como .harness/segments.yaml (ADR-014 rev. 2, 2a).
+# Falta: llevar a `deuda` las 12 aristas no declaradas (`harness segments graph --sugerir-deuda AAAA-MM-DD`).
+version: 1
+segmentos:
+  - id: api
+    proposito: API HTTP (FastAPI), lógica de negocio, tareas ARQ y servicios de búsqueda y topología.
+    rutas: [keep/api/, keep/searchengine/, keep/topologies/, keep/event_subscriber/, keep/server_jobs_bg.py, keep/entrypoint.sh, keep/alembic.ini, keep/cli/]
+    excluir: [keep/api/models/]
+    propietario: "@AlbertoLacambra"
+    lenguaje: python
+    depende_de: [modelo-datos, motor, identidad]
+    riesgo: medio
+    paralelizacion: contrato
+  - id: modelo-datos
+    proposito: Modelos SQLModel/Pydantic y migraciones Alembic.
+    rutas: [keep/api/models/]
+    propietario: "@AlbertoLacambra"
+    lenguaje: python
+    riesgo: medio
+    paralelizacion: contrato
+    puntos_calientes:
+      - rutas: [keep/api/models/db/migrations/versions/]
+        paralelizacion: serializada
+        motivo: Cadena lineal de Alembic; dos migraciones a la vez dejan dos heads.
+  - id: motor
+    proposito: Motor de workflows (parser, pasos, condiciones, funciones, reglas).
+    rutas: [keep/workflowmanager/, keep/step/, keep/parser/, keep/conditions/, keep/functions/, keep/iohandler/, keep/contextmanager/, keep/actions/, keep/throttles/, keep/rulesengine/, keep/validation/, keep/exceptions/]
+    propietario: "@AlbertoLacambra"
+    lenguaje: python
+    depende_de: [modelo-datos]
+    riesgo: medio
+    paralelizacion: contrato
+  - id: providers
+    proposito: Integraciones con sistemas externos, un subdirectorio por proveedor.
+    rutas: [keep/providers/]
+    propietario: "@AlbertoLacambra"
+    lenguaje: python
+    depende_de: [motor, modelo-datos]
+    riesgo: bajo
+    paralelizacion: libre
+  - id: identidad
+    proposito: Gestión de identidad y de secretos.
+    rutas: [keep/identitymanager/, keep/secretmanager/]
+    propietario: "@AlbertoLacambra"
+    lenguaje: python
+    riesgo: alto
+    paralelizacion: serializada
+  - id: ui
+    proposito: Interfaz web Next.js y React.
+    rutas: [keep-ui/]
+    propietario: "@AlbertoLacambra"
+    lenguaje: typescript
+    riesgo: bajo
+    paralelizacion: libre
+  - id: pruebas
+    proposito: Pruebas unitarias, de integración y e2e del backend.
+    rutas: [/tests/]
+    propietario: "@AlbertoLacambra"
+    lenguaje: python
+    depende_de: [api, modelo-datos, motor, providers, identidad]
+    riesgo: bajo
+    paralelizacion: libre
+  - id: infra
+    proposito: Contenedores, observabilidad, proxy, autenticación externa y CI.
+    rutas: ["/docker-compose*", /docker/, /keycloak/, /elk/, /grafana/, /prometheus/, /proxy/, /otel-shared/, /oauth2proxy/, /start.sh, /render.yaml, /.github/, /pyproject.toml, /poetry.lock, /.dockerignore, /.pre-commit-config.yaml, /.python-version]
+    propietario: "@AlbertoLacambra"
+    riesgo: alto
+    paralelizacion: serializada
+excluidos:
+  - rutas: [docs/, examples/, assets/, scripts/, templates/, .cursor/, /README.md, /CHANGELOG.md, /CONTRIBUTING.md, /LICENSE, /PROCEDENCIA.md, /.gitignore]
+    motivo: Documentación, ejemplos, utilidades sueltas y metadatos; sin código de la aplicación.
